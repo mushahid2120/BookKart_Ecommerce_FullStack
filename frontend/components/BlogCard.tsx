@@ -1,16 +1,20 @@
 import {
   Card,
-  CardAction,
-  CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import Image from "next/image";
+import { Button } from "./ui/button";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 export default function BlogCard({
-  imageSrc,title,description,icon
+  imageSrc,
+  title,
+  description,
+  icon,
 }: {
   imageSrc: string;
   title: string;
@@ -18,21 +22,27 @@ export default function BlogCard({
   icon: React.ReactNode;
 }) {
   return (
-    <Card className="shadow-lg border-none text-center relative" >
-      <div className="min-h-24 w-full flex items-center justify-center">
-        <Image
+    <Card className="relative mx-auto w-full max-w-sm md:max-h-100 lg:max-h-200 pt-0 overflow-hidden">
+      <div className="absolute inset-0 z-30 aspect-video" />
+      <img
         src={imageSrc}
-        fill
-        alt="myimage"
-        />
-      </div>
-      <CardHeader>
-        <CardTitle className="text-lg flex gap-2">
-            {icon}
-            <div>{title}</div>
+        alt="blog"
+        className="relative z-20 aspect-video w-full object-cover "
+      />
+      <CardHeader className="md:h-40 " >
+        <CardTitle className="lg:text-xl text-base flex lg:gap-4 gap-4 md:gap-2 justify-center items-center">
+          {icon}
+          <div>{title}</div>
         </CardTitle>
-        <CardDescription className="text-base font-normal">{description}</CardDescription>
+        <CardDescription className="lg:text-base text-sm font-normal">
+          {description}
+        </CardDescription>
       </CardHeader>
+      <CardFooter className="flex items-center justify-center ">
+        <Link href="/">
+          <Button variant="link">Read More <ArrowRight/></Button>
+        </Link>
+      </CardFooter>
     </Card>
   );
 }

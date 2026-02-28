@@ -16,10 +16,11 @@ export default function Hero() {
             return 0;
         return prev+1
       });
-    }, 10000);
+        return () => clearInterval(timer);
+    }, 4000);
   }, []);
 
-  console.log(currentImage);
+  // console.log(currentImage);
 
   return (
     <section className="flex relative items-center justify-center flex-col  min-h-120">
@@ -47,7 +48,7 @@ export default function Hero() {
           </div>
         </Button>
       </div>
-      <div className="absolute inset-0 w-full h-auto bg-black/50 transition-opacity">
+      <div className="absolute inset-0 w-full h-auto bg-black/50">
         {heroImages.map((image,index)=>(
           <Image
           src={`/Image/${image}`}
@@ -55,7 +56,7 @@ export default function Hero() {
           alt="Hero Image"
           key={index} 
           priority={index===0}
-          className={`w=full object-cover ${index===currentImage ?"opacity-100":"opacity-0"} `}
+          className={`w=full object-cover ${index===currentImage ?"opacity-100":"opacity-0"} transition-opacity duration-1000 ease-in-out`}
           />
         ))}
         <div className="absolute inset-0 bg-black/60 z-10"></div>

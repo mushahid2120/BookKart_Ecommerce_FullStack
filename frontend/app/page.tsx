@@ -1,4 +1,5 @@
 import BlogCard from "@/components/BlogCard";
+import BookCrousal from "@/components/BookCrousal";
 import Hero from "@/components/Hero";
 import StepCard from "@/components/StepCard";
 import { Button } from "@/components/ui/button";
@@ -69,15 +70,15 @@ export default function Home() {
       title: "Where and how to sell old books online?",
       description:
         "Get started with selling your used books online and earn money from your old books.",
-      icon: <BookOpen className="w-6 h-6 text-primary" />,
+      icon: <BookOpen className="w-12 h-6 text-primary" />,
     },
     {
       imageSrc:
-        "https://media.istockphoto.com/id/910384920/photo/kid-reading-near-locked-door.webp?a=1&b=1&s=612x612&w=0&k=20&c=J3FL4ZVORItw_bkLzlVo4WO-xUy22S7Qqbuq2xusNnc=",
+        "https://img.freepik.com/premium-photo/little-girl-is-laying-floor-reading-book_1041545-4497.jpg?w=1060",
       title: "What to do with old books?",
       description:
         "Learn about different ways to make use of your old books and get value from them.",
-      icon: <Library className="w-6 h-6 text-primary" />,
+      icon: <Library className="w-12 text-primary" />,
     },
     {
       imageSrc:
@@ -85,7 +86,7 @@ export default function Home() {
       title: "What is BookKart?",
       description:
         "Discover how BookKart helps you buy and sell used books online easily.",
-      icon: <Store className="w-6 h-6 text-primary" />,
+      icon: <Store className="w-12 text-primary" />,
     },
   ];
 
@@ -97,7 +98,7 @@ export default function Home() {
           Newly Added Books
         </h1>
 
-        <div>Crousel</div>
+        <BookCrousal />
 
         <div className="flex items-center justify-center my-8">
           <Button
@@ -108,7 +109,7 @@ export default function Home() {
           </Button>
         </div>
 
-        <div className=" font-semibold text-center mt-24 mb-16">
+        <div className=" font-semibold text-center lg:mt-24 md:mt-16 mt-12 lg:mb-16 mb-12">
           <h1 className="text-3xl">
             How to SELL your old books online on BookKart?
           </h1>
@@ -118,7 +119,7 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="grid grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 grid-row-3 lg:gap-8 sm:px-10 md:px-0 gap-4">
           {sellSteps.map(({ step, title, description, icon }, index) => (
             <StepCard
               key={index}
@@ -132,7 +133,7 @@ export default function Home() {
           ))}
         </div>
 
-        <div className=" font-semibold text-center mt-32 mb-20">
+        <div className=" font-semibold text-center lg:mt-24 md:mt-16 mt-12 lg:mb-16 mb-12">
           <h1 className="text-3xl">
             How to BUY second hand books online on BookKart?
           </h1>
@@ -142,7 +143,7 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="grid grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 grid-row-3 lg:gap-8 gap-4">
           {buySteps.map(({ step, title, description, icon }, index) => (
             <StepCard
               key={index}
@@ -156,22 +157,23 @@ export default function Home() {
           ))}
         </div>
       </section>
-      <div className="md:px-12 sm:px-10  px-6 mt-12  bg-[#ddeafe] ">
-        <h1 className="pt-8 pb-12 text-3xl font-semibold text-center">
-          Read from our Blog
-        </h1>
-        <div className="grid grid-cols-3 gap-8">
-          {blogPosts.map(({ imageSrc, icon, title, description }, index) => (
-          <BlogCard
-            key={index}
-            imageSrc={imageSrc}
-            icon={icon}
-            title={title}
-            description={description}
-          />
-        ))}
-        </div>
-      </div>
+
+      <section className="md:px-12 sm:px-10  px-6 pb-20 pt-8 mt-12   bg-[#ddeafe] ">
+          <h1 className=" pb-12 text-3xl font-semibld text-center">
+            Read from our Blog
+          </h1>
+          <div className="grid md:grid-cols-3 grid-row-3 gap-8">
+            {blogPosts.map(({ imageSrc, icon, title, description }, index) => (
+              <BlogCard
+                key={index}
+                imageSrc={imageSrc}
+                icon={icon}
+                title={title}
+                description={description}
+              />
+            ))}
+          </div>
+      </section>
     </main>
   );
 }
