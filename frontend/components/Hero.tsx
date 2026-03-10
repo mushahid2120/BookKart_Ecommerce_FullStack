@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Book, BookOpen, ShoppingBagIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Hero() {
   const heroImages = ["Hero1.jpg", "Hero2.jpg", "Hero3.jpg"];
@@ -34,7 +35,7 @@ export default function Hero() {
             <ShoppingBagIcon />
           </div>
           <div className="flex flex-col">
-            <span className="font-normal">Start Shopping</span>
+            <Link href="/books" className="font-normal">Start Shopping</Link>
             <span className="font-semibold">Buy Used Books</span>
           </div>
         </Button>

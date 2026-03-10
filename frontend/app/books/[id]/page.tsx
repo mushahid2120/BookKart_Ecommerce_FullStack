@@ -1,0 +1,239 @@
+"use client";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
+import {
+  CircleCheck,
+  Heart,
+  MapPin,
+  MessageCircle,
+  Share,
+  ShoppingCart,
+  User,
+} from "lucide-react";
+import Image from "next/image";
+import { useState } from "react";
+
+const book = {
+  _id: "1",
+  images: [
+    "https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=400&q=80",
+    "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?auto=format&fit=crop&w=400&q=80",
+  ],
+  title: "The Alchemist",
+  category: "Reading Books (Novels)",
+  condition: "Excellent",
+  classType: "B.Com",
+  subject: "Fiction",
+  price: 300,
+  author: "Paulo Coelho",
+  edition: "25th Anniversary Edition",
+  description: "A philosophical novel about destiny and dreams.",
+  finalPrice: 250,
+  shippingCharge: 40,
+  paymentMode: "UPI",
+  paymentDetails: { upiId: "book1@upi" },
+  createdAt: new Date("2024-01-01"),
+  seller: { name: "Seller 1", contact: "9000000001" },
+};
+
+const howWork=[
+  {step:"Step 1",
+    title: "Seller posts an Ad",
+    description: "Seller posts an ad on book kart to sell their used books.",
+    image: "/Image/step1.png"
+  },
+  {step:"Step 2",
+    title: "Buyer Pays Online",
+    description: "Buyer makes an online payment to book kart to buy those books.",
+    image: "/Image/step2.png"
+  },
+  {step:"Step 3",
+    title: "Seller ships the books",
+    description: "Seller then ships the books to the buyer",
+    image: "/Image/step3.png"
+  },
+
+]
+
+export default function page() {
+  const [currentImage, setCurrentImage] = useState<number>(0);
+
+  const monthDiff = (givenDate: Date) => {
+    const currentDate = new Date();
+
+    const monthDiff =
+      (currentDate.getFullYear() - givenDate.getFullYear()) * 12 +
+      (currentDate.getMonth() - givenDate.getMonth());
+
+    return monthDiff;
+  };
+
+  return (
+    <main className="md:px-20 sm:px-10  px-6 py-8 bg-[#ddeafe]">
+      <section className="flex md:flex-row flex-col items-start gap-12">
+        <div className="w-full ">
+          <Card className="lg:max-w-[500px] lg:min-h-[400px] flex justify-center rounded-md">
+            <Image
+              src={book.images[currentImage]}
+              width={200}
+              height={200}
+              alt="Book Image"
+              className="relative aspect-video w-full object-cover"
+            />
+          </Card>
+          <div className="flex gap-2 mt-2 overflow-y-auto custom-scrollbar">
+            {book.images.map((image, index) => (
+              <Image
+                src={image}
+                width="60"
+                height="60"
+                alt="book image list"
+                key={index}
+                className="rounded-md aspect-square object-cover hover:scale-102 transition-transform ease-in-out duration-200"
+                onClick={() => {
+                  setCurrentImage(index);
+                }}
+              />
+            ))}
+          </div>
+        </div>
+        <div className="w-full">
+          <div className="flex justify-between items-center w-full ">
+            <h2 className="text-2xl font-semibold">{book.title}</h2>
+            <div className="font-normal text-sm space-x-4">
+              <Button variant={"outline"} className=" rounded-md">
+                <Share /> Share
+              </Button>
+              <Button variant={"outline"} className=" rounded-md">
+                <Heart /> Add
+              </Button>
+            </div>
+          </div>
+          <p className="text-sm mt-2 mb-4">
+            Posted {monthDiff(book.createdAt)} months ago
+          </p>
+          <div className="flex items-end gap-6">
+            <h1 className="text-3xl font-medium">₹{book.finalPrice}</h1>
+            <p className="text-[#16A34A] text-sm font-medium ">
+              Shipping available
+            </p>
+          </div>
+          <Button
+            size="lg"
+            className="bg-[#1d4ed8] text-lg w-full max-w-[180px] min-h-[44px] my-4"
+          >
+            {" "}
+            <ShoppingCart /> Buy Now
+          </Button>
+          <Card className="gap-2">
+            <CardHeader className="font-semibold text-lg">
+              Book Details
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-3">
+                <li className="grid grid-cols-2 text-[14px] pr-8">
+                  <h1 className="font-medium">Subject/Title</h1>
+                  <p className="justify-self-start">{book.subject}</p>
+                </li>
+                <li className="grid grid-cols-2 text-[14px] pr-8">
+                  <h1 className="font-medium">Course</h1>
+                  <p>{book.classType}</p>
+                </li>
+                <li className="grid grid-cols-2 text-[14px] pr-8">
+                  <h1 className="font-medium">Category</h1>
+                  <p>{book.category}</p>
+                </li>
+                <li className="grid grid-cols-2 text-[14px] pr-8">
+                  <h1 className="font-medium">Author</h1>
+                  <p>{book.author}</p>
+                </li>
+                <li className="grid grid-cols-2 text-[14px] pr-8">
+                  <h1 className="font-medium">Edition</h1>
+                  <p>{book.edition}</p>
+                </li>
+                <li className="grid grid-cols-2 text-[14px] pr-8">
+                  <h1 className="font-medium">Condition</h1>
+                  <p>{book.condition}</p>
+                </li>
+              </ul>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+      <section className="flex md:flex-row flex-col gap-12 items-center justify-between my-8">
+        <Card className="gap-2 w-full md:w-1/2 min-h-[400px] md:min-h-[400px] lg:min-h-[320px] ">
+          <CardHeader className="">
+            <h3 className="font-semibold text-lg">Book Details</h3>
+            <p>this is advance for</p>
+          </CardHeader>
+          <hr className="mx-4 my-2" />
+          <CardContent>
+            <h3 className="font-medium mb-2">Our Community</h3>
+            <p>
+              We're not just another shopping website where you buy from
+              professional sellers - we are a vibrant community of students,
+              book lovers across India who deliver happiness to each other!
+            </p>
+          </CardContent>
+          <CardFooter className="flex justify-between items-center w-full font-normal text-[14px]">
+            <p>Ad Id: {book._id}</p>
+            <p>Posted: {monthDiff(book.createdAt)} months ago</p>
+          </CardFooter>
+        </Card>
+
+        <Card className="gap-2 w-full md:w-1/2 min-h-[400px] md:min-h-[400px] lg:min-h-[320px] ">
+          <CardHeader className="font-semibold text-lg">Sold By</CardHeader>
+          <CardContent className="flex items-center w-full">
+            <div className="bg-[#dbeafe] rounded-full p-4 text-blue-500">
+              <User />
+            </div>
+            <div>
+              <div className="flex gap-4 w-full">
+                <h2 className="text-base font-medium">{book.seller.name}</h2>{" "}
+                <span className="flex gap-1 font-medium items-center p-1 text-green-600 text-[10px] bg-[#f5f5f5] ">
+                  <CircleCheck className="size-4" /> Verified
+                </span>
+              </div>
+              <p className="text-[14px] font-normal flex">
+                {" "}
+                <MapPin /> {" "}
+                karachi orangi, UP
+              </p>
+            </div>
+            
+          </CardContent>
+        </Card>
+      </section>
+      <section>
+        <h1 className="text-2xl font-semibold mt-6 mb-3" >How does it work?</h1>
+        <div className="flex md:flex-row flex-col items-center justify-center gap-4">
+              {
+                howWork.map(({step,title,description,image},index)=>(
+                  <Card key={index} className="w-full gap-0 max-w-[400px] max-h-[500px] min-h-[460px] bg-linear-to-tl from-[#fef3c8] to-[#fffbe9]">
+                    
+                    <CardHeader className="mb-1">
+                      <span className="text-sm mb-2 bg-black rounded-md text-white max-w-[70px] text-center">{step}</span>
+                      <span className="text-lg font-medium">{title}</span></CardHeader>
+                    <CardContent className="text-[14px] text-[#737373]">{description}</CardContent>
+                    <div className="flex item-center justify-center my-4">
+                      <Image
+                    src={image}
+                    width={100}
+                    height={100}
+                    alt={step}
+                    className="object-cover w-auto max-w-[160px] aspect-square"
+                    />
+                    </div>
+                  </Card>
+                ))
+              }
+        </div>
+      </section>
+    </main>
+  );  
+}

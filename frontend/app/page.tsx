@@ -14,6 +14,7 @@ import {
   Truck,
   Wallet,
 } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
   const sellSteps = [
@@ -100,14 +101,14 @@ export default function Home() {
 
         <BookCrousal />
 
-        <div className="flex items-center justify-center my-8">
+        <Link href="/books" className="flex items-center justify-center my-8">
           <Button
             className="bg-[#eab308] hover:bg-[#be951c] text-white text-lg font-normal h-12 "
             size="lg"
           >
             Explore All Books
           </Button>
-        </div>
+        </Link>
 
         <div className=" font-semibold text-center lg:mt-24 md:mt-16 mt-12 lg:mb-16 mb-12">
           <h1 className="text-3xl">

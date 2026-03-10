@@ -7,7 +7,7 @@ export default function Footer() {
     {
       heading: "ABOUT US",
       items: [
-        { name: "About Us", path: "about" },
+        { name: "About Us", path: "about-us" },
         { name: "Contact Us", path: "contactus" },
       ],
     },
@@ -21,7 +21,7 @@ export default function Footer() {
     {
       heading: "POLICIES",
       items: [
-        { name: "Terms Of Use", path: "term-use" },
+        { name: "Terms Of Use", path: "term-of-use" },
         { name: "Privacy Policy", path: "privacy-policy" },
       ],
     },
