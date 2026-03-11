@@ -80,6 +80,7 @@ export default function Header() {
   }
 
 
+
   return (
     <header className="md:px-12 sm:px-10  px-6 md:py-4  sm:py-3 py-2 text-[#374151] sticky">
       <nav className="flex justify-center items-center gap-2 md:gap-4 sm:gap-1">

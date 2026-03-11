@@ -13,9 +13,11 @@ export default function MenuItem({
 }: {
   menuItem: EachMenuItemType[];
   user: UserType | null;
-    setIsMenuOpen:(arg0:boolean)=>void
+  setIsMenuOpen: (arg0: boolean) => void
 }) {
-  const dispatch=useDispatch()
+  const dispatch = useDispatch()
+  console.log(user)
+
   console.log(user)
   return (
     <>
@@ -32,6 +34,7 @@ export default function MenuItem({
                 height={50}
                 alt="profile Pic"
                 className="aspect-square rounded-full"
+                unoptimized
               />
             </div>
             <div className="">

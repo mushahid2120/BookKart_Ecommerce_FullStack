@@ -6,17 +6,17 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "images.unsplash.com",
-        pathname: "**",
+        pathname: "/**",
       },
       {
         protocol: "https",
         hostname: "img.freepik.com",
-        pathname: "**",
+        pathname: "/**",
       },
       {
         protocol: "https",
-        hostname: "https://github.com",
-        pathname: "**",
+        hostname: "github.com",
+        pathname:"/**"
       },
 
     ],

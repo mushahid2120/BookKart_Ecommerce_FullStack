@@ -10,7 +10,7 @@ import {
   Library,
   Search,
   Store,
-  Tag,
+  Tag, 
   Truck,
   Wallet,
 } from "lucide-react";
@@ -96,7 +96,7 @@ export default function Home() {
       <Hero />
       <section className="md:px-12 sm:px-10  px-6 bg-[#f9fafb]">
         <h1 className="pt-10 mb-8 text-xl md:text-3xl sm:text-2xl text-center font-semibold">
-          Newly Added Books
+          Newly Added Books 
         </h1>
 
         <BookCrousal />

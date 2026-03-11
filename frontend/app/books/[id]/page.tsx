@@ -83,6 +83,7 @@ export default function page() {
               width={200}
               height={200}
               alt="Book Image"
+              loading="eager"
               className="relative aspect-video w-full object-cover"
             />
           </Card>
