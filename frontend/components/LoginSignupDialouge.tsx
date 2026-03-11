@@ -16,8 +16,10 @@ import { toggleLoginDialog } from "@/store/slice/userSlice";
 
 export default function LoginSignupDialouge({
   isLoginOpen,
+  setIsMenuOpen
 }: {
   isLoginOpen: boolean;
+  setIsMenuOpen: (arg0: boolean) => void;
 }) {
   const [isShowPassword, setIsShowPassword] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);

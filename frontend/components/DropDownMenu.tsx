@@ -13,6 +13,8 @@ export default function DropDownMenu({
   user,
   setIsMenuOpen,
 }: {
+  open: boolean;
+  onOpenChange: (arg0:boolean) => void;
   children: React.ReactNode;
   menuItem: EachMenuItemType[];
   user: User | null;

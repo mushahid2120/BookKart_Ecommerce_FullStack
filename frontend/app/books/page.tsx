@@ -272,7 +272,7 @@ export default function Books() {
                   variant="ghost"
                   className="hover:bg-slate-300  flex outline-4 border border-solid border-black/40"
                 >
-                  {BooksSort[sortBook].title}
+                  {BooksSort[sortBook as number]?.title}
                   <ChevronsUpDown  />
                 </Button>
               </DropdownMenuTrigger>
@@ -286,10 +286,10 @@ export default function Books() {
                       onClick={() => {
                         setSortBook(index);
                         setIsSortDropDownMenu(false);
-                        setBookSortFunc(sort.sorting)
+                        setBookSortFunc(sort?.sorting)
                       }}
                     >
-                      <span>{sort.title} </span>
+                      <span>{sort?.title} </span>
                       {sortBook === index && <Check size={16} />}
                     </Button>
                   ))}

@@ -23,7 +23,7 @@ export default function BookList({ books,monthDiff }: { books: any ,monthDiff:an
   return (
     <div>
       <div className="grid lg:grid-cols-3 grid-cols-2 gap-4 mt-2 ml-2 ">
-        {books.slice((currentPage - 1) * 6, currentPage * 6).map((book) => (
+        {books.slice((currentPage - 1) * 6, currentPage * 6).map((book:any) => (
             <Link href={`/books/${book._id}`} key={book._id}>
             <Card   className="relative hover:shadow-2xl py-0 overflow-hidden pb-4 gap-2 sm:gap-4">
               <img
