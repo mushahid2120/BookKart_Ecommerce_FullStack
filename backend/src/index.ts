@@ -1,8 +1,9 @@
-import express from "express";
+import express, { Request,NextFunction, Response } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import dbConnect from "./Config/db.ts";
-import { PORT } from "./Config/env.ts";
+import dbConnect from "./Config/db.js";
+import { PORT } from "./Config/env.js";
+import AuthRouter from "./Route/authRoute.js";
 
 await dbConnect();
 
@@ -16,6 +17,14 @@ app.use(cookieParser())
 app.get("/",(req,res)=>{
         res.end("Welcome to this project")
 })
+
+app.use("/auth",AuthRouter)
+
+app.use((err:any, req:Request, res:Response, next:NextFunction) => {
+  console.log("Global error handler");
+  console.log(err)
+  return res.status( 500).json({ error: "something-went-wrong" });
+});
 
 
 app.listen(PORT,()=>{

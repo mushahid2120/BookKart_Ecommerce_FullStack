@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
-import { MONGO_URI } from "./env.ts";
+import { MONGO_URI } from "./env.js";
 
-console.log(MONGO_URI)
 export default async function dbConnect() {
   try {
     await mongoose.connect(MONGO_URI);
