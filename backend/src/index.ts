@@ -3,7 +3,8 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import dbConnect from "./Config/db.js";
 import { PORT } from "./Config/env.js";
-import AuthRouter from "./Route/authRoute.js";
+import AuthRouter from "./Route/authRoutes.js";
+import productRouter from "./Route/productRoutes.js";
 
 await dbConnect();
 
@@ -19,6 +20,7 @@ app.get("/",(req,res)=>{
 })
 
 app.use("/auth",AuthRouter)
+app.use("/product",productRouter)
 
 app.use((err:any, req:Request, res:Response, next:NextFunction) => {
   console.log("Global error handler");
