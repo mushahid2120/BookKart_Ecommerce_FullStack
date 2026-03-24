@@ -5,7 +5,7 @@ import { authenticateUser } from "../middleware/authMiddleware.js";
 const cartRouter=Router()
 
 
-cartRouter.get('/cart',authenticateUser,getCart);
+cartRouter.get('/',authenticateUser,getCart);
 cartRouter.post('/add-to-cart',authenticateUser,addToCart)
 cartRouter.delete('/remove-cart/:productId',authenticateUser,removeCart)
 

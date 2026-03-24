@@ -4,7 +4,7 @@ import { authenticateUser } from "../middleware/authMiddleware.js";
 
 const wishListRouter=Router()
 
-wishListRouter.get('/wishlist',authenticateUser,getWishList);
+wishListRouter.get('/',authenticateUser,getWishList);
 wishListRouter.post('/add-to-wishlist/:productId',authenticateUser,addToWishList)
 wishListRouter.delete('/remove-wishlist/:productId',authenticateUser,removeWishList)
 

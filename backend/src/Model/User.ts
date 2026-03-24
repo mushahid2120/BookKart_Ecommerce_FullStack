@@ -21,7 +21,7 @@ const UserSchema=new Schema<IUser>({
     name:{type:String,required:true},
     email:{type:String,default:null,unique:true},
     password:{type:String,default:null},
-    googleId:{type:String,default:null,unique:true},
+    googleId:{type:String,default:null},
     profilePicture:{type:String,default:null},
     phoneNumber:{type:String,required:true},
     isVerified:{type:Boolean,required:true,default:false},

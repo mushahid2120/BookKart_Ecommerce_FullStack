@@ -1,7 +1,7 @@
 import { model, Schema } from "mongoose";
 
 
-interface IAddress extends Document {
+export interface IAddress extends Document {
     user:Schema.Types.ObjectId;
     addressLine1: string;
     addressLine2:string | null;
@@ -22,3 +22,5 @@ const AddressSchema=new Schema<IAddress>({
 })
 
 const Address=model<IAddress>("Address",AddressSchema)
+
+export default Address;

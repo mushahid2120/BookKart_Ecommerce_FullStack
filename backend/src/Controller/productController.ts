@@ -4,6 +4,7 @@ import Product, { IProduct } from "../Model/Product.js";
 import response from "../Utility/response.js";
 import { Types } from "mongoose";
 
+
 export async function createProduct(
   req: Request,
   res: Response,
@@ -139,7 +140,6 @@ export async function getProductById(
     next(error)
   }
 }
-
 
 export async function getProductBySellerId(
   req: Request,

@@ -7,6 +7,9 @@ import AuthRouter from "./Route/authRoutes.js";
 import productRouter from "./Route/productRoutes.js";
 import cartRouter from "./Route/cartRoutes.js";
 import wishListRouter from "./Route/wishListRoutes.js";
+import addressRouter from "./Route/addressRoutes.js";
+import userRouter from "./Route/userRoutes.js";
+import orderRouter from "./Route/orderRoutes.js";
 
 await dbConnect();
 
@@ -25,6 +28,9 @@ app.use("/auth",AuthRouter)
 app.use("/product",productRouter)
 app.use("/cart",cartRouter)
 app.use("/wishlist",wishListRouter)
+app.use("/address",addressRouter)
+app.use("/user",userRouter)
+app.use("/order",orderRouter)
 
 app.use((err:any, req:Request, res:Response, next:NextFunction) => {
   console.log("Global error handler");

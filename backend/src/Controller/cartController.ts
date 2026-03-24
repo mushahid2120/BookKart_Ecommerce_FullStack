@@ -1,14 +1,14 @@
 import { NextFunction, Request, Response } from "express";
 import response from "../Utility/response.js";
 import Cart, { ICart, ICartItem } from "../Model/Cart.js";
-import { Schema } from "mongoose";
+import mongoose, { ObjectId, Schema } from "mongoose";
 import Product from "../Model/Product.js";
 
 export async function getCart(req: Request, res: Response, next: NextFunction) {
   try {
     const userId = req.id;
     const cart = await Cart.find({
-      user: new Schema.Types.ObjectId(userId as string),
+      user: (userId as unknown) as ObjectId,
     }).lean();
     if (!cart) {
       return response(res, 404, "Your cart is Empty");
@@ -40,12 +40,13 @@ export async function addToCart(
 
 
     let cart = await Cart.findOne({
-      user: new Schema.Types.ObjectId(userId as string),
+      user: (userId as unknown) as ObjectId,
     });
 
     if (!cart) {
       cart = new Cart({ user: userId, item: [] });
     }
+    console.log(cart)
 
     const existingItem = cart.item.find(
       (item) => item.product.toString() === productid,
@@ -78,7 +79,7 @@ export async function removeCart(
       return response(res, 400, "Invalid Product Id");
     }
     const cart = await Cart.findOne({
-      user: new Schema.Types.ObjectId(userId as string),
+      user: (userId as unknown) as ObjectId,
     });
     if (!cart) {
       return response(res, 400, "Cart not Found");

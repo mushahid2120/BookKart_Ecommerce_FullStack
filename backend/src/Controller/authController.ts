@@ -80,7 +80,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
-    if (!user || !(await user.comparePassword(password))) {
+    if (!user || !(await user.comparePassword(password.toString()))) {
       return response(res, 400, "Invalid Credentials");
     }
     if (!user.isVerified) {

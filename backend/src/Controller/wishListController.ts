@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import response from "../Utility/response.js";
 import WishList from "../Model/WishList.js";
-import { Schema } from "mongoose";
+import { ObjectId } from "mongoose";
 import Product from "../Model/Product.js";
 
 export async function getWishList(
@@ -12,7 +12,7 @@ export async function getWishList(
   try {
     const userId = req.id;
     const wishlist = await WishList.find({
-      user: new Schema.Types.ObjectId(userId as string),
+      user:  (userId as unknown) as ObjectId,
     }).lean();
     if (!wishlist) {
       return response(res, 404, "Your wishlist not found");
@@ -44,15 +44,15 @@ export async function addToWishList(
     }
 
     let wishlist = await WishList.findOne({
-      user: new Schema.Types.ObjectId(userId as string),
+      user:  (userId as unknown) as ObjectId,
     });
     if (!wishlist) {
       wishlist = new WishList({ user: userId, product: [] });
     }
     if (
-      !wishlist.product.includes(new Schema.Types.ObjectId(productId as string))
+      !wishlist.product.includes((productId as unknown) as ObjectId)
     ) {
-      wishlist.product.push(new Schema.Types.ObjectId(productId as string));
+      wishlist.product.push((productId as unknown) as ObjectId);
     }
     await wishlist.save();
     return response(res, 200, "Product has been added to WishList");
@@ -81,7 +81,7 @@ export async function removeWishList(
     }
 
     let wishlist = await WishList.findOne({
-      user: new Schema.Types.ObjectId(userId as string),
+      user:  (userId as unknown) as ObjectId,
     });
     if (wishlist) {
       const productIndex = wishlist.product.findIndex(
