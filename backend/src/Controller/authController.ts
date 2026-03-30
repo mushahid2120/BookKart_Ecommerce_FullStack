@@ -24,10 +24,19 @@ export async function register(
   } = req.body;
 
   try {
-    const user = await User.findOne({ email });
-    console.log(user);
+    const user = await User.findOne({ email }).lean();
     if (user) {
-      return response(res, 400, "Email already Exist");
+      return res.status(400).json({ isSuccess:false, message:{email:"email already exists"} });
+    }
+
+    if(name.length>50){
+      return res.status(400).json({ isSuccess:false, message:{name:"name should be less than 50 charater"} });
+    }
+    if(email.length>50){
+     return res.status(400).json({ isSuccess:false, message:{email:"email should be less than 50 charater"} });
+    }
+    if(name.length>20){
+     return res.status(400).json({ isSuccess:false, message:{password:"password should be less than 20 charater"} });
     }
     const verificationToken = crypto.randomBytes(20).toString("hex");
     await User.insertOne({
@@ -41,7 +50,9 @@ export async function register(
       verificationToken,
     });
 
-    sendVerificationEmail(email, verificationToken);
+    const emailResponse=await sendVerificationEmail(email, verificationToken);
+    if(!emailResponse.success)
+        response(res,404,"Something went wrong in email not sent ")
 
     return response(res, 200, "User Created");
   } catch (error) {
@@ -84,7 +95,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
       return response(res, 400, "Invalid Credentials");
     }
     if (!user.isVerified) {
-      return response(res, 400, "Verify your email first!! Check your mail");
+      return response(res, 404, "Verify your email first!! Check your mail");
     }
     const accessToken = generateToken(user._id.toString());
     res.cookie("token", accessToken, {
@@ -162,17 +173,28 @@ export async function checkUserAuth(
   next: NextFunction,
 ) {
   try {
-      const userId = req.id;
-  if (!userId) {
-    return response(res, 400, "User not Logged In");
-  }
-  const user = await User.findById(userId).select("name email profilePicture -_id");
-  if(!user){
-    return response(res,400,"User Not Found")
-  }
-  return response(res,200,"Users Data",user)
+    const userId = req.id;
+    const user = await User.findById(userId).select(
+      "name email profilePicture -_id",
+    );
+    if (!user) {
+      return response(res, 400, "User Not Found");
+    }
+    return response(res, 200, "Users Data", user);
   } catch (error) {
-    console.log(error)
-    next(error)
+    console.log(error);
+    next(error);
+  }
+}
+
+export async function logout(req: Request, res: Response, next: NextFunction) {
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+    });
+    response(res, 200, "Logout Successfully");
+  } catch (error) {
+    console.log(error);
+    next(error);
   }
 }

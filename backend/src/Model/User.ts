@@ -7,7 +7,7 @@ export interface  IUser extends Document{
     password:string | null;
     googleId:string | null;
     profilePicture:string | null;
-    phoneNumber:string;
+    phoneNumber:string | null;
     isVerified:boolean;
     verificationToken:string | null;
     resetPasswordToken:string | null;
@@ -23,7 +23,7 @@ const UserSchema=new Schema<IUser>({
     password:{type:String,default:null},
     googleId:{type:String,default:null},
     profilePicture:{type:String,default:null},
-    phoneNumber:{type:String,required:true},
+    phoneNumber:{type:String},
     isVerified:{type:Boolean,required:true,default:false},
     verificationToken:{type:String,default:null},
     resetPasswordToken:{type:String,default:null},

@@ -2,7 +2,7 @@ import express, { Request,NextFunction, Response } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import dbConnect from "./Config/db.js";
-import { PORT } from "./Config/env.js";
+import { FRONTEND_URL, PORT } from "./Config/env.js";
 import AuthRouter from "./Route/authRoutes.js";
 import productRouter from "./Route/productRoutes.js";
 import cartRouter from "./Route/cartRoutes.js";
@@ -16,7 +16,10 @@ await dbConnect();
 const app = express()
 
 
-app.use(cors())
+app.use(cors({
+  origin: FRONTEND_URL,
+  credentials:true
+}))
 app.use(express.json())
 app.use(cookieParser())
  

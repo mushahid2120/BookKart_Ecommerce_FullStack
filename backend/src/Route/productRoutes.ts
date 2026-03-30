@@ -10,8 +10,8 @@ export const upload = multer({ storage });
 
 const productRouter=Router()
 
-productRouter.get("/productId/:productId",getProductById)
-productRouter.get("/product-sellerId/:sellerId",getProductBySellerId)
+productRouter.get("/:productId",getProductById)
+productRouter.get("/product-seller-id/:sellerId",getProductBySellerId)
 productRouter.post("/create-product",upload.array('images', 4),createProduct)
 productRouter.delete("/delete-product/:productId",deleteProduct)
 

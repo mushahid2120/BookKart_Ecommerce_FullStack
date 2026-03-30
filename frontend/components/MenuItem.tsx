@@ -1,24 +1,44 @@
-import { ChevronRight, Lock } from "lucide-react";
+import { ChevronRight, Lock, User } from "lucide-react";
 import Link from "next/link";
 import { Button } from "./ui/button";
-import Image from "next/image";
 import { EachMenuItemType, User as UserType } from "./Header";
 import { useDispatch } from "react-redux";
-import { toggleLoginDialog } from "@/store/slice/userSlice";
+import { logout, toggleLoginDialog } from "@/store/slice/userSlice";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import {  useLogoutMutation } from "@/store/api";
+import toast from "react-hot-toast";
 
 export default function MenuItem({
   menuItem,
   user,
-  setIsMenuOpen
+  setIsMenuOpen,
+  setIsDropDownMenuOpen,
 }: {
   menuItem: EachMenuItemType[];
   user: UserType | null;
-  setIsMenuOpen: (arg0: boolean) => void
-}) {
-  const dispatch = useDispatch()
-  console.log(user)
+  setIsMenuOpen: (arg0: boolean) => void;
 
-  console.log(user)
+  setIsDropDownMenuOpen: (arg0: boolean) => void;
+}) {
+  const dispatch = useDispatch();
+  const [logoutApi] = useLogoutMutation();
+
+  const handleLogout=async () => {
+              try {
+                if (setIsMenuOpen) setIsMenuOpen(false);
+                if (setIsDropDownMenuOpen) setIsDropDownMenuOpen(false);
+                const response = await logoutApi({}).unwrap();
+                if (response.isSuccess) {
+                  toast.success("Logout Successfull");
+                  dispatch(logout())
+                }
+              } catch (error) {
+                console.log(error);
+                toast.error("Something went Wrong");
+              }
+            }
+
+
   return (
     <>
       {user !== null ? (
@@ -28,19 +48,35 @@ export default function MenuItem({
         >
           <div className="flex gap-4  text-[16px] w-full">
             <div className=" overflow-hidden">
-              <Image
-                src={user.profilePic}
-                width={50}
-                height={50}
-                alt="profile Pic"
-                className="aspect-square rounded-full"
-                unoptimized
-              />
+              <Avatar>
+                {user ? (
+                  user?.profilePic ? (
+                    <AvatarImage
+                      src={user.profilePic}
+                      alt="@shadcn"
+                      className="grayscale"
+                    />
+                  ) : (
+                    <AvatarFallback>
+                      {user.name
+                        .split(" ")
+                        .map((name: string) => name[0])
+                        .join("")}
+                    </AvatarFallback>
+                  )
+                ) : (
+                  <AvatarFallback>
+                    <User />
+                  </AvatarFallback>
+                )}
+              </Avatar>
             </div>
-            <div className="">
-              <h3 className="text-lg font-medium">{user.userName}</h3>
-              <p className="text-[14px] font-light">{user.email}</p>
-            </div>
+            {user && (
+              <div className="">
+                <h3 className="text-lg font-medium">{user.name}</h3>
+                <p className="text-[14px] font-light">{user.email}</p>
+              </div>
+            )}
           </div>
         </Button>
       ) : (
@@ -50,8 +86,9 @@ export default function MenuItem({
         >
           <div
             onClick={() => {
-              setIsMenuOpen(false);
-              dispatch(toggleLoginDialog())
+              if(setIsMenuOpen) setIsMenuOpen(false);
+              if (setIsDropDownMenuOpen) setIsDropDownMenuOpen(false);
+              dispatch(toggleLoginDialog());
             }}
             className="flex justify-between items-center  text-[16px] w-full"
           >
@@ -101,6 +138,23 @@ export default function MenuItem({
             </Button>
           );
       })}
+      {user && (
+        <Button
+          variant="ghost"
+          className="w-full hover:bg-slate-100 flex px-2  py-5 text-[#374151] font-normal"
+        >
+          <div
+            onClick={handleLogout}
+            className="flex justify-between items-center  text-[16px] w-full"
+          >
+            <div className="flex items-center gap-3">
+              <Lock />
+              <div>Logout</div>
+            </div>
+            <ChevronRight />
+          </div>
+        </Button>
+      )}
     </>
   );
 }

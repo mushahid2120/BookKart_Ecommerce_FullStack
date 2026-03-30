@@ -22,11 +22,12 @@ const userSlice=createSlice({
     reducers:{
         setUser:(state,action:PayloadAction<any>)=>{
             state.user=action.payload;
+            state.isLoggedIn=true;
         },
         setEmailVerified:(state,action:PayloadAction<any>)=>{
             state.isEmailVerified=action.payload
         },
-        logout:(state,action:PayloadAction<any>)=>{
+        logout:(state)=>{
             state.user=null,
             state.isLoggedIn=false,
             state.isEmailVerified= false

@@ -10,13 +10,14 @@ import {
   Library,
   Search,
   Store,
-  Tag, 
+  Tag,
   Truck,
   Wallet,
 } from "lucide-react";
 import Link from "next/link";
 
 export default function Home() {
+
   const sellSteps = [
     {
       step: "Step 1",
@@ -96,7 +97,7 @@ export default function Home() {
       <Hero />
       <section className="md:px-12 sm:px-10  px-6 bg-[#f9fafb]">
         <h1 className="pt-10 mb-8 text-xl md:text-3xl sm:text-2xl text-center font-semibold">
-          Newly Added Books 
+          Newly Added Books
         </h1>
 
         <BookCrousal />
@@ -160,20 +161,20 @@ export default function Home() {
       </section>
 
       <section className="md:px-12 sm:px-10  px-6 pb-20 pt-8 mt-12   bg-[#ddeafe] ">
-          <h1 className=" pb-12 text-3xl font-semibld text-center">
-            Read from our Blog
-          </h1>
-          <div className="grid md:grid-cols-3 grid-row-3 gap-8">
-            {blogPosts.map(({ imageSrc, icon, title, description }, index) => (
-              <BlogCard
-                key={index}
-                imageSrc={imageSrc}
-                icon={icon}
-                title={title}
-                description={description}
-              />
-            ))}
-          </div>
+        <h1 className=" pb-12 text-3xl font-semibld text-center">
+          Read from our Blog
+        </h1>
+        <div className="grid md:grid-cols-3 grid-row-3 gap-8">
+          {blogPosts.map(({ imageSrc, icon, title, description }, index) => (
+            <BlogCard
+              key={index}
+              imageSrc={imageSrc}
+              icon={icon}
+              title={title}
+              description={description}
+            />
+          ))}
+        </div>
       </section>
     </main>
   );

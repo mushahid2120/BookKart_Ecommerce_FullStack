@@ -8,10 +8,13 @@ import MenuItem from "./MenuItem";
 import { EachMenuItemType, User } from "./Header";
 
 export default function DropDownMenu({
+  open,
+  onOpenChange,
   children,
   menuItem,
   user,
   setIsMenuOpen,
+  setIsDropDownMenuOpen
 }: {
   open: boolean;
   onOpenChange: (arg0:boolean) => void;
@@ -19,9 +22,10 @@ export default function DropDownMenu({
   menuItem: EachMenuItemType[];
   user: User | null;
   setIsMenuOpen: (arg0: boolean) => void;
+  setIsDropDownMenuOpen:(arg0: boolean) => void;
 }) {
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuGroup>
@@ -29,6 +33,7 @@ export default function DropDownMenu({
             menuItem={menuItem}
             user={user}
             setIsMenuOpen={setIsMenuOpen}
+            setIsDropDownMenuOpen={setIsDropDownMenuOpen}
           />
         </DropdownMenuGroup>
       </DropdownMenuContent>

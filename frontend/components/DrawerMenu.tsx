@@ -18,19 +18,21 @@ export default function DrawerMenu({
   menuItem,
   user,
   setIsMenuOpen,
+  setIsDropDownMenuOpen
 }: {
 
   isMenuOpen: boolean;
   menuItem: EachMenuItemType[];
   user: User | null;
   setIsMenuOpen: (arg0: boolean) => void;
+  setIsDropDownMenuOpen: (arg0: boolean) => void;
 }) {
   return (
     <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
       <SheetTrigger>
         <MenuIcon strokeWidth={3} className="size-6 cursor-pointer" />
       </SheetTrigger>
-      <SheetContent side="left">
+      <SheetContent side="left" className="overflow-y-auto">
         <SheetHeader>
           <SheetTitle>
             <Image
@@ -42,11 +44,12 @@ export default function DrawerMenu({
             />
           </SheetTitle>
           <hr />
-          <SheetDescription>
+          <SheetDescription >
             <MenuItem
               menuItem={menuItem}
               user={user}
               setIsMenuOpen={setIsMenuOpen}
+              setIsDropDownMenuOpen={setIsDropDownMenuOpen}
             />
           </SheetDescription>
         </SheetHeader>

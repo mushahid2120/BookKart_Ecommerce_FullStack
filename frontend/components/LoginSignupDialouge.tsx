@@ -8,30 +8,145 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Eye, EyeOff, Loader, Lock, Mail } from "lucide-react";
+import { Eye, EyeOff, Loader, Lock, Mail, CircleUserRound } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import { useDispatch } from "react-redux";
-import { toggleLoginDialog } from "@/store/slice/userSlice";
+import { setUser, toggleLoginDialog } from "@/store/slice/userSlice";
+import { useForm } from "react-hook-form";
+import {
+  useLazyCheckUserQuery,
+  useLoginMutation,
+  useRegisterMutation,
+} from "@/store/api";
+import toast from "react-hot-toast";
+
+interface ILogin {
+  email: string;
+  password: string;
+}
+
+interface ISignUp extends ILogin {
+  name: string;
+}
+
+interface IForgotPassword {
+  email: string;
+}
 
 export default function LoginSignupDialouge({
   isLoginOpen,
-  setIsMenuOpen
 }: {
   isLoginOpen: boolean;
-  setIsMenuOpen: (arg0: boolean) => void;
 }) {
   const [isShowPassword, setIsShowPassword] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const dispatch=useDispatch()
+  const dispatch = useDispatch();
+  const [registerApi] = useRegisterMutation();
+  const [loginApi] = useLoginMutation();
+  const [checkUser] = useLazyCheckUserQuery();
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [signupError, setSignUpError] = useState<ISignUp>({
+    name: "",
+    email: "",
+    password: "",
+  });
+  const [forgotPasswordError, setforgotPasswordError] = useState<string | null>(
+    null,
+  );
 
-  const handleLogin = (e: any) => {
-    e.preventDefault();
-    setIsLoading(true);
+  const { register: loginRegister, handleSubmit: handleLoginSubmit } =
+    useForm<ILogin>();
+  const { register: signupRegister, handleSubmit: handleSignupSubmit } =
+    useForm<ISignUp>();
+  const {
+    register: forgotPasswordRegister,
+    handleSubmit: handleForgotPasswordSubmit,
+  } = useForm<IForgotPassword>();
+
+  //Login Submission
+  const handleLogin = async (data: ILogin) => {
+    try {
+      setIsLoading(true);
+      const { email, password } = data;
+      const response = await loginApi({ email, password }).unwrap();
+      if (response.isSuccess) {
+        toast.success("Login Successfull");
+        dispatch(toggleLoginDialog());
+        const res = await checkUser({}).unwrap();
+        if (res.isSuccess) {
+          dispatch(setUser(res.data));
+        }
+      }
+    } catch (error: any) {
+      console.log(error);
+      setLoginError(error.data.message);
+      if (error.status === 500)
+        toast.error("Something went wrong try again later");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  //SignUp Submission
+  const handleSignup = async (data: ISignUp) => {
+    try {
+      setIsLoading(true);
+      const { email, password, name } = data;
+      if (name === "") {
+        setSignUpError((prevState: ISignUp) => ({
+          ...prevState,
+          name: "Name is Required",
+        }));
+        return;
+      }
+      if (email === "") {
+        setSignUpError((prevState: ISignUp) => ({
+          ...prevState,
+          email: "Email is Required",
+        }));
+        return;
+      }
+      if (password === "") {
+        setSignUpError((prevState: ISignUp) => ({
+          ...prevState,
+          password: "Password is Required",
+        }));
+        return;
+      }
+      const response = await registerApi({ email, password, name }).unwrap();
+      if (response.isSuccess) {
+        toast.success(
+          "User has been created check your email and verify Email",
+        );
+        dispatch(toggleLoginDialog());
+      }
+    } catch (error:any) {
+      console.log(error)
+      if(error.data?.message)
+      setSignUpError((prevState)=>({...prevState,...(error.data.message)}))
+      if(error.status===500) toast.error("Something went wrong try again later");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleForgotPassword = (data: IForgotPassword) => {
+    try {
+      setIsLoading(true);
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <Dialog open={isLoginOpen} onOpenChange={()=>{dispatch(toggleLoginDialog())}}>
+    <Dialog
+      open={isLoginOpen}
+      onOpenChange={() => {
+        dispatch(toggleLoginDialog());
+      }}
+    >
       <DialogContent className="sm:max-w-sm  ">
         <DialogHeader>
           <DialogTitle className="text-xl text-center">
@@ -46,28 +161,32 @@ export default function LoginSignupDialouge({
           </TabsList>
           <TabsContent value="login">
             <form
-              className="space-y-4 mt-5 text-[#686868]"
-              onSubmit={(e) => {
-                handleLogin(e);
-              }}
+              className="space-y-6 mt-5 text-[#686868]"
+              onSubmit={handleLoginSubmit(handleLogin)}
             >
               <div className="relative">
                 <Input
                   id="email"
                   type="email"
-                  name="email"
                   placeholder="Email"
+                  {...loginRegister("email", { required: true })}
                   className="pl-10 text-black"
+                  onChange={() => {
+                    if (loginError) setLoginError(null);
+                  }}
                 />
                 <Mail className="absolute top-1/2 -translate-y-1/2 left-2" />
               </div>
               <div className="relative">
                 <Input
                   id="password"
-                  name="password"
+                  {...loginRegister("password", { required: true })}
                   placeholder="Password"
                   type={isShowPassword ? "text" : "password"}
                   className="pl-10 text-black"
+                  onChange={() => {
+                    if (loginError) setLoginError(null);
+                  }}
                 />
                 <Lock className="absolute top-1/2 -translate-y-1/2 left-2" />
                 {isShowPassword ? (
@@ -86,13 +205,20 @@ export default function LoginSignupDialouge({
                   />
                 )}
               </div>
-              <Button type="submit" className=" w-full">
-                {isLoading ? (
-                  <Loader className="animate-spin cursor-pointer" />
-                ) : (
-                  "Login"
+              <div className="relative">
+                {loginError && (
+                  <p className="absolute -top-4 text-xs text-red-500 pl-2 font-medium w-full">
+                    {loginError}
+                  </p>
                 )}
-              </Button>
+                <Button type="submit" className=" w-full ">
+                  {isLoading ? (
+                    <Loader className="animate-spin cursor-pointer" />
+                  ) : (
+                    "Login"
+                  )}
+                </Button>
+              </div>
             </form>
             <div className="flex justify-between items-center gap-1 my-2 text-sm text-[#686868]">
               <hr className="grow" />
@@ -114,34 +240,56 @@ export default function LoginSignupDialouge({
           </TabsContent>
 
           <TabsContent value="signup">
-            <form className="space-y-4 mt-5 text-[#686868]">
+            <form
+              className="space-y-6 mt-5 text-[#686868]"
+              onSubmit={handleSignupSubmit(handleSignup)}
+            >
               <div className="relative">
+                {signupError.name && (
+                  <p className="absolute -top-4 text-xs text-red-500 text-right pl-2 font-medium w-full">
+                    {signupError.name}
+                  </p>
+                )}
                 <Input
                   id="name"
                   type="name"
-                  name="name"
+                  {...signupRegister("name", { required: true })}
                   placeholder="Name"
-                  className=" text-black"
+                  className=" pl-10 text-black"
+                  onChange={()=>{if(signupError.name) setSignUpError((prevState:ISignUp)=>({...prevState,name:''}))}}
                 />
+                <CircleUserRound className="absolute top-1/2 -translate-y-1/2 left-2" />
               </div>
 
               <div className="relative">
+                {signupError.email && (
+                  <p className="absolute -top-4 text-xs text-red-500 text-right pl-2 font-medium w-full">
+                    {signupError.email}
+                  </p>
+                )}
                 <Input
                   id="email"
                   type="email"
-                  name="email"
+                  {...signupRegister("email", { required: true })}
                   placeholder="Email"
                   className="pl-10 text-black"
+                  onChange={()=>{if(signupError.email) setSignUpError((prevState:ISignUp)=>({...prevState,email:''}))}}
                 />
                 <Mail className="absolute top-1/2 -translate-y-1/2 left-2" />
               </div>
               <div className="relative">
+                {signupError.password && (
+                  <p className="absolute -top-4 text-xs text-red-500 text-right pl-2 font-medium w-full">
+                    {signupError.password}
+                  </p>
+                )}
                 <Input
                   id="password"
-                  name="password"
+                  {...signupRegister("password", { required: true })}
                   placeholder="Password"
                   type={isShowPassword ? "text" : "password"}
                   className="pl-10 text-black"
+                  onChange={()=>{if(signupError.password) setSignUpError((prevState:ISignUp)=>({...prevState,password:''}))}}
                 />
                 <Lock className="absolute top-1/2 -translate-y-1/2 left-2" />
                 {isShowPassword ? (
@@ -182,12 +330,15 @@ export default function LoginSignupDialouge({
           </TabsContent>
 
           <TabsContent value="forgot">
-            <form className="space-y-4 mt-5 text-[#686868]">
+            <form
+              className="space-y-4 mt-5 text-[#686868]"
+              onSubmit={handleForgotPasswordSubmit(handleForgotPassword)}
+            >
               <div className="relative">
                 <Input
                   id="email"
                   type="email"
-                  name="email"
+                  {...forgotPasswordRegister("email", { required: true })}
                   placeholder="Email"
                   className="pl-10 text-black"
                 />
