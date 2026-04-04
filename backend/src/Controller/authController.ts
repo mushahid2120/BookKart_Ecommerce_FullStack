@@ -26,17 +26,34 @@ export async function register(
   try {
     const user = await User.findOne({ email }).lean();
     if (user) {
-      return res.status(400).json({ isSuccess:false, message:{email:"email already exists"} });
+      return res
+        .status(400)
+        .json({ isSuccess: false, message: { email: "email already exists" } });
     }
 
-    if(name.length>50){
-      return res.status(400).json({ isSuccess:false, message:{name:"name should be less than 50 charater"} });
+    if (name.length > 50) {
+      return res
+        .status(400)
+        .json({
+          isSuccess: false,
+          message: { name: "name should be less than 50 charater" },
+        });
     }
-    if(email.length>50){
-     return res.status(400).json({ isSuccess:false, message:{email:"email should be less than 50 charater"} });
+    if (email.length > 50) {
+      return res
+        .status(400)
+        .json({
+          isSuccess: false,
+          message: { email: "email should be less than 50 charater" },
+        });
     }
-    if(name.length>20){
-     return res.status(400).json({ isSuccess:false, message:{password:"password should be less than 20 charater"} });
+    if (name.length > 20) {
+      return res
+        .status(400)
+        .json({
+          isSuccess: false,
+          message: { password: "password should be less than 20 charater" },
+        });
     }
     const verificationToken = crypto.randomBytes(20).toString("hex");
     await User.insertOne({
@@ -50,9 +67,9 @@ export async function register(
       verificationToken,
     });
 
-    const emailResponse=await sendVerificationEmail(email, verificationToken);
-    if(!emailResponse.success)
-        response(res,404,"Something went wrong in email not sent ")
+    const emailResponse = await sendVerificationEmail(email, verificationToken);
+    if (!emailResponse.success)
+      response(res, 404, "Something went wrong in email not sent ");
 
     return response(res, 200, "User Created");
   } catch (error) {
@@ -95,6 +112,15 @@ export async function login(req: Request, res: Response, next: NextFunction) {
       return response(res, 400, "Invalid Credentials");
     }
     if (!user.isVerified) {
+      const verificationToken = crypto.randomBytes(20).toString("hex");
+      user.verificationToken=verificationToken;
+      await user.save()
+      const emailResponse = await sendVerificationEmail(
+        email,
+        verificationToken,
+      );
+      if (!emailResponse.success)
+        return response(res, 404, "Something went wrong in email not sent ");
       return response(res, 404, "Verify your email first!! Check your mail");
     }
     const accessToken = generateToken(user._id.toString());
@@ -102,7 +128,9 @@ export async function login(req: Request, res: Response, next: NextFunction) {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
     });
-    response(res, 200, "Login Successfully");
+    return response(res, 200, "Login Successfully", {
+      isEmailVerified: user.isVerified,
+    });
   } catch (error) {
     console.log(error);
     next(error);

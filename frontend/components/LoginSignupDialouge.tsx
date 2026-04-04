@@ -8,13 +8,22 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Eye, EyeOff, Loader, Lock, Mail, CircleUserRound } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Loader,
+  Lock,
+  Mail,
+  CircleUserRound,
+  CircleCheckBig,
+} from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import { useDispatch } from "react-redux";
-import { setUser, toggleLoginDialog } from "@/store/slice/userSlice";
+import { setEmailVerified, setUser, toggleLoginDialog } from "@/store/slice/userSlice";
 import { useForm } from "react-hook-form";
 import {
+  useForgotPasswordMutation,
   useLazyCheckUserQuery,
   useLoginMutation,
   useRegisterMutation,
@@ -45,6 +54,7 @@ export default function LoginSignupDialouge({
   const [registerApi] = useRegisterMutation();
   const [loginApi] = useLoginMutation();
   const [checkUser] = useLazyCheckUserQuery();
+  const [forgotpassword] = useForgotPasswordMutation();
   const [loginError, setLoginError] = useState<string | null>(null);
   const [signupError, setSignUpError] = useState<ISignUp>({
     name: "",
@@ -54,6 +64,7 @@ export default function LoginSignupDialouge({
   const [forgotPasswordError, setforgotPasswordError] = useState<string | null>(
     null,
   );
+  const [isResetLinkSent, setIsResetLinkSent] = useState<boolean>(false);
 
   const { register: loginRegister, handleSubmit: handleLoginSubmit } =
     useForm<ILogin>();
@@ -73,10 +84,12 @@ export default function LoginSignupDialouge({
       if (response.isSuccess) {
         toast.success("Login Successfull");
         dispatch(toggleLoginDialog());
+        
         const res = await checkUser({}).unwrap();
         if (res.isSuccess) {
           dispatch(setUser(res.data));
         }
+        dispatch(setEmailVerified(response.data.isEmailVerified));
       }
     } catch (error: any) {
       console.log(error);
@@ -121,20 +134,35 @@ export default function LoginSignupDialouge({
         );
         dispatch(toggleLoginDialog());
       }
-    } catch (error:any) {
-      console.log(error)
-      if(error.data?.message)
-      setSignUpError((prevState)=>({...prevState,...(error.data.message)}))
-      if(error.status===500) toast.error("Something went wrong try again later");
+    } catch (error: any) {
+      console.log(error);
+      if (error.data?.message)
+        setSignUpError((prevState) => ({
+          ...prevState,
+          ...error.data.message,
+        }));
+      if (error.status === 500)
+        toast.error("Something went wrong try again later");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleForgotPassword = (data: IForgotPassword) => {
+  const handleForgotPassword = async (data: IForgotPassword) => {
     try {
       setIsLoading(true);
-    } catch (error) {
+      const response = await forgotpassword(data.email).unwrap();
+      console.log(response);
+      if (response.isSuccess) {
+        setIsResetLinkSent(true);
+      }
+    } catch (error: any) {
+      console.log(error);
+      if (error.status === 400) {
+        toast.error("Email not found");
+      }
+      if (error.status === 500)
+        toast.error("Something went wrong try again later");
     } finally {
       setIsLoading(false);
     }
@@ -256,7 +284,13 @@ export default function LoginSignupDialouge({
                   {...signupRegister("name", { required: true })}
                   placeholder="Name"
                   className=" pl-10 text-black"
-                  onChange={()=>{if(signupError.name) setSignUpError((prevState:ISignUp)=>({...prevState,name:''}))}}
+                  onChange={() => {
+                    if (signupError.name)
+                      setSignUpError((prevState: ISignUp) => ({
+                        ...prevState,
+                        name: "",
+                      }));
+                  }}
                 />
                 <CircleUserRound className="absolute top-1/2 -translate-y-1/2 left-2" />
               </div>
@@ -273,7 +307,13 @@ export default function LoginSignupDialouge({
                   {...signupRegister("email", { required: true })}
                   placeholder="Email"
                   className="pl-10 text-black"
-                  onChange={()=>{if(signupError.email) setSignUpError((prevState:ISignUp)=>({...prevState,email:''}))}}
+                  onChange={() => {
+                    if (signupError.email)
+                      setSignUpError((prevState: ISignUp) => ({
+                        ...prevState,
+                        email: "",
+                      }));
+                  }}
                 />
                 <Mail className="absolute top-1/2 -translate-y-1/2 left-2" />
               </div>
@@ -289,7 +329,13 @@ export default function LoginSignupDialouge({
                   placeholder="Password"
                   type={isShowPassword ? "text" : "password"}
                   className="pl-10 text-black"
-                  onChange={()=>{if(signupError.password) setSignUpError((prevState:ISignUp)=>({...prevState,password:''}))}}
+                  onChange={() => {
+                    if (signupError.password)
+                      setSignUpError((prevState: ISignUp) => ({
+                        ...prevState,
+                        password: "",
+                      }));
+                  }}
                 />
                 <Lock className="absolute top-1/2 -translate-y-1/2 left-2" />
                 {isShowPassword ? (
@@ -330,40 +376,62 @@ export default function LoginSignupDialouge({
           </TabsContent>
 
           <TabsContent value="forgot">
-            <form
-              className="space-y-4 mt-5 text-[#686868]"
-              onSubmit={handleForgotPasswordSubmit(handleForgotPassword)}
-            >
-              <div className="relative">
-                <Input
-                  id="email"
-                  type="email"
-                  {...forgotPasswordRegister("email", { required: true })}
-                  placeholder="Email"
-                  className="pl-10 text-black"
-                />
-                <Mail className="absolute top-1/2 -translate-y-1/2 left-2" />
+            {isResetLinkSent ? (
+              <div className="flex justify-center items-center flex-col gap-2">
+                <div>
+                  <CircleCheckBig size={72} className="text-[#d7925a]" />
+                </div>
+                <h1 className="text-xl font-medium">Reset Link Send</h1>
+                <p className="text-center text-[#686868] text-sm">
+                  we've sent reset password link to your email. Please, check
+                  you inbox and follow the instruction to reset your password
+                </p>
+                <Button type="submit" className=" w-full">
+                  {isLoading ? (
+                    <Loader className="animate-spin cursor-pointer" />
+                  ) : (
+                    "Send Another Link"
+                  )}
+                </Button>
               </div>
+            ) : (
+              <>
+                <form
+                  className="space-y-4 mt-5 text-[#686868]"
+                  onSubmit={handleForgotPasswordSubmit(handleForgotPassword)}
+                >
+                  <div className="relative">
+                    <Input
+                      id="email"
+                      type="email"
+                      {...forgotPasswordRegister("email", { required: true })}
+                      placeholder="Email"
+                      className="pl-10 text-black"
+                    />
+                    <Mail className="absolute top-1/2 -translate-y-1/2 left-2" />
+                  </div>
 
-              <Button type="submit" className=" w-full">
-                {isLoading ? (
-                  <Loader className="animate-spin cursor-pointer" />
-                ) : (
-                  "Send Resent Link"
-                )}
-              </Button>
-            </form>
+                  <Button type="submit" className=" w-full">
+                    {isLoading ? (
+                      <Loader className="animate-spin cursor-pointer" />
+                    ) : (
+                      "Send Resent Link"
+                    )}
+                  </Button>
+                </form>
 
-            <p className="text-sm text-[#686868] mt-2 text-center">
-              By clicking "agree", you agree to our{" "}
-              <Link href="term-of-use" className="text-blue-500">
-                Terms of Use
-              </Link>
-              ,{" "}
-              <Link href="privacy-policy" className="text-blue-500">
-                Privac Policy
-              </Link>
-            </p>
+                <p className="text-sm text-[#686868] mt-2 text-center">
+                  By clicking "agree", you agree to our{" "}
+                  <Link href="term-of-use" className="text-blue-500">
+                    Terms of Use
+                  </Link>
+                  ,{" "}
+                  <Link href="privacy-policy" className="text-blue-500">
+                    Privac Policy
+                  </Link>
+                </p>
+              </>
+            )}
           </TabsContent>
         </Tabs>
       </DialogContent>

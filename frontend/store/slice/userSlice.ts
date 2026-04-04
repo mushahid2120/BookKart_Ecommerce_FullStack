@@ -1,5 +1,7 @@
 import { createSlice,PayloadAction } from "@reduxjs/toolkit";
 
+
+
 interface UserState{
     user: any | null;
     isEmailVerified: boolean;
@@ -30,7 +32,7 @@ const userSlice=createSlice({
         logout:(state)=>{
             state.user=null,
             state.isLoggedIn=false,
-            state.isEmailVerified= false
+            state.isEmailVerified=false
         },
         toggleLoginDialog:(state)=>{
             state.isLogingDialogOpen=!state.isLogingDialogOpen
