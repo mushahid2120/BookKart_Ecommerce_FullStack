@@ -38,8 +38,8 @@ interface ClassTypeType {
   "B.Tech": boolean;
   "B.Sc": boolean;
   "B.Com": boolean;
-  BCA: boolean;
-  MBA: boolean;
+  "BCA": boolean;
+  "MBA": boolean;
   "M.Tech": boolean;
   "M.Sc": boolean;
   "Ph.D": boolean;

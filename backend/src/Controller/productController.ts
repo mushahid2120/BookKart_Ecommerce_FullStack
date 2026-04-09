@@ -2,7 +2,7 @@ import { NextFunction, Response, Request } from "express";
 import { uploadToCloudinary, deleteImage } from "../Config/cloudinaryConfig.js";
 import Product, { IProduct } from "../Model/Product.js";
 import response from "../Utility/response.js";
-import { Types } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 
 
 export async function createProduct(
@@ -10,6 +10,8 @@ export async function createProduct(
   res: Response,
   next: NextFunction,
 ) {
+
+  const userId=req.id;
   try {
     const {
       title,
@@ -25,7 +27,6 @@ export async function createProduct(
       shippingCharge,
       paymentMode,
       paymentDetails,
-      seller,
     } = req.body as unknown as IProduct;
 
     const paymentDetailsParse =
@@ -79,7 +80,7 @@ export async function createProduct(
       shippingCharge: Number(shippingCharge),
       paymentMode,
       paymentDetails,
-      seller,
+      seller: (userId as unknown )as Schema.Types.ObjectId
     });
 
     return response(res, 200, "Product created Successfully");

@@ -138,7 +138,7 @@ export default function Header() {
           </Button>
         </div>
 
-        <Link href="/">
+        <Link href="/book-sell">
           <Button
             variant="secondary"
             className="bg-[#ffc400] hover:bg-[#e5b108] cursor-pointer hidden lg:block"
