@@ -12,6 +12,7 @@ export async function createProduct(
 ) {
 
   const userId=req.id;
+  console.log(req.body)
   try {
     const {
       title,
@@ -41,18 +42,22 @@ export async function createProduct(
     }
     if (
       paymentMode === "UPI" &&
-      (!paymentDetailsParse || !paymentDetailsParse?.upiId)
+      (!paymentDetailsParse || !paymentDetailsParse?.UpiId)
     ) {
       return response(res, 404, "UPI is Required for paymentMode UPI");
     }
 
+    
+    console.log({paymentDetails})
+    console.log({paymentDetailsParse})
+    
     if (
       paymentMode === "Bank Account" &&
       (!paymentDetailsParse ||
         !paymentDetailsParse?.bankDetails ||
-        !paymentDetailsParse?.bankDetails.accountNumber ||
-        !paymentDetailsParse.bankDetails.ifscode ||
-        !paymentDetailsParse.bankDetails.bankName)
+        !paymentDetailsParse?.bankDetails.AccountNumber ||
+        !paymentDetailsParse?.bankDetails.IFSC ||
+        !paymentDetailsParse?.bankDetails.BankName)
     ) {
       return response(
         res,
@@ -60,6 +65,7 @@ export async function createProduct(
         "Required Field all the AccountNumber,ifscode,bankName for paymentMode Bank Account",
       );
     }
+
 
     const uploadPromises = files.map((file) => uploadToCloudinary(file.buffer));
     const results = await Promise.all(uploadPromises);
@@ -79,14 +85,14 @@ export async function createProduct(
       finalPrice: Number(finalPrice),
       shippingCharge: Number(shippingCharge),
       paymentMode,
-      paymentDetails,
+      paymentDetails:paymentDetailsParse,
       seller: (userId as unknown )as Schema.Types.ObjectId
     });
 
     return response(res, 200, "Product created Successfully");
   } catch (error) {
     console.log(error);
-    res.status(404).json({ error });
+    return res.status(404).json({ error });
     next(error);
   }
 }

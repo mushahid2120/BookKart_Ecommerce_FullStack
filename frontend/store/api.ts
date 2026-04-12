@@ -127,10 +127,13 @@ export const api = createApi({
       providesTags: [{ type: "Product", id: "getBySellerId" }],
     }),
     createProduct: builder.mutation({
-      query: (sellerId) => ({
+      query: (productData) => {
+        console.log(productData)
+        return ({
         url: Api_Urls.createProduct,
         method: "POST",
-      }),
+        body:productData
+      })},
       invalidatesTags: [{ type: "Product", id: "create" }],
     }),
     deleteProduct: builder.mutation({

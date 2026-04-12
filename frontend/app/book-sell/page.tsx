@@ -18,7 +18,7 @@ import {
   PlusCircle,
 } from "lucide-react";
 import Link from "next/link";
-import React, { ChangeEvent, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
@@ -84,12 +84,12 @@ export interface IBookSale {
 }
 
 export default function page() {
-  const [addProduct]=useCreateProductMutation();
+  const [addProduct] = useCreateProductMutation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewsImages, setPreviewsImages] = useState<string[]>([]);
   const [isFreeShipping, setIsFreeShipping] = useState<boolean>(false);
-  const [paymentMode, setPaymentMode] = useState<string>("");
-  const [bookCondition, setBookCondition] = useState<string>("");
+  // const [paymentMode, setPaymentMode] = useState<"UPI"|"Bank Account">("UPI");
+  // const [bookCondition, setBookCondition] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const {
     control,
@@ -112,10 +112,13 @@ export default function page() {
       description: "",
       finalPrice: "",
       shippingCharge: 0,
-      paymentMode: "",
+      paymentMode: "UPI",
       paymentDetails: { UpiId: "" },
     },
   });
+
+  const watchedImages = watch("images");
+  const paymentMode = watch("paymentMode");
 
   const OptionalDetails = [
     {
@@ -221,25 +224,76 @@ export default function page() {
     },
   });
 
-  const handlePost = async (data: IBookSale) => {
-    setIsLoading(true)
-    try {
-      const response=await addProduct(data).unwrap();
-      if(response.isSuccess){
-        toast.success("Your Book has been posted")
-        setIsLoading(false)
-      }
+  const convertToFormData = (data: IBookSale) => {
+    const formData = new FormData();
 
-    } catch (error:any) {
+        if(isFreeShipping){
+      data.shippingCharge=0;
+    }
+
+    Object.entries(data).forEach(([key, value]) => {
+      if (key !== "images" && key !== "paymentDetails") {
+        formData.append(key, String(value));
+      }
+    });
+
+    // 🔹 images
+    if (data.images) {
+      Array.from(data.images).forEach((file) => {
+        formData.append("images", file); // must match multer
+      });
+    }
+
+    if (paymentMode === "UPI") {
+      formData.append(
+        "paymentDetails",
+        JSON.stringify({ UpiId: (data.paymentDetails as IUPI).UpiId }),
+      );
+    } else {
+      formData.append(
+        "paymentDetails",
+        JSON.stringify({
+          bankDetails:{AccountNumber: (data.paymentDetails as IBankAccount).AccountNumber,
+          IFSC: (data.paymentDetails as IBankAccount).IFSC,
+          BankName: (data.paymentDetails as IBankAccount).BankName,}
+        }),
+      );
+    }
+
+
+
+    //       if ("UpiId" in data.paymentDetails) {
+    //       formData.append(
+    //   "paymentDetails",
+    //   JSON.stringify(data.paymentDetails)
+    // );
+    //     } else {
+    //       formData.append("paymentDetails[AccountNumber]", data.paymentDetails.AccountNumber);
+    //       formData.append("paymentDetails[IFSC]", data.paymentDetails.IFSC);
+    //       formData.append("paymentDetails[BankName]", data.paymentDetails.BankName);
+    //     }
+
+    return formData;
+  };
+
+  const handlePost = async (data: IBookSale) => {
+    setIsLoading(true);
+    try {
+      const formData = convertToFormData(data);
+      console.log(formData);
+      const response = await addProduct(formData).unwrap();
+      if (response.isSuccess) {
+        toast.success("Your Book has been posted");
+        setIsLoading(false);
+      }
+    } catch (error: any) {
       console.log(error);
-      if(error.status==500)
-          toast.error("Something went wrong")
-    }finally{
-      setIsLoading(false)
+      if (error.status == 500) toast.error("Something went wrong");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const watchedImages = watch("images");
   useEffect(() => {
     if (watchedImages && watchedImages.length > 0) {
       const files = Array.from(watchedImages as FileList);
@@ -251,7 +305,6 @@ export default function page() {
       setPreviewsImages([]);
     }
   }, [watchedImages]);
-
 
   return (
     <main className="bg-[#eff6ff] space-y-4 flex flex-col items-center py-4 md:px-4 px-2">
@@ -314,7 +367,6 @@ export default function page() {
                 <label htmlFor="ad-title">Book Condition</label>
                 <RadioGroupFeild
                   RadioItem={BookCondition}
-                  setSelectedItem={setBookCondition}
                   control={control}
                   name="condition"
                 />
@@ -511,7 +563,7 @@ export default function page() {
         </fieldset>
         <fieldset>
           {/* Bank Details */}
-          <Card className="relative overflow-hidden p-0 ">
+          <Card className="relative overflow-hidden p-0 pb-4 ">
             <div className="h-1 bg-[#eab308] w-full absolute top-0"></div>
             <CardHeader className="flex flex-col text-xl  text-[#ca8a04] font-medium bg-[#e8f0ff] py-6">
               <div className="flex items-center gap-4">
@@ -527,8 +579,7 @@ export default function page() {
                     receive the payment?
                   </p>
                   <RadioGroupFeild
-                    RadioItem={["UPI Number", "Bank Account"]}
-                    setSelectedItem={setPaymentMode}
+                    RadioItem={["UPI", "Bank Account"]}
                     control={control}
                     name="paymentMode"
                   />
@@ -539,7 +590,7 @@ export default function page() {
                   )}
                 </div>
               </div>
-              {paymentMode === "UPI Number" && (
+              {paymentMode === "UPI" && (
                 <div className="relative flex flex-col text-[#374151] sm:flex-row gap-1 sm:gap-4 sm:justify-between sm:items-center text-sm font-medium whitespace-nowrap">
                   <label htmlFor="ad-title">UPI ID</label>
                   <Input
@@ -550,7 +601,7 @@ export default function page() {
                     {...register("paymentDetails.UpiId", {
                       validate: (value) => {
                         // Check if the current payment mode is UPI
-                        if (paymentMode === "UPI Number") {
+                        if (paymentMode === "UPI") {
                           if (!value || value.trim() === "") {
                             return "UPI ID is required for UPI payments";
                           }
@@ -565,9 +616,9 @@ export default function page() {
                       },
                     })}
                   />
-                  {errors.paymentDetails?.UpiId && (
+                  {"UpiId" in (errors.paymentDetails || {}) && (
                     <p className="text-red-500 text-[10px] font-normal absolute -bottom-4 right-0">
-                      {errors.paymentDetails?.UpiId?.messsage}
+                      {(errors.paymentDetails as any)?.UpiId?.message}
                     </p>
                   )}
                 </div>
@@ -593,9 +644,9 @@ export default function page() {
                         },
                       })}
                     />
-                    {(errors.paymentDetails as any).AccountNumber && (
+                    {"AccountNumber" in (errors.paymentDetails || {}) && (
                       <p className="text-red-500 text-[10px] font-normal absolute -bottom-4 right-0">
-                        {(errors.paymentDetails as any).AccountNumber.message}
+                        {(errors.paymentDetails as any)?.AccountNumber?.message}
                       </p>
                     )}
                   </div>
@@ -617,9 +668,9 @@ export default function page() {
                         },
                       })}
                     />
-                    {(errors.paymentDetails as any).IFSC && (
+                    {"IFSC" in (errors.paymentDetails || {}) && (
                       <p className="text-red-500 text-[10px] font-normal absolute -bottom-4 right-0">
-                        {(errors.paymentDetails as any).IFSC.message}
+                        {(errors.paymentDetails as any)?.IFSC?.message}
                       </p>
                     )}
                   </div>
@@ -632,9 +683,9 @@ export default function page() {
                       placeholder="Enter your Bank name"
                       {...register("paymentDetails.BankName")}
                     />
-                    {(errors.paymentDetails as any).BankName && (
+                    {"BankName" in (errors.paymentDetails || {}) && (
                       <p className="text-red-500 text-[10px] font-normal absolute -bottom-4 right-0">
-                        {(errors.paymentDetails as any).BankName.message}
+                        {(errors.paymentDetails as any)?.BankName?.message}
                       </p>
                     )}
                   </div>

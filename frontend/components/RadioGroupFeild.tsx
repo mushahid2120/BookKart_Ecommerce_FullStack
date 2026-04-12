@@ -5,14 +5,12 @@ import { Control, Controller } from "react-hook-form";
 
 export default function RadioGroupFeild({
   RadioItem,
-  setSelectedItem,
   control,
   name,
 }: {
   RadioItem: string[];
   control: Control<IBookSale>;
   name: "paymentMode" | "condition";
-  setSelectedItem: (arg: string) => void;
 }) {
   return (
     <Controller
@@ -25,7 +23,6 @@ export default function RadioGroupFeild({
           value={field.value ?? ""} // Controlled by react-hook-form
           onValueChange={(val) => {
             field.onChange(val || ""); // Update react-hook-form
-            setSelectedItem(val || ""); // Update your custom state
           }}
         >
           {RadioItem.map((item, i) => (

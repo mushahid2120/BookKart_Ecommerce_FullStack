@@ -7,8 +7,8 @@ export interface IProduct extends Document {
   classType: string;
   subject: string;
   images: string[] | null;
-  price: number;
-  author: string;
+  price: number|null;
+  author: string | null;
   edition: string | null;
   description: string | null;
   finalPrice: number | null;
@@ -17,9 +17,9 @@ export interface IProduct extends Document {
   paymentDetails: {
     upiId: string | null;
     bankDetails: {
-      accountNumber: string;
-      ifscode: string;
-      bankName: string;
+      AccountNumber: string |null ;
+      IFSC: string | null ;
+      BankName: string| null;
     } | null;
   };
   seller: Schema.Types.ObjectId;
@@ -32,20 +32,20 @@ const ProductSchema = new Schema<IProduct>({
   classType: { type: String, required: true },
   subject: { type: String, required: true },
   images: { type: [String], default: null },
-  price: { type: Number, required: true },
-  author: { type: String, required: true },
-  edition: { type: String, default: null },
-  description: { type: String, default: null },
+  price: { type: Number },
+  author: { type: String },
+  edition: { type: String },
+  description: { type: String },
   finalPrice: { type: Number, required:true},
   shippingCharge: { type: Number, required: true },
   paymentMode: { type: String,enum:['UPI','Bank Account'], required: true },
   paymentDetails: {
-    upiId: { type: String, default: null },
+    UpiId: { type: String, default: null },
     bankDetails: {
       type: {
-        accountNumber: { type: String, required: true },
-        ifscode: { type: String, required: true },
-        bankName: { type: String, required: true },
+        AccountNumber: { type: String, required: true },
+        IFSC: { type: String, required: true },
+        BankName: { type: String, required: true },
       },
       default: null,
     },
