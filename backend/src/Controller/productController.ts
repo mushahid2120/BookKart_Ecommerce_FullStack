@@ -4,15 +4,12 @@ import Product, { IProduct } from "../Model/Product.js";
 import response from "../Utility/response.js";
 import mongoose, { Schema, Types } from "mongoose";
 
-
 export async function createProduct(
   req: Request,
   res: Response,
   next: NextFunction,
 ) {
-
-  const userId=req.id;
-  console.log(req.body)
+  const userId = req.id;
   try {
     const {
       title,
@@ -47,10 +44,6 @@ export async function createProduct(
       return response(res, 404, "UPI is Required for paymentMode UPI");
     }
 
-    
-    console.log({paymentDetails})
-    console.log({paymentDetailsParse})
-    
     if (
       paymentMode === "Bank Account" &&
       (!paymentDetailsParse ||
@@ -66,12 +59,29 @@ export async function createProduct(
       );
     }
 
-
     const uploadPromises = files.map((file) => uploadToCloudinary(file.buffer));
     const results = await Promise.all(uploadPromises);
     const imageUrls = results.map((item: any) => item.secure_url);
 
-    await Product.insertOne({
+    // await Product.insertOne(
+    //   {
+    //   title,
+    //   category,
+    //   condition,
+    //   classType,
+    //   subject,
+    //   images: imageUrls,
+    //   price: Number(price),
+    //   author,
+    //   edition,
+    //   description,
+    //   finalPrice: Number(finalPrice),
+    //   shippingCharge: Number(shippingCharge),
+    //   paymentMode,
+    //   paymentDetails: paymentDetailsParse,
+    //   seller: userId as unknown as Schema.Types.ObjectId,
+    // });
+    const product=new Product({
       title,
       category,
       condition,
@@ -85,14 +95,34 @@ export async function createProduct(
       finalPrice: Number(finalPrice),
       shippingCharge: Number(shippingCharge),
       paymentMode,
-      paymentDetails:paymentDetailsParse,
-      seller: (userId as unknown )as Schema.Types.ObjectId
-    });
+      paymentDetails: paymentDetailsParse,
+      seller: userId as unknown as Schema.Types.ObjectId,
+    })
 
-    return response(res, 200, "Product created Successfully");
+    const productResponse=await product.save();
+
+    return response(res, 200, "Product created Successfully",{productid:productResponse._id});
   } catch (error) {
     console.log(error);
     return res.status(404).json({ error });
+    next(error);
+  }
+}
+
+export async function getAllProduct(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const products = await Product.find()
+      .select(
+        "  _id title  author  price  finalPrice  createdAt  condition  category  classType  images",
+      )
+      .lean();
+    response(res, 200, "All the Book data", products);
+  } catch (error) {
+    console.log(error);
     next(error);
   }
 }
@@ -133,18 +163,19 @@ export async function getProductById(
 ) {
   try {
     const { productId } = req.params;
-    if(!productId){
-      response(res,404,"Invalid Product Id ")
+    if (!productId) {
+      response(res, 404, "Invalid Product Id ");
     }
-    const product=await Product.findById(productId).populate("seller","name").lean()
-    if(!product){
-      return response(res,404,"product not found!!")
+    const product = await Product.findById(productId)
+      .populate({path:"seller",select:"name address",populate:{path:"address",select:"-_id addressLine1 phoneNumber city state pin"}})
+      .lean();
+    if (!product) {
+      return response(res, 404, "product not found!!");
     }
-    response(res,200,"Product Details",product)
-
+    response(res, 200, "Product Details", product);
   } catch (error) {
-    console.log(error)
-    next(error)
+    console.log(error);
+    next(error);
   }
 }
 
@@ -154,19 +185,21 @@ export async function getProductBySellerId(
   next: NextFunction,
 ) {
   try {
-   const { sellerId } = req.params;
-   if(!sellerId){
-    response(res,404,"Invalid Seller Id")
-   }
-    const product=await Product.find({seller:sellerId as any}).populate("seller","name").lean()
- 
-    if(!product){
-      return response(res,404,"product not found!!")
+    const userId=req.id;
+    if (!userId) {
+      response(res, 404, "Invalid Seller Id");
     }
-    response(res,200,"Product Details",product)
+    const product = await Product.find({ seller: (userId as unknown) as mongoose.ObjectId })
+      .populate("seller", "name -_id")
+      .lean();
 
+    if (!product) {
+      return response(res, 404, "product not found!!");
+    }
+    response(res, 200, "Product Details", product);
   } catch (error) {
-    console.log(error)
-    next(error)
+    console.log(error);
+    
+    next(error);
   }
 }

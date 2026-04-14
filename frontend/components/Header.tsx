@@ -66,27 +66,27 @@ export default function Header() {
     {
       title: "My Profile",
       icon: <User />,
-      onClick: () => handleProtectNav("myprofile"),
+      onClick: () => handleProtectNav("/account/profile"),
     },
     {
       title: "My Orders",
       icon: <Package />,
-      onClick: () => handleProtectNav("myorder"),
+      onClick: () => handleProtectNav("/account/order"),
     },
     {
       title: "My Selling Orders",
       icon: <PiggyBank />,
-      onClick: () => handleProtectNav("mysellingorder"),
+      onClick: () => handleProtectNav("/account/selling-products"),
     },
     {
       title: "Cart",
       icon: <ShoppingCart />,
-      onClick: () => handleProtectNav("cart"),
+      onClick: () => handleProtectNav("/checkout/cart"),
     },
     {
       title: "Wishlist",
       icon: <Heart />,
-      onClick: () => handleProtectNav("wishlist"),
+      onClick: () => handleProtectNav("/account/wishlist"),
     },
     { title: "About Us", icon: <UsersRound />, path: "about-us" },
     { title: "Terms & Use", icon: <FileTerminal />, path: "term-of-use" },
@@ -101,7 +101,7 @@ export default function Header() {
   // }
 
   return (
-    <header className="md:px-12 sm:px-10  px-6 md:py-4  sm:py-3 py-2 text-[#374151] sticky">
+    <header className="md:px-12 sm:px-10  px-6 md:py-4  sm:py-3 py-2 text-[#374151] bg-[#fffbebc1] backdrop-blur-lg sticky top-0 z-1000 border-solid border border-b-[#e5e7eb]">
       <nav className="flex justify-center items-center gap-2 md:gap-4 sm:gap-1">
         <div className="lg:hidden">
           <DrawerMenu

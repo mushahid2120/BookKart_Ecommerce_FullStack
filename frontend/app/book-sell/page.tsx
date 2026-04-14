@@ -18,6 +18,7 @@ import {
   PlusCircle,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -88,6 +89,7 @@ export default function page() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewsImages, setPreviewsImages] = useState<string[]>([]);
   const [isFreeShipping, setIsFreeShipping] = useState<boolean>(false);
+  const router=useRouter();
   // const [paymentMode, setPaymentMode] = useState<"UPI"|"Bank Account">("UPI");
   // const [bookCondition, setBookCondition] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -260,19 +262,6 @@ export default function page() {
       );
     }
 
-
-
-    //       if ("UpiId" in data.paymentDetails) {
-    //       formData.append(
-    //   "paymentDetails",
-    //   JSON.stringify(data.paymentDetails)
-    // );
-    //     } else {
-    //       formData.append("paymentDetails[AccountNumber]", data.paymentDetails.AccountNumber);
-    //       formData.append("paymentDetails[IFSC]", data.paymentDetails.IFSC);
-    //       formData.append("paymentDetails[BankName]", data.paymentDetails.BankName);
-    //     }
-
     return formData;
   };
 
@@ -280,11 +269,11 @@ export default function page() {
     setIsLoading(true);
     try {
       const formData = convertToFormData(data);
-      console.log(formData);
       const response = await addProduct(formData).unwrap();
       if (response.isSuccess) {
         toast.success("Your Book has been posted");
         setIsLoading(false);
+        setTimeout(()=>{router.push(`/books/${response.data.id}`)},3000)
       }
     } catch (error: any) {
       console.log(error);

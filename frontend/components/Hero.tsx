@@ -34,19 +34,19 @@ export default function Hero() {
           <div className="md:p-2 p-1 bg-[#5578d8] rounded-lg">
             <ShoppingBagIcon />
           </div>
-          <div className="flex flex-col">
-            <Link href="/books" className="font-normal">Start Shopping</Link>
+          <Link href="/books" className="flex flex-col">
+            <span  className="font-normal">Start Shopping</span>
             <span className="font-semibold">Buy Used Books</span>
-          </div>
+          </Link >
         </Button>
         <Button className="w-auto px-28  max-w-44 rounded-2xl h-auto flex items-center gap-x-4 bg-[#cc8d04] hover:bg-[#ad7c13]">
           <div className="md:p-2 p-1 bg-[#bf9f5a] rounded-lg">
             <BookOpen />
           </div>
-          <div className="flex flex-col">
+          <Link href="/book-sell" className="flex flex-col">
             <span className="font-normal">Start Selling</span>
             <span className="font-semibold">Sell Old Books</span>
-          </div>
+          </Link>
         </Button>
       </div>
       <div className="absolute inset-0 w-full h-auto bg-black/50">

@@ -51,6 +51,8 @@ const ProductSchema = new Schema<IProduct>({
     },
   },
   seller: { type: Schema.Types.ObjectId, required: true ,ref:'User'},
+},{
+  timestamps:true
 });
 
 const Product = model("Product", ProductSchema);

@@ -25,9 +25,9 @@ export default function DropDownMenu({
   setIsDropDownMenuOpen:(arg0: boolean) => void;
 }) {
   return (
-    <DropdownMenu open={open} onOpenChange={onOpenChange}>
+    <DropdownMenu open={open} onOpenChange={onOpenChange} >
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent className="z-2000">
         <DropdownMenuGroup>
           <MenuItem
             menuItem={menuItem}

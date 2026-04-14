@@ -6,11 +6,12 @@ import response from "../Utility/response.js";
 
 export async function updateUserProfile(req:Request,res:Response,next:NextFunction){
     const userId = req.id;
-    const {name,email,phoneNumber}=req.body;
-    if(!name || !email || !phoneNumber){
-        return response(res,404,"Name , Email, Phone Number is required")
+    const {userName,email,phoneNumber}=req.body;
+    console.log(userName,email)
+    if(!userName || !email ){
+        return response(res,404,"Name , Email is required")
     }
-    const user=await User.findByIdAndUpdate(userId,{name,email,phoneNumber})
+    const user=await User.findByIdAndUpdate(userId,{name:userName,email,phoneNumber})
     if(!user){
         return response(res,404,"User not found")
     }

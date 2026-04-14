@@ -40,7 +40,7 @@ export async function sendVerificationEmail(email: string, token: string) {
                             <h2 style="font-size:20px;font-weight:300">Welcome to your Book-Kart!!! Verify Your Email<br>
                             <p style="font-size:16px">Thanks for Registering  Click to Verify</p>
                             <button style="padding-inline:12px;font-size:26px">
-                            <a style="${FRONTEND_URL}/verify-email/${token}" href="#">Verify Now</a>
+                            <a href="${FRONTEND_URL}/verifyemail/${token}">Verify Now</a>
                             </button>
                     </div>`;
 
@@ -59,7 +59,7 @@ export async function sendResetPasswordLinktoEmail(email:string,resetPasswordTok
                             <h2 style="font-size:20px;font-weight:300">Welcome to your Book-Kart!!! Reset your password<br>
                             <p style="font-size:16px">Click to Reset Password</p>
                             <button style="padding-inline:12px;font-size:26px">
-                            <a style="${FRONTEND_URL}/verify-email/${resetPasswordToken}" href="#">Reset Password</a>
+                            <a href="${FRONTEND_URL}/resetpassword/${resetPasswordToken}" >Reset Password</a>
                             </button>
                     </div>`;
 

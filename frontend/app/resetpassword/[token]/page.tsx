@@ -18,7 +18,7 @@ export interface IResetPassword {
 export default function page() {
   const {token} = useParams();
   const [resetPassword]=useResetPasswordMutation();
-  const [isPasswordChanged, setIsPasswordChanged] = useState<boolean>(true);
+  const [isPasswordChanged, setIsPasswordChanged] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { register, handleSubmit } = useForm<IResetPassword>();
   const [isShowPassword, setIsShowPassword] = useState<boolean>(false);
@@ -51,10 +51,9 @@ export default function page() {
           <div>
             <CircleCheckBig size={72} className="text-[#d7925a]" />
           </div>
-          <h1 className="text-xl font-medium">Reset Link Send</h1>
+          <h1 className="text-xl font-medium">Reset Password</h1>
           <p className="text-center text-[#686868] text-sm">
-            we've sent reset password link to your email. Please, check you
-            inbox and follow the instruction to reset your password
+            Password has been reset succesully. you can login into you Account.
           </p>
           <Button type="submit" className=" w-full" onClick={()=>{
             if(isLoading) return;

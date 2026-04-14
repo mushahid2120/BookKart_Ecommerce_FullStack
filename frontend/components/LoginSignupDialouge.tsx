@@ -73,6 +73,7 @@ export default function LoginSignupDialouge({
   const {
     register: forgotPasswordRegister,
     handleSubmit: handleForgotPasswordSubmit,
+    watch:watchForgotPassword
   } = useForm<IForgotPassword>();
 
   //Login Submission
@@ -148,6 +149,7 @@ export default function LoginSignupDialouge({
     }
   };
 
+  //forgot password Submission
   const handleForgotPassword = async (data: IForgotPassword) => {
     try {
       setIsLoading(true);
@@ -155,6 +157,7 @@ export default function LoginSignupDialouge({
       console.log(response);
       if (response.isSuccess) {
         setIsResetLinkSent(true);
+        toast.success("Reset Link Sent to Your Email")
       }
     } catch (error: any) {
       console.log(error);
@@ -175,7 +178,7 @@ export default function LoginSignupDialouge({
         dispatch(toggleLoginDialog());
       }}
     >
-      <DialogContent className="sm:max-w-sm  ">
+      <DialogContent className="sm:max-w-sm  z-2000">
         <DialogHeader>
           <DialogTitle className="text-xl text-center">
             Welcome to Book Kart
@@ -386,7 +389,11 @@ export default function LoginSignupDialouge({
                   we've sent reset password link to your email. Please, check
                   you inbox and follow the instruction to reset your password
                 </p>
-                <Button type="submit" className=" w-full">
+                <Button type="submit" className=" w-full" onClick={()=>{
+                  const forgotPasswordEmail=watchForgotPassword("email")
+                  handleForgotPassword({email:forgotPasswordEmail})
+                  
+                }}>
                   {isLoading ? (
                     <Loader className="animate-spin cursor-pointer" />
                   ) : (

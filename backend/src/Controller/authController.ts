@@ -203,7 +203,7 @@ export async function checkUserAuth(
   try {
     const userId = req.id;
     const user = await User.findById(userId).select(
-      "name email profilePicture -_id",
+      "name email profilePicture phoneNumber -_id",
     );
     if (!user) {
       return response(res, 400, "User Not Found");

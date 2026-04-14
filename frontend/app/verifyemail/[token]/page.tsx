@@ -52,6 +52,7 @@ export default function page() {
         }
       }
     };
+    if(verificationStatus==="loading")
     verify();
   }, [token]);
 

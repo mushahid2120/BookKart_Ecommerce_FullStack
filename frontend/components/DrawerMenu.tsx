@@ -28,11 +28,11 @@ export default function DrawerMenu({
   setIsDropDownMenuOpen: (arg0: boolean) => void;
 }) {
   return (
-    <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+    <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen} >
       <SheetTrigger>
         <MenuIcon strokeWidth={3} className="size-6 cursor-pointer" />
       </SheetTrigger>
-      <SheetContent side="left" className="overflow-y-auto">
+      <SheetContent side="left" className="overflow-y-auto z-2000">
         <SheetHeader>
           <SheetTitle>
             <Image

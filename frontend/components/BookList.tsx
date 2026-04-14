@@ -4,8 +4,10 @@ import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { ChevronLeft, ChevronRight, Heart } from "lucide-react";
 import Link from "next/link";
+import { IBook } from "@/app/books/page";
+import { monthDiff } from "@/lib/bookUploadTime";
 
-export default function BookList({ books,monthDiff }: { books: any ,monthDiff:any}) {
+export default function BookList({ books }: { books: IBook[]}) {
   const [currentPage, setCurrentPage] = useState<number>(1);
 
   const calculateDiscount = (price: number, finalPrice: number) => {
@@ -15,7 +17,7 @@ export default function BookList({ books,monthDiff }: { books: any ,monthDiff:an
     return 0;
   };
 
-
+  
 
   if(books.length===0) 
     return (<div className=" text-center py-12 text-2xl text-gray-700">No Book Found</div>)

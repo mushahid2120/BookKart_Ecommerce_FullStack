@@ -7,6 +7,7 @@ import { logout, toggleLoginDialog } from "@/store/slice/userSlice";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import {  useLogoutMutation } from "@/store/api";
 import toast from "react-hot-toast";
+import UserCard from "./UserCard";
 
 export default function MenuItem({
   menuItem,
@@ -42,43 +43,7 @@ export default function MenuItem({
   return (
     <>
       {user !== null ? (
-        <Button
-          variant="ghost"
-          className="w-full h-auto hover:bg-slate-100 px-2  py-5 text-[#374151] font-normal"
-        >
-          <div className="flex gap-4  text-[16px] w-full">
-            <div className=" overflow-hidden">
-              <Avatar>
-                {user ? (
-                  user?.profilePic ? (
-                    <AvatarImage
-                      src={user.profilePic}
-                      alt="@shadcn"
-                      className="grayscale"
-                    />
-                  ) : (
-                    <AvatarFallback>
-                      {user.name
-                        .split(" ")
-                        .map((name: string) => name[0])
-                        .join("")}
-                    </AvatarFallback>
-                  )
-                ) : (
-                  <AvatarFallback>
-                    <User />
-                  </AvatarFallback>
-                )}
-              </Avatar>
-            </div>
-            {user && (
-              <div className="">
-                <h3 className="text-lg font-medium">{user.name}</h3>
-                <p className="text-[14px] font-light">{user.email}</p>
-              </div>
-            )}
-          </div>
-        </Button>
+        <UserCard user={user}/>
       ) : (
         <Button
           variant="ghost"

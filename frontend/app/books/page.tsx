@@ -18,8 +18,21 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Check, ChevronsUpDown } from "lucide-react";
 import BookList from "@/components/BookList";
-import { books } from "@/lib/BookData";
 import { useEffect, useMemo, useState } from "react";
+import { useLazyGetAllProductQuery } from "@/store/api";
+import { monthDiff } from "@/lib/bookUploadTime";
+
+export interface IBook{
+  _id:string,
+  title:string;
+  author:string;
+  price:number;
+  finalPrice:number;
+  createdAt:Date;
+  condition:string;
+  category:string;
+  classType:string;
+}
 
 interface ContiditionCheckType {
   Excellent: boolean;
@@ -62,6 +75,8 @@ export default function Books() {
     Good: false,
     Fair: false,
   });
+  const [getBooks]=useLazyGetAllProductQuery();
+  const [books,setBooks]=useState<IBook[]>([])
 
 
   const [categoriesCheck, setCategoriesCheck] = useState<CategoriesCheckType>({
@@ -103,6 +118,7 @@ export default function Books() {
       .filter(([_, value]) => value)
       .map(([key]) => key as keyof ClassTypeType);
 
+      console.log("filtering")
     return books.filter((book) => {
       const conditionMatch =
         activeConditions.length === 0 ||
@@ -118,7 +134,7 @@ export default function Books() {
 
       return conditionMatch && categoryMatch && classMatch;
     });
-  }, [conditionCheck, categoriesCheck, classType]);
+  }, [conditionCheck, categoriesCheck, classType,books]);
 
   const BooksFilters = {
     condition: ["Excellent", "Good", "Fair"],
@@ -168,16 +184,24 @@ export default function Books() {
     },
   ];
 
-  const monthDiff = (givenDate: Date) => {
-    const currentDate = new Date();
+ 
 
-    const monthDiff =
-      (currentDate.getFullYear() - givenDate.getFullYear()) * 12 +
-      (currentDate.getMonth() - givenDate.getMonth());
+  useEffect(()=>{
+    getAllBooks()
+  },[])
 
-    return monthDiff;
-  };
+  const getAllBooks=async ()=>{
+    try {
+      const response=await getBooks({}).unwrap()
+      if(response.isSuccess){
+        setBooks(response.data);
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
+  console.log(books)
   return (
     <main className="md:px-10 sm:px-10  px-4 pb-16 pt-8   bg-[#ddeafe] ">
       <div className="text-2xl font-semibold">
@@ -299,7 +323,6 @@ export default function Books() {
           </div>
           <BookList
             books={filteredBooks.sort(bookSortFunc)}
-            monthDiff={monthDiff}
           />
         </div>
       </div>

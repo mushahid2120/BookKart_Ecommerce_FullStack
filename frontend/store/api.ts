@@ -15,9 +15,9 @@ const Api_Urls = {
   logout: `${BASE_URL}/auth/logout`,
 
   //Product
-  getProductById: (productId: string) => `${BASE_URL}/product/${productId}`,
-  getProductBySellerId: (sellerId: string) =>
-    `${BASE_URL}/product/product-seller-id/${sellerId}`,
+  getAllProducts:`${BASE_URL}/product`,
+  getProductById: (productId: string) => `${BASE_URL}/product/productId/${productId}`,
+  getProductBySellerId: `${BASE_URL}/product/product-seller-id`,
   createProduct: `${BASE_URL}/product/create-product`,
   deleteProduct: (productId: string) => `${BASE_URL}/product/${productId}`,
 
@@ -111,7 +111,13 @@ export const api = createApi({
     }),
 
     //Product
-
+    getAllProduct:builder.query({
+      query:()=>({
+        url:Api_Urls.getAllProducts,
+        method:"GET"
+      }),
+      providesTags:[{type:"Product",id:"getAllProduct"}]
+    }),
     getProductById: builder.query({
       query: (productId) => ({
         url: Api_Urls.getProductById(productId),
@@ -120,8 +126,8 @@ export const api = createApi({
       providesTags: [{ type: "Product", id: "getById" }],
     }),
     getProductBySellerId: builder.query({
-      query: (sellerId) => ({
-        url: Api_Urls.getProductBySellerId(sellerId),
+      query: () => ({
+        url: Api_Urls.getProductBySellerId,
         method: "GET",
       }),
       providesTags: [{ type: "Product", id: "getBySellerId" }],
@@ -134,16 +140,15 @@ export const api = createApi({
         method: "POST",
         body:productData
       })},
-      invalidatesTags: [{ type: "Product", id: "create" }],
+      invalidatesTags: [{ type: "Product", id: "getAllProduct" }],
     }),
     deleteProduct: builder.mutation({
-      query: (sellerId) => ({
-        url: Api_Urls.getProductBySellerId(sellerId),
+      query: (productId) => ({
+        url: Api_Urls.deleteProduct(productId),
         method: "POST",
       }),
       invalidatesTags: [
-        { type: "Product", id: "getBySellerId" },
-        { type: "Product", id: "getById" },
+        { type: "Product", id: "getAllProduct" }
       ],
     }),
 
@@ -255,8 +260,8 @@ export const api = createApi({
     updateUser: builder.mutation({
       query: (userData) => ({
         url: Api_Urls.updateUser,
-        method: "POST",
-        body: userData,
+        method: "PUT",
+        body:userData,
       }),
       invalidatesTags: ["Auth"],
     }),
@@ -271,6 +276,7 @@ export const {
   useResetPasswordMutation,
   useLazyCheckUserQuery,
   useLogoutMutation,
+  useLazyGetAllProductQuery ,
   useLazyGetProductByIdQuery,
   useLazyGetProductBySellerIdQuery,
   useCreateProductMutation,
