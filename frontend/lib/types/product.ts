@@ -63,3 +63,10 @@ export interface IOrderItem {
   product: IProduct;
   quantity: number;
 }
+
+export interface IWishlistItem{
+  name: string;
+  finalPrice:string;
+  images:string;
+  _id:string;
+}

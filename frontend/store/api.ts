@@ -215,21 +215,21 @@ export const api = createApi({
         url: Api_Urls.getWishList,
         method: "GET",
       }),
-      providesTags: [{ type: "WishList", id: "getWish" }],
+      providesTags: ["WishList"],
     }),
     addToWishlist: builder.mutation({
       query: (productId) => ({
         url: Api_Urls.addToWishList(productId),
         method: "POST",
       }),
-      invalidatesTags: [{ type: "WishList", id: "getWish" }],
+      invalidatesTags: ["WishList"],
     }),
     removeFromWishlist: builder.mutation({
       query: (productId) => ({
         url: Api_Urls.removeFromWishList(productId),
-        method: "POST",
+        method: "DELETE",
       }),
-      invalidatesTags: [{ type: "WishList", id: "getWish" }],
+      invalidatesTags: ["WishList"],
     }),
 
     //Address

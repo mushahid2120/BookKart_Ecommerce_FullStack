@@ -90,8 +90,6 @@ export default function page() {
   const [previewsImages, setPreviewsImages] = useState<string[]>([]);
   const [isFreeShipping, setIsFreeShipping] = useState<boolean>(false);
   const router=useRouter();
-  // const [paymentMode, setPaymentMode] = useState<"UPI"|"Bank Account">("UPI");
-  // const [bookCondition, setBookCondition] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const {
     control,

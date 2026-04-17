@@ -8,7 +8,14 @@ import {
 } from "@/components/ui/card";
 import { monthDiff } from "@/lib/bookUploadTime";
 import { IProduct } from "@/lib/types/product";
-import { useLazyGetProductByIdQuery } from "@/store/api";
+import {
+  useAddToWishlistMutation,
+  useLazyGetProductByIdQuery,
+  useLazyGetWishlistQuery,
+  useRemoveFromWishlistMutation,
+} from "@/store/api";
+import { setWishlist } from "@/store/slice/wishlistSlice";
+import { RootState } from "@/store/store";
 import {
   CircleCheck,
   Heart,
@@ -21,6 +28,8 @@ import {
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
 
 const book = {
   _id: "1",
@@ -72,10 +81,23 @@ export default function page() {
   const { id } = useParams();
   const [book, setBook] = useState<IProduct | null>(null);
   const [getBookData] = useLazyGetProductByIdQuery();
+  const dispatch = useDispatch();
+  const [addProductToWishList] = useAddToWishlistMutation();
+  const [getWishlist] = useLazyGetWishlistQuery();
+  const [removeProductFromWishlist] = useRemoveFromWishlistMutation();
+  const wishlist = useSelector((state: RootState) => state.wishlist.product);
+  const [isWishlist, setIsWishlist] = useState<boolean>(false);
 
   useEffect(() => {
     getSigleBook();
+    fetchingWishlist();
   }, []);
+
+  useEffect(() => {
+    if (book) {
+      setIsWishlist(!!wishlist.find((item) => item._id === book._id));
+    }
+  }, [book, wishlist]);
 
   const getSigleBook = async () => {
     try {
@@ -88,10 +110,47 @@ export default function page() {
     }
   };
 
+  const handleAddToWishlist = async (productId: string) => {
+    try {
+      const response = await addProductToWishList(productId).unwrap();
+      if (response.isSuccess) {
+        await fetchingWishlist();
+      }
+    } catch (error: any) {
+      console.log(error);
+      if (error.status === 400) {
+        toast.error("Seller will not added their own product to wishlist");
+      }
+    }
+  };
+
+  const removeFromWishlistByProductId = async (productid: string) => {
+    try {
+      const response = await removeProductFromWishlist(productid).unwrap();
+      if (response.isSuccess) {
+        await fetchingWishlist();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchingWishlist = async () => {
+    try {
+      const response = await getWishlist({}).unwrap();
+      if (response.isSuccess) {
+        dispatch(setWishlist(response.data));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
   if (book) {
     return (
       <main className="md:px-20 sm:px-10  px-6 py-8 bg-[#ddeafe]">
-        <section className="flex md:flex-row flex-col items-start gap-12">
+        <section className="flex lg:flex-row flex-col items-start gap-12">
           <div className="w-full ">
             <Card className="lg:max-w-125 lg:min-h-100 flex justify-center rounded-md">
               {book.images && (
@@ -129,8 +188,25 @@ export default function page() {
                 <Button variant={"outline"} className=" rounded-md">
                   <Share /> Share
                 </Button>
-                <Button variant={"outline"} className=" rounded-md">
-                  <Heart /> Add
+                <Button
+                  variant={"outline"}
+                  className=" rounded-md cursor-pointer"
+                  onClick={(e) => {
+                    e.preventDefault(); // stops Link navigation
+                    e.stopPropagation();
+
+                    if (isWishlist) {
+                      removeFromWishlistByProductId(book._id);
+                    } else {
+                      handleAddToWishlist(book._id);
+                    }
+                  }}
+                >
+                  <Heart
+                    width={22}
+                    fill={book && wishlist && isWishlist ? "red" : "none"}
+                  />{" "}
+                  {isWishlist ? "Remove" : "Add"}
                 </Button>
               </div>
             </div>
@@ -188,8 +264,8 @@ export default function page() {
         <section className="flex md:flex-row flex-col gap-12 items-center justify-between my-8">
           <Card className="gap-2 w-full md:w-1/2 min-h-100 md:min-h-100 lg:min-h-80 ">
             <CardHeader className="">
-              <h3 className="font-semibold text-lg">Book Details</h3>
-              <p>this is advance for</p>
+              <h3 className="font-semibold text-lg">Book Description</h3>
+              <p>{book.description}</p>
             </CardHeader>
             <hr className="mx-4 my-2" />
             <CardContent>

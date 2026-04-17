@@ -11,14 +11,27 @@ export async function getWishList(
 ) {
   try {
     const userId = req.id;
-    const wishlist = await WishList.find({
-      user:  (userId as unknown) as ObjectId,
-    }).lean();
+    const wishlist = await WishList.findOne({
+      user: userId as unknown as ObjectId,
+    })
+      .populate("product", "title images finalPrice")
+      .select("product -_id")
+      .lean();
+
     if (!wishlist) {
-      return response(res, 404, "Your wishlist not found");
+      return response(res, 404, "Wish list is Empty");
     }
 
-    return response(res, 200, "Your wishlist", wishlist);
+    return response(res, 200, "Your wishlist", {
+      product: wishlist.product.map(
+        ({ title, images, finalPrice, _id }: any) => ({
+          title,
+          images: images[0],
+          finalPrice,
+          _id,
+        }),
+      ),
+    });
   } catch (error) {
     console.log(error);
     next(error);
@@ -44,17 +57,16 @@ export async function addToWishList(
     }
 
     let wishlist = await WishList.findOne({
-      user:  (userId as unknown) as ObjectId,
+      user: userId as unknown as ObjectId,
     });
     if (!wishlist) {
       wishlist = new WishList({ user: userId, product: [] });
     }
-    if (
-      !wishlist.product.includes((productId as unknown) as ObjectId)
-    ) {
-      wishlist.product.push((productId as unknown) as ObjectId);
+    if (!wishlist.product.includes(productId as unknown as ObjectId)) {
+      wishlist.product.push(productId as unknown as ObjectId);
     }
-    await wishlist.save();
+    const afterAdding = await wishlist.save();
+
     return response(res, 200, "Product has been added to WishList");
   } catch (error) {
     console.log(error);
@@ -81,7 +93,7 @@ export async function removeWishList(
     }
 
     let wishlist = await WishList.findOne({
-      user:  (userId as unknown) as ObjectId,
+      user: userId as unknown as ObjectId,
     });
     if (wishlist) {
       const productIndex = wishlist.product.findIndex(

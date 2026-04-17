@@ -8,17 +8,20 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { IProduct } from "@/lib/types/product";
-import { useLazyGetProductBySellerIdQuery } from "@/store/api";
-import { RootState } from "@/store/store";
-import { Delete, Edit, Package, Trash2, View } from "lucide-react";
-import Image from "next/image";
+import {
+  useDeleteProductMutation,
+  useLazyGetProductBySellerIdQuery,
+} from "@/store/api";
+import { Loader, Trash2, View } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import toast from "react-hot-toast";
 
 export default function page() {
   const [sellingbook, setSellingBook] = useState<IProduct[]>([]);
   const [getMyPostedBooks] = useLazyGetProductBySellerIdQuery();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [deleteProduct] = useDeleteProductMutation();
 
   useEffect(() => {
     getAllPostedBooksByMe();
@@ -33,6 +36,23 @@ export default function page() {
       }
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const handleDeleteProduct = async (productId: string) => {
+    try {
+      setIsLoading(true);
+      const response = await deleteProduct(productId).unwrap();
+      if (response.isSuccess) {
+        toast.success("Product has been deleted Successfully");
+      }
+    } catch (error: any) {
+      console.log(error);
+      if (error.status === 500) {
+        toast.error("Something went wrong");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -104,19 +124,28 @@ export default function page() {
                 <span className="line-through text-sm">₹{book.price}</span>
               </div>
             </CardContent>
-            <CardFooter className="flex flex-col items-center justify-between mt-3 gap-2">
-              <Button className=" bg-blue-700 hover:bg-blue-800 w-full font-medium cursor-pointer">
-                <View />
-                View
+            <CardFooter className=" mt-3 gap-2 w-full block">
+              <Link href={`/books/${book._id}`}>
+                <Button className=" bg-blue-700 hover:bg-blue-800 w-full font-medium cursor-pointer ">
+                  <View />
+                  View
+                </Button>
+              </Link>
+              <Button
+                className="absolute top-2 right-2 bg-red-500 hover:bg-red-700 cursor-pointer"
+                onClick={() => {
+                  handleDeleteProduct(book._id);
+                }}
+                size="icon"
+              >
+                {isLoading ? (
+                  <Loader className="animate-spin cursor-pointer" />
+                ) : (
+                  <>
+                    <Trash2 size={20} strokeWidth={3} />
+                  </>
+                )}
               </Button>
-              <div className="flex items-center justify-between space-x-2 text-white w-full">
-                <Button className=" bg-red-500 hover:bg-red-700 cursor-pointer">
-                  <Trash2 size={20} strokeWidth={3} /> Delete
-                </Button>
-                <Button className=" bg-blue-500 hover:bg-blue-600 cursor-pointer">
-                  <Edit size={20} strokeWidth={3} /> Edit
-                </Button>
-              </div>
             </CardFooter>
           </Card>
         ))}

@@ -1,5 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit/react";
 import userSlice from "./slice/userSlice";
+import wishlistSlice from "./slice/wishlistSlice"
 import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PURGE, PERSIST, REGISTER } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import { api } from "./api";
@@ -9,13 +10,18 @@ import { setupListeners } from "@reduxjs/toolkit/query";
 const userPersistConfig = {
     key: 'user', storage, whitelist: ['user', 'isEmailVerified', 'isLoggedIn']
 }  // what you are type to save in localstorage and which one
+const wishlistPersistConfig = {
+    key: 'wishlist', storage, whitelist: ['item']
+}  // what you are type to save in localstorage and which one
 
 const persistedUserReducer = persistReducer(userPersistConfig, userSlice) // what to store and from where
+const persistedWishlistReducer = persistReducer(wishlistPersistConfig, wishlistSlice) // what to store and from where
 
 const store = configureStore({
     //where the state has been changing
     reducer: {
         user: persistedUserReducer,
+        wishlist:persistedWishlistReducer,
         [api.reducerPath]: api.reducer
     },                          
     // before changing the state passing through this        

@@ -19,7 +19,7 @@ import { Label } from "@/components/ui/label";
 import { Check, ChevronsUpDown } from "lucide-react";
 import BookList from "@/components/BookList";
 import { useEffect, useMemo, useState } from "react";
-import { useLazyGetAllProductQuery } from "@/store/api";
+import { useAddToWishlistMutation, useLazyGetAllProductQuery } from "@/store/api";
 import { monthDiff } from "@/lib/bookUploadTime";
 
 export interface IBook{
@@ -77,7 +77,8 @@ export default function Books() {
   });
   const [getBooks]=useLazyGetAllProductQuery();
   const [books,setBooks]=useState<IBook[]>([])
-
+  const [addToWishList]=useAddToWishlistMutation();
+  
 
   const [categoriesCheck, setCategoriesCheck] = useState<CategoriesCheckType>({
     "College Books (Higher Education Textbooks)": false,
@@ -118,7 +119,6 @@ export default function Books() {
       .filter(([_, value]) => value)
       .map(([key]) => key as keyof ClassTypeType);
 
-      console.log("filtering")
     return books.filter((book) => {
       const conditionMatch =
         activeConditions.length === 0 ||
@@ -201,7 +201,6 @@ export default function Books() {
     }
   }
 
-  console.log(books)
   return (
     <main className="md:px-10 sm:px-10  px-4 pb-16 pt-8   bg-[#ddeafe] ">
       <div className="text-2xl font-semibold">
