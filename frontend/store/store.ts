@@ -1,6 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit/react";
 import userSlice from "./slice/userSlice";
 import wishlistSlice from "./slice/wishlistSlice"
+import cartSlice from "./slice/cartSlice"
 import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PURGE, PERSIST, REGISTER } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import { api } from "./api";
@@ -11,17 +12,22 @@ const userPersistConfig = {
     key: 'user', storage, whitelist: ['user', 'isEmailVerified', 'isLoggedIn']
 }  // what you are type to save in localstorage and which one
 const wishlistPersistConfig = {
-    key: 'wishlist', storage, whitelist: ['item']
+    key: 'wishlist', storage, whitelist: ['product']
+}  // what you are type to save in localstorage and which one
+const cartPersistConfig = {
+    key: 'cart', storage, whitelist: ['product','checkoutStatus']
 }  // what you are type to save in localstorage and which one
 
 const persistedUserReducer = persistReducer(userPersistConfig, userSlice) // what to store and from where
 const persistedWishlistReducer = persistReducer(wishlistPersistConfig, wishlistSlice) // what to store and from where
+const persistedCartReducer = persistReducer(cartPersistConfig, cartSlice) // what to store and from where
 
 const store = configureStore({
     //where the state has been changing
     reducer: {
         user: persistedUserReducer,
         wishlist:persistedWishlistReducer,
+        cart:persistedCartReducer,
         [api.reducerPath]: api.reducer
     },                          
     // before changing the state passing through this        

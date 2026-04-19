@@ -49,6 +49,7 @@ export default function Header() {
   const user = useSelector((state: RootState) => state.user.user);
   const dispatch = useDispatch();
   const router = useRouter();
+  const cart=useSelector((state:RootState)=>state.cart.product)
   
   const handleProtectNav = (href: string) => {
     if (user) {
@@ -94,11 +95,6 @@ export default function Header() {
     { title: "Help", icon: <CircleQuestionMark />, path: "help" },
   ];
 
-  // const user: User | null ={
-  //   userName:"md",
-  //   profilePic: "https://github.com/shadcn.png",
-  //   email:"md@md.com"
-  // }
 
   return (
     <header className="md:px-12 sm:px-10  px-6 md:py-4  sm:py-3 py-2 text-[#374151] bg-[#fffbebc1] backdrop-blur-lg sticky top-0 z-1000 border-solid border border-b-[#e5e7eb]">
@@ -192,10 +188,11 @@ export default function Header() {
           isLoginOpen={isLoginOpen}
         />
 
-        <Link href="/">
-          <Button variant="ghost" className="hover:bg-slate-100">
+        <Link href="/checkout/cart">
+          <Button variant="ghost" className="relative hover:bg-slate-100">
             <ShoppingCart />
             Cart
+            <div className="absolute top-0 left-4 px-1  bg-[#EF4444] text-white rounded-full text-[10px]">{cart.length>0 && cart.length}</div>
           </Button>
         </Link>
       </nav>

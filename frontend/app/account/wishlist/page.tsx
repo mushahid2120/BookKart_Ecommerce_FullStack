@@ -1,16 +1,14 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { Card, CardFooter, CardHeader } from "@/components/ui/card";
 import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
-import {
-  useAddToWishlistMutation,
+  useAddToCartMutation,
+  useLazyGetCartQuery,
   useLazyGetWishlistQuery,
+  useRemoveFromCartMutation,
   useRemoveFromWishlistMutation,
 } from "@/store/api";
+import { setCart } from "@/store/slice/cartSlice";
 import { setWishlist } from "@/store/slice/wishlistSlice";
 import { RootState } from "@/store/store";
 import { Check, Heart, Loader, ShoppingCart, Trash2 } from "lucide-react";
@@ -26,6 +24,10 @@ export default function page() {
   const wishlist = useSelector((state: RootState) => state.wishlist.product);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [isAddingToCart, setIsAddingToCart] = useState<boolean>(false);
+  const [getCart] = useLazyGetCartQuery();
+  const [removeFromCart] = useRemoveFromCartMutation();
+  const [addToCart] = useAddToCartMutation();
+  const cart = useSelector((state: RootState) => state.cart);
 
   useEffect(() => {
     fetchingWishlist();
@@ -39,7 +41,7 @@ export default function page() {
         await fetchingWishlist();
         toast.success("Item has been remove from wishlist");
       }
-    } catch (error:any) {
+    } catch (error: any) {
       console.log(error);
       if (error.status === 500) {
         toast.error("Something went wrong");
@@ -54,6 +56,58 @@ export default function page() {
       const response = await getWishlist({}).unwrap();
       if (response.isSuccess) {
         dispatch(setWishlist(response.data));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleAddToCart = async ({
+    productid,
+    quantity,
+  }: {
+    productid: string;
+    quantity: number;
+  }) => {
+    if (isAddingToCart) return;
+    try {
+      setIsAddingToCart(true);
+      const response = await addToCart({ productid, quantity }).unwrap();
+      if (response.isSuccess) {
+        await fetchingCart();
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsAddingToCart(false);
+    }
+  };
+
+  const handleRemoveFromCart = async (productid: string) => {
+    if (isAddingToCart) return;
+    try {
+      setIsAddingToCart(true);
+      const response = await removeFromCart(productid).unwrap();
+      if (response.isSuccess) {
+        fetchingCart();
+        toast.success("product has been remove from cart");
+      }
+    } catch (error: any) {
+      console.log(error);
+      if (error.status === 500) {
+        toast.error("Something went wrong");
+      }
+    } finally {
+      setIsAddingToCart(false);
+    }
+  };
+
+  const fetchingCart = async () => {
+    try {
+      const response = await getCart({}).unwrap();
+      console.log(response);
+      if (response.isSuccess) {
+        dispatch(setCart(response.data));
       }
     } catch (error) {
       console.log(error);
@@ -92,9 +146,10 @@ export default function page() {
         <h1 className="flex items-center text-xl font-medium my-4">
           <Heart /> My WishList
         </h1>
-        {wishlist.map((item, index) => (
-          <div className="grid sm:grid-cols-2" key={index}>
-            <Card className="w-72 gap-2 py-4">
+
+        <div className="grid sm:grid-cols-2 gap-4">
+          {wishlist.map((item, index) => (
+            <Card className="w-72 gap-2 py-4" key={index}>
               <CardHeader className="gap-0">
                 <h2 className="text-sm font-medium ">{item.title}</h2>
                 <p className="text-[#737373] font-light text-sm">
@@ -123,16 +178,32 @@ export default function page() {
                     <Trash2 />
                   )}
                 </Button>
-                <Button className="bg-blue-600 text-white cursor-pointer">
-                  <ShoppingCart /> Add to Cart
-                </Button>
-                {/* <Button className="bg-[#8b8b8b] text-white cursor-pointer">
-              <Check /> Item in Cart
-            </Button> */}
+                {cart.product.findIndex(
+                  (product) => product._id === item._id,
+                ) === -1 ? (
+                  <Button
+                    className="bg-blue-600 text-white cursor-pointer"
+                    onClick={() => {
+                      handleRemoveFromCart(item._id);
+                      handleAddToCart({ productid: item._id, quantity: 1 });
+                    }}
+                  >
+                    <ShoppingCart /> Add to Cart
+                  </Button>
+                ) : (
+                  <Button
+                    className="bg-[#8b8b8b] text-white cursor-pointer"
+                    onClick={() => {
+                      handleRemoveFromCart(item._id);
+                    }}
+                  >
+                    <Check /> Item in Cart
+                  </Button>
+                )}
               </CardFooter>
             </Card>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     );
   }

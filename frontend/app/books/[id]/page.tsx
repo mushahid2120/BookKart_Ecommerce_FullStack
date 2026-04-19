@@ -9,16 +9,21 @@ import {
 import { monthDiff } from "@/lib/bookUploadTime";
 import { IProduct } from "@/lib/types/product";
 import {
+  useAddToCartMutation,
   useAddToWishlistMutation,
+  useLazyGetCartQuery,
   useLazyGetProductByIdQuery,
   useLazyGetWishlistQuery,
+  useRemoveFromCartMutation,
   useRemoveFromWishlistMutation,
 } from "@/store/api";
+import { setCart } from "@/store/slice/cartSlice";
 import { setWishlist } from "@/store/slice/wishlistSlice";
 import { RootState } from "@/store/store";
 import {
   CircleCheck,
   Heart,
+  Loader,
   MapPin,
   MessageCircle,
   Share,
@@ -87,6 +92,12 @@ export default function page() {
   const [removeProductFromWishlist] = useRemoveFromWishlistMutation();
   const wishlist = useSelector((state: RootState) => state.wishlist.product);
   const [isWishlist, setIsWishlist] = useState<boolean>(false);
+  const [addToCart] = useAddToCartMutation();
+  const cart = useSelector((state: RootState) => state.cart);
+  const [getCart] = useLazyGetCartQuery();
+  const [isPresentInCart, setIsPresentInCart] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [removeFromCart] = useRemoveFromCartMutation();
 
   useEffect(() => {
     getSigleBook();
@@ -94,10 +105,18 @@ export default function page() {
   }, []);
 
   useEffect(() => {
-    if (book) {
+    if (book && wishlist && wishlist.length !== 0 ) {
       setIsWishlist(!!wishlist.find((item) => item._id === book._id));
     }
   }, [book, wishlist]);
+
+  useEffect(() => {
+    if (book && cart && cart.product.length !== 0 ) {
+        setIsPresentInCart(
+          !!cart.product.find((item) => item._id === book._id),
+        );
+    }
+  }, [book, cart]);
 
   const getSigleBook = async () => {
     try {
@@ -146,6 +165,57 @@ export default function page() {
     }
   };
 
+  const handleAddToCart = async ({
+    productid,
+    quantity,
+  }: {
+    productid: string;
+    quantity: number;
+  }) => {
+    if (isLoading) return;
+    try {
+      setIsLoading(true);
+      const response = await addToCart({ productid, quantity }).unwrap();
+      if (response.isSuccess) {
+        await fetchingCart();
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRemoveFromCart = async (productid: string) => {
+    if (isLoading) return;
+    try {
+      setIsLoading(true);
+      const response = await removeFromCart(productid).unwrap();
+      if (response.isSuccess) {
+        fetchingCart();
+        toast.success("product has been remove from cart");
+      }
+    } catch (error: any) {
+      console.log(error);
+      if (error.status === 500) {
+        toast.error("Something went wrong");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchingCart = async () => {
+    try {
+      const response = await getCart({}).unwrap();
+      console.log(response);
+      if (response.isSuccess) {
+        dispatch(setCart(response.data));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   if (book) {
     return (
@@ -221,10 +291,23 @@ export default function page() {
             </div>
             <Button
               size="lg"
-              className="bg-[#1d4ed8] text-lg w-full max-w-45 min-h-11 my-4"
+              className={`${isPresentInCart ? "bg-red-500" : "bg-[#1d4ed8]"} text-lg w-full max-w-55 min-h-11 my-4 cursor-pointer`}
+              onClick={() => {
+                if (isPresentInCart) {
+                  handleRemoveFromCart(book._id);
+                } else {
+                  handleAddToCart({ productid: book._id, quantity: 1 });
+                }
+              }}
             >
-              {" "}
-              <ShoppingCart /> Buy Now
+              {isLoading ? (
+                <Loader className="animate-spin cursor-not-allowed" />
+              ) : (
+                <>
+                  <ShoppingCart />{" "}
+                  {isPresentInCart ? "Remove from Cart" : "Add to Cart"}
+                </>
+              )}
             </Button>
             <Card className="gap-2">
               <CardHeader className="font-semibold text-lg">

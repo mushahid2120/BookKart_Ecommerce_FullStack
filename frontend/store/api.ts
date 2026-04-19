@@ -197,14 +197,14 @@ export const api = createApi({
       query: (cartData) => ({
         url: Api_Urls.addToCart,
         method: "POST",
-        body: cartData,
+        body: {...cartData},
       }),
       invalidatesTags: [{ type: "Cart", id: "getCart" }],
     }),
     removeFromCart: builder.mutation({
       query: (productId) => ({
         url: Api_Urls.removeFromCart(productId),
-        method: "POST",
+        method: "DELETE",
       }),
       invalidatesTags: [{ type: "Cart", id: "getCart" }],
     }),

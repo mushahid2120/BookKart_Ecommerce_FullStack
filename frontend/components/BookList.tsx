@@ -13,7 +13,7 @@ import {
   useLazyGetWishlistQuery,
   useRemoveFromWishlistMutation,
 } from "@/store/api";
-import { addToWishlist, removeFromWishlist, setWishlist } from "@/store/slice/wishlistSlice";
+import {  setWishlist } from "@/store/slice/wishlistSlice";
 import toast from "react-hot-toast";
 import { RootState } from "@/store/store";
 

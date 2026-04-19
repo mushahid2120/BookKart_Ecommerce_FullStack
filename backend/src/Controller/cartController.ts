@@ -7,13 +7,29 @@ import Product from "../Model/Product.js";
 export async function getCart(req: Request, res: Response, next: NextFunction) {
   try {
     const userId = req.id;
-    const cart = await Cart.find({
-      user: (userId as unknown) as ObjectId,
-    }).lean();
+    const cart = await Cart.findOne({
+      user: userId as unknown as ObjectId,
+    })
+      .populate("item.product", "title finalPrice price shippingCharge images")
+      .select("item -_id")
+      .lean();
     if (!cart) {
       return response(res, 404, "Your cart is Empty");
     }
-    return response(res, 200, "Your Cart Item", cart);
+    return response(
+      res,
+      200,
+      "Your Cart Item",
+      cart.item.map((cartItem: any) => ({
+          title: cartItem.product.title,
+          price: cartItem.product.price,
+          finalPrice: cartItem.product.finalPrice,
+          shippingCharge: cartItem.product.shippingCharge,
+          _id: cartItem.product._id,
+          image: cartItem.product.images[0],
+          quantity:cartItem.quantity  
+      })),
+    );
   } catch (error) {
     console.log(error);
     next(error);
@@ -38,15 +54,13 @@ export async function addToCart(
       return response(res, 400, "Seller cannot add to cart thier own product");
     }
 
-
     let cart = await Cart.findOne({
-      user: (userId as unknown) as ObjectId,
+      user: userId as unknown as ObjectId,
     });
 
     if (!cart) {
       cart = new Cart({ user: userId, item: [] });
     }
-    console.log(cart)
 
     const existingItem = cart.item.find(
       (item) => item.product.toString() === productid,
@@ -79,7 +93,7 @@ export async function removeCart(
       return response(res, 400, "Invalid Product Id");
     }
     const cart = await Cart.findOne({
-      user: (userId as unknown) as ObjectId,
+      user: userId as unknown as ObjectId,
     });
     if (!cart) {
       return response(res, 400, "Cart not Found");
