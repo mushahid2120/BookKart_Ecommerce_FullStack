@@ -42,27 +42,6 @@ export interface IAddress {
     pin:string
 }
 
-export interface IOrder {
-  _id:string;
-  user: string;
-  items: IOrderItem[];
-  totalAmount: number;
-  shippingAddress:IAddress;
-  paymentStatus: "pending" | "complete" | "failed";
-  paymentMethod: string;
-  paymentDetail: {
-    razorpay_order?: string;
-    razorpay_payment_id?: string;
-    razorpay_signature?: string;
-  };
-  status: "processing" | "shipped" | "delivered" | "cancelled";
-  createdAt:string;
-}
-
-export interface IOrderItem {
-  product: IProduct;
-  quantity: number;
-}
 
 export interface IWishlistItem{
   name: string;

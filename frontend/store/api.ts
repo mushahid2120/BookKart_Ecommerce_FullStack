@@ -19,7 +19,7 @@ const Api_Urls = {
   getProductById: (productId: string) => `${BASE_URL}/product/productId/${productId}`,
   getProductBySellerId: `${BASE_URL}/product/product-seller-id`,
   createProduct: `${BASE_URL}/product/create-product`,
-  deleteProduct: (productId: string) => `${BASE_URL}/product/${productId}`,
+  deleteProduct: (productId: string) => `${BASE_URL}/product/delete-product/${productId}`,
 
   //Order
   getOrderByUserId: `${BASE_URL}/order/get-order-by-userid`,
@@ -145,7 +145,7 @@ export const api = createApi({
     deleteProduct: builder.mutation({
       query: (productId) => ({
         url: Api_Urls.deleteProduct(productId),
-        method: "POST",
+        method: "DELETE",
       }),
       invalidatesTags: [
         { type: "Product", id: "getAllProduct" }

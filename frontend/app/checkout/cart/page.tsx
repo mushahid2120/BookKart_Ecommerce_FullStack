@@ -1,17 +1,26 @@
 "use client";
+import Address from "@/components/Address";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { IOrderItem } from "@/lib/types/order";
 import {
   useAddToWishlistMutation,
+  useCreateOrUpdateOrderMutation,
   useLazyGetCartQuery,
   useLazyGetWishlistQuery,
   useRemoveFromCartMutation,
   useRemoveFromWishlistMutation,
 } from "@/store/api";
-import { setCart } from "@/store/slice/cartSlice";
+import { changeCheckoutStatus, setCart } from "@/store/slice/cartSlice";
+import {
+  IAddress,
+  setOrderItem,
+  setShippingAddress,
+} from "@/store/slice/orderSlice";
 import { setWishlist } from "@/store/slice/wishlistSlice";
 import { RootState } from "@/store/store";
 import {
+  ChevronLeft,
   ChevronRight,
   CreditCard,
   Heart,
@@ -35,13 +44,20 @@ export default function page() {
   const [getWishlist] = useLazyGetWishlistQuery();
   const [removeProductFromWishlist] = useRemoveFromWishlistMutation();
   const wishlist = useSelector((state: RootState) => state.wishlist.product);
-  const [isCartLoading, setIsCartLoading] = useState<boolean>(false);
-  const [isWishlistLoading, setIsWishlistLoading] = useState<boolean>(false);
+  const order = useSelector((state: RootState) => state.order);
+  const [isCartLoading, setIsCartLoading] = useState<string | null>(null);
+  const [isWishlistLoading, setIsWishlistLoading] = useState<string | null>(
+    null,
+  );
+  const [isCreateOrderLoading, setIsCreateOrderLoading] =
+    useState<boolean>(false);
+  const [createOrder] = useCreateOrUpdateOrderMutation();
+  const [isChangingAddress, setIsChangingAddress] = useState<boolean>(false);
 
   const handleAddToWishlist = async (productId: string) => {
     if (isWishlistLoading) return;
     try {
-      setIsWishlistLoading(true);
+      setIsWishlistLoading(productId);
       const response = await addProductToWishList(productId).unwrap();
       if (response.isSuccess) {
         await fetchingWishlist();
@@ -52,14 +68,33 @@ export default function page() {
         toast.error("Seller will not added their own product to wishlist");
       }
     } finally {
-      setIsWishlistLoading(false);
+      setIsWishlistLoading(null);
+    }
+  };
+
+  const handleRemoveFromCart = async (productid: string) => {
+    if (isCartLoading) return;
+    try {
+      setIsCartLoading(productid);
+      const response = await removeFromCart(productid).unwrap();
+      if (response.isSuccess) {
+        fetchingCart();
+        toast.success("product has been remove from cart");
+      }
+    } catch (error: any) {
+      console.log(error);
+      if (error.status === 500) {
+        toast.error("Something went wrong");
+      }
+    } finally {
+      setIsCartLoading(null);
     }
   };
 
   const removeFromWishlistByProductId = async (productid: string) => {
     if (isWishlistLoading) return;
     try {
-      setIsWishlistLoading(true);
+      setIsWishlistLoading(productid);
       const response = await removeProductFromWishlist(productid).unwrap();
       if (response.isSuccess) {
         await fetchingWishlist();
@@ -67,7 +102,7 @@ export default function page() {
     } catch (error) {
       console.log(error);
     } finally {
-      setIsWishlistLoading(false);
+      setIsWishlistLoading(null);
     }
   };
 
@@ -82,30 +117,6 @@ export default function page() {
     }
   };
 
-  const handleRemoveFromCart = async (productid: string) => {
-    if (isCartLoading) return;
-    try {
-      setIsCartLoading(true);
-      const response = await removeFromCart(productid).unwrap();
-      if (response.isSuccess) {
-        fetchingCart();
-        toast.success("product has been remove from cart");
-      }
-    } catch (error: any) {
-      console.log(error);
-      if (error.status === 500) {
-        toast.error("Something went wrong");
-      }
-    } finally {
-      setIsCartLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchingCart();
-    fetchingWishlist();
-  }, []);
-
   const fetchingCart = async () => {
     try {
       const response = await getCart({}).unwrap();
@@ -118,19 +129,66 @@ export default function page() {
     }
   };
 
+  const handleCreateOrder = async () => {
+    if (isCreateOrderLoading) return;
+    if (!cart || cart?.item.length === 0 || !cart.orderId) {
+      console.log("cart is empty");
+      return;
+    }
+    try {
+      setIsCreateOrderLoading(true);
+      const response = await createOrder({
+        orderId: cart.orderId,
+        cartId: cart.cartId,
+        status: "processing",
+      }).unwrap();
+
+      if (response.isSuccess) {
+        dispatch(changeCheckoutStatus("address"));
+        dispatch(
+          setOrderItem({
+            items: cart.item,
+            _id: cart.orderId,
+            status: "processing",
+          }),
+        );
+        toast.success("Order has been created");
+      }
+    } catch (error: any) {
+      console.log(error);
+    } finally {
+      setIsCreateOrderLoading(false);
+    }
+  };
+
+  const handleAddress = async (address: IAddress) => {
+    dispatch(changeCheckoutStatus("address"));
+    dispatch(setShippingAddress(address));
+    toast.success("Address has been added");
+    setIsChangingAddress(true);
+  };
+
+  useEffect(() => {
+    fetchingCart();
+    fetchingWishlist();
+  }, []);
+
+  console.log({ cart });
+  console.log({ order });
+
   return (
     <>
       <div className="flex items-center gap-4 font-medium text-lg bg-[#f3f4f6]  p-4">
         <ShoppingCart className="text-[#4b5563]" />{" "}
         <span>
-          {cart.product.length !== 0 && cart.product.length} items in your cart
+          {cart.item.length !== 0 && cart.item.length} items in your cart
         </span>
       </div>
       <main className="md:px-10 sm:px-10  px-4 pb-16    bg-[#ddeafe] ">
         <section className="flex items-center justify-center gap-4 p-6">
           <div className="flex items-center justify-center gap-2">
             <span
-              className={`p-2.5 rounded-full text-white bg-blue-100 shadow-xl ${cart.checkoutStatus === "cart" && "bg-blue-700"}`}
+              className={`p-2.5 rounded-full text-white bg-blue-300 shadow-xl ${cart.checkoutStatus === "cart" && "bg-blue-700"}`}
             >
               <ShoppingCart />
             </span>
@@ -156,22 +214,22 @@ export default function page() {
           </div>
         </section>
         <section className="flex lg:flex-row flex-col gap-8">
-          <Card className="gap-4 grow h-160 overflow-scroll">
+          <Card className="gap-4 grow h-160 overflow-y-scroll">
             <CardHeader className="gap-0">
               <h1 className="text-2xl font-medium">Order Summary</h1>
               <p className="text-[#737373] text-sm">Review your items</p>
             </CardHeader>
             <CardContent>
-              {cart.product &&
-                cart.product.map((item, index) => (
+              {cart.item &&
+                cart.item.map((item, index) => (
                   <div key={index}>
                     <div
                       className="flex flex-col sm:flex-row gap-8"
                       key={index}
                     >
-                      {item.image && (
+                      {item.product.image && (
                         <Image
-                          src={item.image}
+                          src={item.product.image}
                           width={200}
                           height={200}
                           alt="cartImage "
@@ -179,32 +237,33 @@ export default function page() {
                         />
                       )}
                       <div className="space-y-1">
-                        <h1 className="font-medium">{item.title}</h1>
+                        <h1 className="font-medium">{item.product.title}</h1>
                         <p className="text-[#6B7280] text-sm font-light">
                           Quantity: {item.quantity}
                         </p>
                         <div>
                           <span className="text-[#6B7280] font-medium line-through text-sm">
-                            ₹{item.price}
+                            ₹{item.product.price}
                           </span>{" "}
                           <span className="font-medium">
-                            ₹{item.finalPrice}
+                            ₹{item.product.finalPrice}
                           </span>
                         </div>
                         <p className="text-[#16A34A] text-sm font-medium ">
-                          {item.shippingCharge === 0
+                          {item.product.shippingCharge === 0
                             ? "Free Shipping"
-                            : `Shipping Charge: ₹${item.shippingCharge}`}
+                            : `Shipping Charge: ₹${item.product.shippingCharge}`}
                         </p>
                         <div className="flex gap-4 mt-6">
                           <Button
                             variant="outline"
                             className="text-xs cursor-pointer"
                             onClick={() => {
-                              handleRemoveFromCart(item._id);
+                              handleRemoveFromCart(item.product._id);
                             }}
                           >
-                            {isCartLoading ? (
+                            {isCartLoading &&
+                            isCartLoading === item.product._id ? (
                               <Loader className="animate-spin cursor-not-allowed" />
                             ) : (
                               <>
@@ -218,15 +277,18 @@ export default function page() {
                             className="text-xs cursor-pointer"
                             onClick={() => {
                               if (
-                                wishlist.find((book) => book._id === item._id)
+                                wishlist.find(
+                                  (book) => book._id === item.product._id,
+                                )
                               ) {
-                                removeFromWishlistByProductId(item._id);
+                                removeFromWishlistByProductId(item.product._id);
                               } else {
-                                handleAddToWishlist(item._id);
+                                handleAddToWishlist(item.product._id);
                               }
                             }}
                           >
-                            {isWishlistLoading ? (
+                            {isWishlistLoading &&
+                            isWishlistLoading === item.product._id ? (
                               <Loader className="animate-spin cursor-not-allowed" />
                             ) : (
                               <>
@@ -235,7 +297,7 @@ export default function page() {
                                     item &&
                                     wishlist &&
                                     wishlist.find(
-                                      (book) => item._id === book._id,
+                                      (book) => item.product._id === book._id,
                                     )
                                       ? "red"
                                       : "none"
@@ -256,19 +318,29 @@ export default function page() {
             </CardContent>
           </Card>
 
-          {cart.product && (
+          {cart.checkoutStatus === "address" && (
+            <Address
+              handleAddress={handleAddress}
+              isChangingAddress={isChangingAddress}
+              setIsChangingAddress={setIsChangingAddress}
+              address={order.shippingAddress}
+              currentAddressIndex={order.currentSelectedShippingAddress}
+            />
+          )}
+
+          {cart.item && (
             <Card className="lg:w-80 gap-2 h-90">
               <CardHeader className="text-xl font-medium ">
                 Price Details
               </CardHeader>
               <CardContent className="flex flex-col gap-4 text-sm">
                 <div className="flex items-center justify-between">
-                  <span>Price ({cart.product.length} items)</span>
+                  <span>Price ({cart.item.length} items)</span>
                   <span>
                     ₹
-                    {cart.product.reduce(
+                    {cart.item.reduce(
                       (acc: number, item: any) =>
-                        acc + item.price * item.quantity,
+                        acc + item.product.price * item.quantity,
                       0,
                     )}
                   </span>
@@ -277,9 +349,11 @@ export default function page() {
                   <span>Discount</span>
                   <span>
                     - ₹
-                    {cart.product.reduce(
+                    {cart.item.reduce(
                       (acc: number, item: any) =>
-                        acc + (item.price - item.finalPrice * item.quantity),
+                        acc +
+                        (item.product.price -
+                          item.product.finalPrice * item.quantity),
                       0,
                     )}
                   </span>
@@ -287,9 +361,9 @@ export default function page() {
                 <div className="flex items-center justify-between">
                   <span>Delivery Charges</span>
                   <span className="text-[16A34A]">
-                    {cart.product.reduce(
+                    {cart.item.reduce(
                       (acc: number, item: any) =>
-                        acc + item.shippingCharge * item.quantity,
+                        acc + item.product.shippingCharge * item.quantity,
                       0,
                     )}
                   </span>
@@ -299,19 +373,67 @@ export default function page() {
                   <span>Total Amount</span>
                   <span>
                     ₹
-                    {cart.product.reduce(
+                    {cart.item.reduce(
                       (acc: number, item: any) =>
                         acc +
-                        item.finalPrice * item.quantity +
-                        item.shippingCharge,
+                        item.product.finalPrice * item.quantity +
+                        item.product.shippingCharge,
                       0,
                     )}
                   </span>
                 </div>
-                <Button className="bg-blue-600 hover:bg-blue-700 cursor-pointer">
-                  {" "}
-                  <ChevronRight /> Proceed to Checkout
+                <Button
+                  className="bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                  onClick={async () => {
+                    if (cart.checkoutStatus === "cart") {
+                      await handleCreateOrder();
+                    } else if (cart.checkoutStatus === "address") {
+                      dispatch(changeCheckoutStatus("payment"));
+                    } else if (cart.checkoutStatus === "payment") {
+                      dispatch(changeCheckoutStatus("cart"));
+                    }
+                  }}
+                >
+                  {isCreateOrderLoading ? (
+                    <Loader className="animate-spin cursor-not-allowed" />
+                  ) : (
+                    <>
+                      {cart.checkoutStatus === "cart" && (
+                        <>
+                          {" "}
+                          <ChevronRight /> Proceed to Checkout{" "}
+                        </>
+                      )}
+                      {cart.checkoutStatus === "address" && (
+                        <>
+                          {" "}
+                          <ChevronRight /> Proceed to Payment{" "}
+                        </>
+                      )}
+                      {cart.checkoutStatus === "payment" && (
+                        <>
+                          {" "}
+                          <ChevronRight /> Proceed to Pay{" "}
+                        </>
+                      )}
+                    </>
+                  )}
                 </Button>
+                {cart && cart.checkoutStatus !== "cart" && (
+                  <Button
+                    variant="outline"
+                    className="cursor-pointer"
+                    onClick={() => {
+                      if (cart.checkoutStatus === "address") {
+                        dispatch(changeCheckoutStatus("cart"));
+                      } else if (cart.checkoutStatus === "payment") {
+                        dispatch(changeCheckoutStatus("address"));
+                      }
+                    }}
+                  >
+                    <ChevronLeft /> Go Back
+                  </Button>
+                )}
                 <p className="text-sm flex items-center gap-2 justify-center text-[#4B5563]">
                   <Shield /> Safe and Secure Payments
                 </p>

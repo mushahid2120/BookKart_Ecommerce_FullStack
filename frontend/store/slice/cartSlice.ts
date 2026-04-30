@@ -1,41 +1,51 @@
-import { createSlice,PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-
-
-interface cartItemState{
+interface ICartProduct {
   title: string;
-  finalPrice:string;
-  price:string;
-  image:string;
-  _id:string;
-  quantity:number;
-  shippingCharge:number;
+  finalPrice: number;
+  price: number;
+  image: string;
+  _id: string;
+  shippingCharge: number;
 }
 
-interface cartState{
-  product:cartItemState[],
-  checkoutStatus:"cart" | "address" | "payment"
+interface cartItemState {
+  product: ICartProduct;
+  quantity: number;
 }
 
-const initialState :cartState={
-    product:[],
-    checkoutStatus:"cart"
+interface cartState {
+  item: cartItemState[];
+  checkoutStatus: "cart" | "address" | "payment";
+  orderId: string;
+  cartId: string;
 }
 
+const initialState: cartState = {
+  item: [],
+  checkoutStatus: "cart",
+  orderId: "",
+  cartId: "",
+};
 
+const cartSlice = createSlice({
+  name: "wishlist",
+  initialState,
+  reducers: {
+    setCart: (state, action: PayloadAction<cartState>) => {
+      state.item = action.payload.item;
+      state.orderId = action.payload.orderId;
+      state.cartId = action.payload.cartId;
+    },
+    changeCheckoutStatus: (
+      state,
+      action: PayloadAction<"cart" | "address" | "payment">,
+    ) => {
+      state.checkoutStatus = action.payload;
+    },
+  },
+});
 
-const cartSlice=createSlice({
-    name:"wishlist",
-    initialState,
-    reducers:{
-        setCart:(state,action:PayloadAction<cartItemState[]>)=>{
-          state.product=[...action.payload]
-        }
-    }
-    
-})
+export const { setCart, changeCheckoutStatus } = cartSlice.actions;
 
-
-export const {setCart}=cartSlice.actions
-
-export default cartSlice.reducer
+export default cartSlice.reducer;

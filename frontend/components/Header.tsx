@@ -49,7 +49,7 @@ export default function Header() {
   const user = useSelector((state: RootState) => state.user.user);
   const dispatch = useDispatch();
   const router = useRouter();
-  const cart=useSelector((state:RootState)=>state.cart.product)
+  const cart=useSelector((state:RootState)=>state.cart)
   
   const handleProtectNav = (href: string) => {
     if (user) {
@@ -192,7 +192,7 @@ export default function Header() {
           <Button variant="ghost" className="relative hover:bg-slate-100">
             <ShoppingCart />
             Cart
-            <div className="absolute top-0 left-4 px-1  bg-[#EF4444] text-white rounded-full text-[10px]">{cart.length>0 && cart.length}</div>
+            <div className="absolute top-0 left-4 px-1  bg-[#EF4444] text-white rounded-full text-[10px]">{cart.item?.length>0 && cart.item?.length}</div>
           </Button>
         </Link>
       </nav>

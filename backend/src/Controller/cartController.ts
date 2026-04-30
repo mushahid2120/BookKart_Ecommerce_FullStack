@@ -3,6 +3,7 @@ import response from "../Utility/response.js";
 import Cart, { ICart, ICartItem } from "../Model/Cart.js";
 import mongoose, { ObjectId, Schema } from "mongoose";
 import Product from "../Model/Product.js";
+import Order from "../Model/Order.js";
 
 export async function getCart(req: Request, res: Response, next: NextFunction) {
   try {
@@ -11,25 +12,27 @@ export async function getCart(req: Request, res: Response, next: NextFunction) {
       user: userId as unknown as ObjectId,
     })
       .populate("item.product", "title finalPrice price shippingCharge images")
-      .select("item -_id")
+      .select("item orderId")
       .lean();
     if (!cart) {
-      return response(res, 404, "Your cart is Empty");
+      return response(res, 200, "Your cart is Empty", []);
     }
-    return response(
-      res,
-      200,
-      "Your Cart Item",
-      cart.item.map((cartItem: any) => ({
+
+    return response(res, 200, "Your Cart Item", {
+      item: cart.item.map((cartItem: any) => ({
+        product: {
           title: cartItem.product.title,
           price: cartItem.product.price,
           finalPrice: cartItem.product.finalPrice,
           shippingCharge: cartItem.product.shippingCharge,
           _id: cartItem.product._id,
           image: cartItem.product.images[0],
-          quantity:cartItem.quantity  
+        },
+        quantity: cartItem.quantity,
       })),
-    );
+      orderId: cart.orderId,
+      cartId: cart._id,
+    });
   } catch (error) {
     console.log(error);
     next(error);
@@ -59,18 +62,16 @@ export async function addToCart(
     });
 
     if (!cart) {
-      cart = new Cart({ user: userId, item: [] });
+      const order = new Order({
+        user: userId as unknown as ObjectId,
+        items: [],
+      });
+      const result = await order.save();
+      cart = new Cart({ user: userId, item: [], orderId: result._id });
     }
 
-    const existingItem = cart.item.find(
-      (item) => item.product.toString() === productid,
-    );
-    if (existingItem) {
-      existingItem.quantity += quantity;
-    } else {
-      const newItem = { product: productid, quantity: quantity };
-      cart.item.push(newItem as ICartItem);
-    }
+    const newItem = { product: productid, quantity: quantity };
+    cart.item.push(newItem as ICartItem);
     await cart.save();
     return response(res, 200, "Product has been added to Cart");
   } catch (error) {
@@ -109,7 +110,9 @@ export async function removeCart(
     } else {
       cart.item[ProductInCartIndex].quantity -= 1;
     }
+
     await cart.save();
+
     return response(res, 200, "Product has been removed from Cart");
   } catch (error) {
     console.log(error);

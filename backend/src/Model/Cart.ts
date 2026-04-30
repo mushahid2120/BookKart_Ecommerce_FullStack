@@ -1,13 +1,14 @@
 import { Document, model, Schema } from "mongoose";
 
-export interface ICartItem extends Document {
-  product: Schema.Types.ObjectId;
+export interface ICartItem {
+  product: Schema.Types.ObjectId ;
   quantity: number;
 }
 
 export interface ICart extends Document {
   user: Schema.Types.ObjectId;
   item: ICartItem[];
+  orderId:Schema.Types.ObjectId;
 }
 
 const CartSchema = new Schema<ICart>(
@@ -17,6 +18,7 @@ const CartSchema = new Schema<ICart>(
       product: { type: Schema.Types.ObjectId, required: true ,ref:'Product'},
       quantity: { type: Number, required: true },
     }],
+    orderId:{type:Schema.Types.ObjectId,required:true,ref:'Order'}
   },
   { timestamps: true },
 );

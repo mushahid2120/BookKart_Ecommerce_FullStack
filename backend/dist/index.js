@@ -2,17 +2,35 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import dbConnect from "./Config/db.js";
-import { PORT } from "./Config/env.js";
+import { FRONTEND_URL, PORT } from "./Config/env.js";
+import AuthRouter from "./Route/authRoutes.js";
+import productRouter from "./Route/productRoutes.js";
+import cartRouter from "./Route/cartRoutes.js";
+import wishListRouter from "./Route/wishListRoutes.js";
+import addressRouter from "./Route/addressRoutes.js";
+import userRouter from "./Route/userRoutes.js";
+import orderRouter from "./Route/orderRoutes.js";
 await dbConnect();
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: FRONTEND_URL,
+    credentials: true
+}));
 app.use(express.json());
 app.use(cookieParser());
 app.get("/", (req, res) => {
     res.end("Welcome to this project");
 });
+app.use("/auth", AuthRouter);
+app.use("/product", productRouter);
+app.use("/cart", cartRouter);
+app.use("/wishlist", wishListRouter);
+app.use("/address", addressRouter);
+app.use("/user", userRouter);
+app.use("/order", orderRouter);
 app.use((err, req, res, next) => {
     console.log("Global error handler");
+    console.log(err);
     return res.status(500).json({ error: "something-went-wrong" });
 });
 app.listen(PORT, () => {

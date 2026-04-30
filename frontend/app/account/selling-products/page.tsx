@@ -20,7 +20,7 @@ import toast from "react-hot-toast";
 export default function page() {
   const [sellingbook, setSellingBook] = useState<IProduct[]>([]);
   const [getMyPostedBooks] = useLazyGetProductBySellerIdQuery();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<string | null>(null);
   const [deleteProduct] = useDeleteProductMutation();
 
   useEffect(() => {
@@ -41,9 +41,10 @@ export default function page() {
 
   const handleDeleteProduct = async (productId: string) => {
     try {
-      setIsLoading(true);
+      setIsLoading(productId);
       const response = await deleteProduct(productId).unwrap();
       if (response.isSuccess) {
+         getAllPostedBooksByMe();
         toast.success("Product has been deleted Successfully");
       }
     } catch (error: any) {
@@ -52,7 +53,7 @@ export default function page() {
         toast.error("Something went wrong");
       }
     } finally {
-      setIsLoading(false);
+      setIsLoading(null);
     }
   };
 
@@ -138,7 +139,7 @@ export default function page() {
                 }}
                 size="icon"
               >
-                {isLoading ? (
+                {isLoading===book._id ? (
                   <Loader className="animate-spin cursor-pointer" />
                 ) : (
                   <>

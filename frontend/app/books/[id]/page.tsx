@@ -111,9 +111,9 @@ export default function page() {
   }, [book, wishlist]);
 
   useEffect(() => {
-    if (book && cart && cart.product.length !== 0 ) {
+    if (book && cart ) {
         setIsPresentInCart(
-          !!cart.product.find((item) => item._id === book._id),
+          !!cart.item.find((item) => item.product._id === book._id),
         );
     }
   }, [book, cart]);

@@ -18,7 +18,7 @@ export default function layout({
   console.log(pathName)
   return (
     <main className="md:px-16 sm:px-14  px-10 py-4 bg-[#f9fafb] flex gap-8">
-      <Card className="w-full max-w-82.5 p-8 bg-[#8a55f1] text-white gap-0 lg:flex hidden">
+      <Card className="w-full max-w-82.5 p-8 bg-[#8a55f1] text-white gap-0 lg:flex hidden h-120">
         <CardTitle className="text-2xl">Your Account</CardTitle>
         <CardHeader className="p-0 hover:bg-inherit">
           <UserCard user={user} />
