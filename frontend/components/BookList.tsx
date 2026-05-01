@@ -68,7 +68,6 @@ export default function BookList({ books }: { books: IBook[] }) {
     }
   };
 
-      console.log({wishlist})
 
   useEffect(() => {
     fetchingWishlist();

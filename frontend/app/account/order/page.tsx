@@ -7,7 +7,7 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { IOrder } from "@/lib/types/product";
+import { IOrder } from "@/store/slice/orderSlice";
 import { Calendar, CreditCard, ShoppingBag } from "lucide-react";
 import { useState } from "react";
 

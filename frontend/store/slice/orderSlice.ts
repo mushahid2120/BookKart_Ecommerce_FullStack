@@ -18,8 +18,7 @@ export interface IOrder {
   _id?: string;
   items?: IOrderItem[];
   totalAmount?: number;
-  currentSelectedShippingAddress?:number ;
-  shippingAddress?: IAddress[];
+  shippingAddress?: IAddress ;
   paymentStatus?: "pending" | "complete" | "failed";
   paymentMethod?: "UPI" | "Bank Account";
   paymentDetail?: {
@@ -31,6 +30,7 @@ export interface IOrder {
 }
 
 export interface IAddress {
+  _id:string;
   addressLine1: string;
   addressLine2?: string | null;
   phoneNumber?: string;
@@ -43,8 +43,7 @@ const initialState: IOrder = {
   _id: "",
   items: [],
   totalAmount: 0,
-  shippingAddress: [],
-  currentSelectedShippingAddress:-1,
+  shippingAddress: undefined,
   paymentStatus: "pending",
   paymentMethod: "UPI",
   paymentDetail: {
@@ -59,29 +58,12 @@ const orderSlice = createSlice({
   name: "order",
   initialState,
   reducers: {
-    setOrderItem: (state, action: PayloadAction<IOrder>) => {
-      state._id = action.payload._id;
-      state.items = action.payload.items;
-      state.totalAmount = state.items?.reduce(
-        (acc: number, item: any) =>
-          acc +
-          item.product.finalPrice * item.quantity +
-          item.product.shippingCharge,
-        0,
-      );
-      state.status=action.payload.status;
-    },
-    setShippingAddress:(state,action:PayloadAction<IAddress>)=>{
-      state.shippingAddress?.push(action.payload)
-    },
-    setCurrentSelectAddress:(state,action:PayloadAction<number>)=>{
-      if(!state.shippingAddress) return 
-      if(action.payload<0 && action.payload>=state.shippingAddress?.length) return 
-      state.currentSelectedShippingAddress=action.payload
+    setOrder: (state, action: PayloadAction<IOrder>) => {
+     return action.payload;
     }
   },
 });
 
-export const { setOrderItem,setShippingAddress } = orderSlice.actions;
+export const { setOrder } = orderSlice.actions;
 
 export default orderSlice.reducer;

@@ -2,8 +2,7 @@
 import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Button } from "./ui/button";
-import { Edit, Plus } from "lucide-react";
-import { Label } from "./ui/label";
+import { Edit, Loader, Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
@@ -13,49 +12,60 @@ import { Checkbox } from "./ui/checkbox";
 
 export default function Address({
   handleAddress,
-  isChangingAddress,
-  setIsChangingAddress,
-  address,
-  currentAddressIndex,
+  addressDialogueStatus,
+  setAddressDialogueStatus,
+  userAddress,
+  orderAddress,
+  isAddressLoading,
+  handleAddAddressOnOrder,
+  handleRemoveAddressOnOrder,
+  editingAddressId,
+  setEditingAddressId,
 }: {
   handleAddress: (address: IAddress) => void;
-  isChangingAddress: boolean;
-  setIsChangingAddress: (val: boolean) => void;
-  address?: IAddress[];
-  currentAddressIndex?: number;
+  isAddressLoading: boolean;
+  addressDialogueStatus:
+    | "noAddress"
+    | "selectAddress"
+    | "openAddressForm"
+    | null;
+  setAddressDialogueStatus: (
+    val: "noAddress" | "selectAddress" | "openAddressForm" | null,
+  ) => void;
+  userAddress: IAddress[] | null;
+  orderAddress?: IAddress;
+  handleAddAddressOnOrder: (address: IAddress) => void;
+  handleRemoveAddressOnOrder: (address: IAddress) => void;
+  editingAddressId: string | null;
+  setEditingAddressId: (addressId: string) => void;
 }) {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<IAddress>();
-  const [emptyAddress, setEmptyAddress] = useState<boolean>(false);
-  const [isAddressForm, setIsAddressForm] = useState<boolean>(false);
-  const [isAddressDialoageOpen, setIsAddressDialoageOpen] =
-    useState<boolean>(false);
 
   useEffect(() => {
-    if (address && address.length === 0) {
-      setEmptyAddress(true);
-      setIsAddressDialoageOpen(true);
+    if (userAddress && userAddress.length === 0) {
+      setAddressDialogueStatus("noAddress");
     }
-    if (currentAddressIndex === -1) {
-      setIsAddressDialoageOpen(true);
-      setIsChangingAddress(true);
+    if (userAddress && userAddress.length !== 0) {
+      setAddressDialogueStatus("selectAddress");
     }
-  }, [address]);
+    if (orderAddress) {
+      setAddressDialogueStatus(null);
+    }
+  }, [userAddress, orderAddress]);
 
-  console.log({ emptyAddress });
-  console.log({ isAddressDialoageOpen });
-  console.log({ address });
   return (
     <Dialog
-      open={isAddressDialoageOpen}
+      open={!!addressDialogueStatus}
       onOpenChange={() => {
-        setIsAddressDialoageOpen(false);
+        setAddressDialogueStatus(null);
       }}
     >
-      {emptyAddress && (
+      {addressDialogueStatus === "noAddress" && (
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="text-center ">
@@ -66,15 +76,14 @@ export default function Address({
             variant="outline"
             className="cursor-pointer"
             onClick={() => {
-              setIsAddressForm(true);
-              setEmptyAddress(false);
+              setAddressDialogueStatus("openAddressForm");
             }}
           >
             <Plus /> Add New Adddress
           </Button>
         </DialogContent>
       )}
-      {isAddressForm && (
+      {addressDialogueStatus === "openAddressForm" && (
         <DialogContent className="sm:max-w-md  z-2000">
           <DialogHeader>
             <DialogTitle>Add New Address</DialogTitle>
@@ -224,51 +233,76 @@ export default function Address({
               type="submit"
               className="bg-blue-600 hover:bg-blue-700 cursor-pointer"
             >
-              Add Adddress
+              {isAddressLoading ? (
+                <Loader className="animate-spin cursor-not-allowed" />
+              ) : editingAddressId ? (
+                "Save Address"
+              ) : (
+                "Add Adddress"
+              )}
             </Button>
           </form>
         </DialogContent>
       )}
-      {isChangingAddress && (
+      {addressDialogueStatus === "selectAddress" && (
         <DialogContent className="sm:max-w-2xl  z-2000">
           <DialogHeader>
             <DialogTitle className="text-center ">
               Select or Add Delivery Address
             </DialogTitle>
           </DialogHeader>
-          <div className="flex gap-4">
-            {address &&
-              address.map((add: IAddress) => (
-                <Card className="sm:max-w-1/2 gap-2">
+          <div className="grid sm:grid-cols-2 gap-4">
+            {userAddress &&
+              userAddress.map((add: IAddress, index: number) => (
+                <Card
+                  className={` gap-2 py-1 ${add._id === orderAddress?._id && "border-blue-500"}`}
+                  key={index}
+                >
                   <CardHeader className="flex justify-between items-center">
-                    <Checkbox className="w-5 h-5 border-black cursor-pointer" />
-                    <Button variant="ghost">
+                    <Checkbox
+                      className="w-5 h-5 border-black cursor-pointer"
+                      checked={add._id === orderAddress?._id}
+                      onCheckedChange={(checked) => {
+                        if (add._id === orderAddress?._id) {
+                          handleRemoveAddressOnOrder(add);
+                        } else {
+                          handleAddAddressOnOrder(add);
+                        }
+                      }}
+                    />
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        reset(add);
+                        setEditingAddressId(add._id);
+                        setAddressDialogueStatus("openAddressForm");
+                      }}
+                    >
                       <Edit size={20} />
                     </Button>
                   </CardHeader>
                   <CardContent className="text-[#4B5563] text-sm">
+                    <div>{add.addressLine1}</div>
+                    <div>{add.addressLine2}</div>
                     <div>
-                      {add.addressLine1}
+                      {add.city} {add.state} {add.pin}
                     </div>
-                    <div>
-                      {add.addressLine2}
-                    </div>
-                    <div>{add.city} {add.state} {add.pin}</div>
                     <div className="font-medium">Phone: {add.phoneNumber}</div>
                   </CardContent>
                 </Card>
               ))}
           </div>
-          <Button
-            variant="outline"
-            className="cursor-pointer"
-            onClick={() => {
-              setIsAddressForm(true);
-              setEmptyAddress(false);
-            }}
-          >
-            <Plus /> Add New Adddress
-          </Button>
+          {userAddress && userAddress.length < 2 && (
+            <Button
+              variant="outline"
+              className="cursor-pointer"
+              onClick={() => {
+                setAddressDialogueStatus("openAddressForm");
+              }}
+            >
+              <Plus /> Add New Adddress
+            </Button>
+          )}
         </DialogContent>
       )}
     </Dialog>

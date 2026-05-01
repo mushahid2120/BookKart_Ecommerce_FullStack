@@ -29,7 +29,7 @@ const OrderSchema = new Schema<IOrder>({
     },
   ],
   totalAmount: { type: Number, required: true, default: 0 },
-  shippingAddress: { type: Schema.Types.ObjectId },
+  shippingAddress: { type: Schema.Types.ObjectId ,ref:"Address"},
   paymentStatus: {
     type: String,
     enum: ["pending", "complete", "failed", null],
@@ -50,6 +50,8 @@ const OrderSchema = new Schema<IOrder>({
     enum: ["processing", "shipped", "delivered", "cancelled", null],
     default: null,
   },
+},{
+  timestamps:true
 });
 
 const Order = model("Order", OrderSchema);

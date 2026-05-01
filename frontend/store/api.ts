@@ -43,9 +43,9 @@ const Api_Urls = {
     `${BASE_URL}/wishlist/remove-wishlist/${productId}`,
 
   //Address
-  getAddressByUserId: `{BASE_URL}/address/`,
-  createOrUpdateAddress: `{BASE_URL}/address/create-update-address`,
-  deleteAddress: `{BASE_URL}/address/delete-address`,
+  getAddressByUserId: `${BASE_URL}/address/`,
+  createOrUpdateAddress: (addressId:string)=>`${BASE_URL}/address/create-update-address/${addressId}`,
+  deleteAddress: `${BASE_URL}/address/delete-address`,
 
   //User
   updateUser: `${BASE_URL}/user/update-user`,
@@ -242,7 +242,7 @@ export const api = createApi({
     }),
     createOrUpdateAddress: builder.mutation({
       query: (address) => ({
-        url: Api_Urls.createOrUpdateAddress,
+        url: Api_Urls.createOrUpdateAddress(address.addressId),
         method: "POST",
         body: address,
       }),

@@ -208,7 +208,6 @@ export default function page() {
   const fetchingCart = async () => {
     try {
       const response = await getCart({}).unwrap();
-      console.log(response);
       if (response.isSuccess) {
         dispatch(setCart(response.data));
       }

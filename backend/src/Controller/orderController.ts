@@ -31,14 +31,22 @@ export async function getOrderByOrderId(
 ) {
   try {
     const { orderId } = req.params;
-    if (orderId) {
-      response(res, 400, "OrderId is required");
+    if (!orderId) {
+      return response(res, 400, "OrderId is required");
     }
-    const order = await Order.findById(orderId).lean();
+    const order = await Order.findById(orderId)
+      .populate(
+        "shippingAddress",
+        "addressLine1 addressLine2 city phoneNumber pin state",
+      )
+      .select(
+        "items totalAmount paymentStatus paymentMethod status shippingAddress ",
+      )
+      .lean();
     if (!order) {
-      response(res, 400, "Invalid Order id");
+      return response(res, 400, "Invalid Order id");
     }
-    response(res, 200, "Your order By orderId", order);
+    return response(res, 200, "Your order By orderId", order);
   } catch (error) {
     console.log(error);
     next(error);
@@ -73,17 +81,22 @@ export async function createUpdateOrder(
     let order = await Order.findById(orderId);
 
     if (order) {
-      order.items=cart.item.map((it)=>({product:(it.product as any)._id,quantity:it.quantity}))
-      order.shippingAddress = shippingAddress || order.shippingAddress;
+      order.items =
+        cart.item.map((it) => ({
+          product: (it.product as any)._id,
+          quantity: it.quantity,
+        })) || order.items;
+      order.shippingAddress = shippingAddress ;
       order.paymentMethod = paymentMethod || order.paymentMethod;
-      order.status = status;
-      order.totalAmount = cart.item.reduce(
-        (acc: number, item: any) =>
-          acc +
-          item.product.finalPrice * item.quantity +
-          item.product.shippingCharge,
-        0,
-      );
+      order.status = status || order.status;
+      order.totalAmount =
+        cart.item.reduce(
+          (acc: number, item: any) =>
+            acc +
+            item.product.finalPrice * item.quantity +
+            item.product.shippingCharge,
+          0,
+        ) || order.totalAmount;
       if (paymentDetail) {
         order.paymentMethod = paymentMethod;
         order.paymentStatus = paymentStatus;

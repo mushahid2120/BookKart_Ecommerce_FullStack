@@ -13,7 +13,7 @@ export interface  IUser extends Document{
     resetPasswordToken:string | null;
     resetPaswordExpires:Date | null;
     agreeTerms:boolean;
-    address:Schema.Types.ObjectId | null;
+    address:Schema.Types.ObjectId[]
     comparePassword(candidatePassword:string):Promise<boolean>
 }
 
@@ -29,7 +29,7 @@ const UserSchema=new Schema<IUser>({
     resetPasswordToken:{type:String,default:null},
     resetPaswordExpires:{type:Date,default:new Date(Date.now()+10000*60*60)},
     agreeTerms:{type:Boolean,required:true,default:false},
-    address:{type:Schema.Types.ObjectId,default:null,ref:"Address"},
+    address:[{type:Schema.Types.ObjectId,default:[],ref:"Address"}],
 },{
     timestamps:true,
     strict: "throw",

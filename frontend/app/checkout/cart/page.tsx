@@ -1,12 +1,20 @@
 "use client";
 import Address from "@/components/Address";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import { IOrderItem } from "@/lib/types/order";
 import {
   useAddToWishlistMutation,
+  useCreateOrUpdateAddressMutation,
   useCreateOrUpdateOrderMutation,
+  useLazyGetAddressByUserIdQuery,
   useLazyGetCartQuery,
+  useLazyGetOrderByOrderIdQuery,
   useLazyGetWishlistQuery,
   useRemoveFromCartMutation,
   useRemoveFromWishlistMutation,
@@ -14,8 +22,7 @@ import {
 import { changeCheckoutStatus, setCart } from "@/store/slice/cartSlice";
 import {
   IAddress,
-  setOrderItem,
-  setShippingAddress,
+  setOrder,
 } from "@/store/slice/orderSlice";
 import { setWishlist } from "@/store/slice/wishlistSlice";
 import { RootState } from "@/store/store";
@@ -31,6 +38,7 @@ import {
   Trash2,
 } from "lucide-react";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
@@ -52,7 +60,16 @@ export default function page() {
   const [isCreateOrderLoading, setIsCreateOrderLoading] =
     useState<boolean>(false);
   const [createOrder] = useCreateOrUpdateOrderMutation();
-  const [isChangingAddress, setIsChangingAddress] = useState<boolean>(false);
+  const [addressDialogueStatus, setAddressDialogueStatus] = useState<
+    "noAddress" | "selectAddress" | "openAddressForm" | null
+  >(null);
+  const [addressUpdate] = useCreateOrUpdateAddressMutation();
+  const [getUserAddress] = useLazyGetAddressByUserIdQuery();
+  const [getOrderByOrderId] = useLazyGetOrderByOrderIdQuery();
+  const [userAddress, setUserAddress] = useState<IAddress[] | null>([]);
+  const [isAddressLoading, setIsAddressLoading] = useState<boolean>(false);
+  const [editingAddressId,setEditingAddressId]=useState<string | null>(null);
+  const pathname= usePathname();
 
   const handleAddToWishlist = async (productId: string) => {
     if (isWishlistLoading) return;
@@ -120,7 +137,6 @@ export default function page() {
   const fetchingCart = async () => {
     try {
       const response = await getCart({}).unwrap();
-      console.log(response);
       if (response.isSuccess) {
         dispatch(setCart(response.data));
       }
@@ -128,6 +144,35 @@ export default function page() {
       console.log(error);
     }
   };
+
+  const fetchingAddress = async () => {
+    try {
+      const response = await getUserAddress({}).unwrap();
+      if (response.isSuccess) {
+        setUserAddress(response.data);
+      }
+    } catch (error: any) {
+      console.log(error);
+      if (error.status === 500) {
+        toast.error("Something went wrong");
+      }
+    }
+  };
+
+  const fetchingOrder = async () => {
+    try {
+      const response = await getOrderByOrderId(cart.orderId).unwrap();
+      if(response.isSuccess){
+        dispatch(setOrder(response.data))
+      }
+    } catch (error: any) {
+      console.log(error);
+      if (error.status === 500) {
+        toast.error("Something went wrong");
+      }
+    }
+  };
+
 
   const handleCreateOrder = async () => {
     if (isCreateOrderLoading) return;
@@ -144,14 +189,8 @@ export default function page() {
       }).unwrap();
 
       if (response.isSuccess) {
+        await fetchingOrder();
         dispatch(changeCheckoutStatus("address"));
-        dispatch(
-          setOrderItem({
-            items: cart.item,
-            _id: cart.orderId,
-            status: "processing",
-          }),
-        );
         toast.success("Order has been created");
       }
     } catch (error: any) {
@@ -162,10 +201,61 @@ export default function page() {
   };
 
   const handleAddress = async (address: IAddress) => {
-    dispatch(changeCheckoutStatus("address"));
-    dispatch(setShippingAddress(address));
-    toast.success("Address has been added");
-    setIsChangingAddress(true);
+    if(isAddressLoading) return 
+    setIsAddressLoading(true)
+    try {
+      const response = await addressUpdate({...address,addressId:editingAddressId}).unwrap();
+      if (response.isSuccess) {
+        await fetchingAddress();
+        await fetchingOrder();
+        toast.success("Address has been added");
+        setAddressDialogueStatus("selectAddress");
+      }
+    } catch (error: any) {
+      console.log(error);
+      if (error.status === 500) {
+        toast.error("Something went wrong");
+      }
+    }finally{
+      setIsAddressLoading(false);
+    }
+  };
+
+  const handleAddAddressOnOrder = async (address: IAddress) => {
+    try {
+      const response = await createOrder({
+        orderId: cart.orderId,
+        cartId: cart.cartId,
+        shippingAddress: address._id,
+      }).unwrap();
+      if (response.isSuccess) {
+        await fetchingOrder();
+        setAddressDialogueStatus(null);
+      }
+    } catch (error: any) {
+      console.log(error);
+      if (error.status === 500) {
+        toast.error("Something Went Wrong");
+      }
+    }
+  };
+
+  const handleRemoveAddressOnOrder = async (address: IAddress) => {
+    try {
+      const response = await createOrder({
+        orderId: cart.orderId,
+        cartId: cart.cartId,
+        shippingAddress: null,
+      }).unwrap();
+      if (response.isSuccess) {
+        await fetchingOrder();
+      }
+    } catch (error: any) {
+      console.log(error);
+      if (error.status === 500) {
+        toast.error("Something Went Wrong");
+      }
+    }
   };
 
   useEffect(() => {
@@ -173,8 +263,21 @@ export default function page() {
     fetchingWishlist();
   }, []);
 
-  console.log({ cart });
-  console.log({ order });
+  useEffect(() => {
+    if (cart.checkoutStatus === "address") {
+      fetchingAddress();
+    }
+  }, [cart.checkoutStatus]);
+
+  useEffect(() => {
+    if (!!cart?.orderId) {
+      fetchingOrder();
+    }
+  }, [cart.orderId]);
+
+  useEffect(()=>{
+    dispatch(changeCheckoutStatus("cart"))
+  },[pathname])
 
   return (
     <>
@@ -214,7 +317,7 @@ export default function page() {
           </div>
         </section>
         <section className="flex lg:flex-row flex-col gap-8">
-          <Card className="gap-4 grow h-160 overflow-y-scroll">
+          <Card className="gap-4 grow max-h-160 overflow-y-scroll">
             <CardHeader className="gap-0">
               <h1 className="text-2xl font-medium">Order Summary</h1>
               <p className="text-[#737373] text-sm">Review your items</p>
@@ -321,125 +424,175 @@ export default function page() {
           {cart.checkoutStatus === "address" && (
             <Address
               handleAddress={handleAddress}
-              isChangingAddress={isChangingAddress}
-              setIsChangingAddress={setIsChangingAddress}
-              address={order.shippingAddress}
-              currentAddressIndex={order.currentSelectedShippingAddress}
+              addressDialogueStatus={addressDialogueStatus}
+              setAddressDialogueStatus={setAddressDialogueStatus}
+              userAddress={userAddress}
+              orderAddress={order.shippingAddress}
+              isAddressLoading={isAddressLoading}
+              handleAddAddressOnOrder={handleAddAddressOnOrder}
+              handleRemoveAddressOnOrder={handleRemoveAddressOnOrder}
+              editingAddressId={editingAddressId}
+              setEditingAddressId={setEditingAddressId}
             />
           )}
 
-          {cart.item && (
-            <Card className="lg:w-80 gap-2 h-90">
-              <CardHeader className="text-xl font-medium ">
-                Price Details
-              </CardHeader>
-              <CardContent className="flex flex-col gap-4 text-sm">
-                <div className="flex items-center justify-between">
-                  <span>Price ({cart.item.length} items)</span>
-                  <span>
-                    ₹
-                    {cart.item.reduce(
-                      (acc: number, item: any) =>
-                        acc + item.product.price * item.quantity,
-                      0,
-                    )}
-                  </span>
-                </div>
-                <div className="text-[#16A34A] flex items-center justify-between">
-                  <span>Discount</span>
-                  <span>
-                    - ₹
-                    {cart.item.reduce(
-                      (acc: number, item: any) =>
-                        acc +
-                        (item.product.price -
-                          item.product.finalPrice * item.quantity),
-                      0,
-                    )}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Delivery Charges</span>
-                  <span className="text-[16A34A]">
-                    {cart.item.reduce(
-                      (acc: number, item: any) =>
-                        acc + item.product.shippingCharge * item.quantity,
-                      0,
-                    )}
-                  </span>
-                </div>
-                <hr />
-                <div className="flex items-center justify-between font-medium ">
-                  <span>Total Amount</span>
-                  <span>
-                    ₹
-                    {cart.item.reduce(
-                      (acc: number, item: any) =>
-                        acc +
-                        item.product.finalPrice * item.quantity +
-                        item.product.shippingCharge,
-                      0,
-                    )}
-                  </span>
-                </div>
-                <Button
-                  className="bg-blue-600 hover:bg-blue-700 cursor-pointer"
-                  onClick={async () => {
-                    if (cart.checkoutStatus === "cart") {
-                      await handleCreateOrder();
-                    } else if (cart.checkoutStatus === "address") {
-                      dispatch(changeCheckoutStatus("payment"));
-                    } else if (cart.checkoutStatus === "payment") {
-                      dispatch(changeCheckoutStatus("cart"));
-                    }
-                  }}
-                >
-                  {isCreateOrderLoading ? (
-                    <Loader className="animate-spin cursor-not-allowed" />
-                  ) : (
-                    <>
-                      {cart.checkoutStatus === "cart" && (
-                        <>
-                          {" "}
-                          <ChevronRight /> Proceed to Checkout{" "}
-                        </>
+          <div className="space-y-4">
+            {cart.item && (
+              <Card className="lg:w-80 gap-2 h-90">
+                <CardHeader className="text-xl font-medium ">
+                  Price Details
+                </CardHeader>
+                <CardContent className="flex flex-col gap-4 text-sm">
+                  <div className="flex items-center justify-between">
+                    <span>Price ({cart.item.length} items)</span>
+                    <span>
+                      ₹
+                      {cart.item.reduce(
+                        (acc: number, item: any) =>
+                          acc + item.product.price * item.quantity,
+                        0,
                       )}
-                      {cart.checkoutStatus === "address" && (
-                        <>
-                          {" "}
-                          <ChevronRight /> Proceed to Payment{" "}
-                        </>
+                    </span>
+                  </div>
+                  <div className="text-[#16A34A] flex items-center justify-between">
+                    <span>Discount</span>
+                    <span>
+                      - ₹
+                      {cart.item.reduce(
+                        (acc: number, item: any) =>
+                          acc +
+                          (item.product.price -
+                            item.product.finalPrice * item.quantity),
+                        0,
                       )}
-                      {cart.checkoutStatus === "payment" && (
-                        <>
-                          {" "}
-                          <ChevronRight /> Proceed to Pay{" "}
-                        </>
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Delivery Charges</span>
+                    <span className="text-[16A34A]">
+                      {cart.item.reduce(
+                        (acc: number, item: any) =>
+                          acc + item.product.shippingCharge * item.quantity,
+                        0,
                       )}
-                    </>
-                  )}
-                </Button>
-                {cart && cart.checkoutStatus !== "cart" && (
+                    </span>
+                  </div>
+                  <hr />
+                  <div className="flex items-center justify-between font-medium ">
+                    <span>Total Amount</span>
+                    <span>
+                      ₹
+                      {cart.item.reduce(
+                        (acc: number, item: any) =>
+                          acc +
+                          item.product.finalPrice * item.quantity +
+                          item.product.shippingCharge,
+                        0,
+                      )}
+                    </span>
+                  </div>
                   <Button
-                    variant="outline"
-                    className="cursor-pointer"
-                    onClick={() => {
-                      if (cart.checkoutStatus === "address") {
-                        dispatch(changeCheckoutStatus("cart"));
+                    className="bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                    onClick={async () => {
+                      if (cart.checkoutStatus === "cart") {
+                        await handleCreateOrder();
+                      } else if (cart.checkoutStatus === "address") {
+                        if (
+                          !!userAddress &&
+                          !order?.shippingAddress &&
+                          !userAddress.find(
+                            (address) =>
+                              order.shippingAddress?._id === address._id,
+                          )
+                        ) {
+                          if (userAddress.length === 0)
+                            setAddressDialogueStatus("noAddress");
+                          setAddressDialogueStatus("selectAddress");
+                        } else {
+                          dispatch(changeCheckoutStatus("payment"));
+                        }
                       } else if (cart.checkoutStatus === "payment") {
-                        dispatch(changeCheckoutStatus("address"));
+                        dispatch(changeCheckoutStatus("cart"));
                       }
                     }}
                   >
-                    <ChevronLeft /> Go Back
+                    {isCreateOrderLoading ? (
+                      <Loader className="animate-spin cursor-not-allowed" />
+                    ) : (
+                      <>
+                        {cart.checkoutStatus === "cart" && (
+                          <>
+                            {" "}
+                            <ChevronRight /> Proceed to Checkout{" "}
+                          </>
+                        )}
+                        {cart.checkoutStatus === "address" && (
+                          <>
+                            {" "}
+                            <ChevronRight /> Proceed to Payment{" "}
+                          </>
+                        )}
+                        {cart.checkoutStatus === "payment" && (
+                          <>
+                            {" "}
+                            <ChevronRight /> Proceed to Pay{" "}
+                          </>
+                        )}
+                      </>
+                    )}
                   </Button>
-                )}
-                <p className="text-sm flex items-center gap-2 justify-center text-[#4B5563]">
-                  <Shield /> Safe and Secure Payments
-                </p>
-              </CardContent>
-            </Card>
-          )}
+                  {cart && cart.checkoutStatus !== "cart" && (
+                    <Button
+                      variant="outline"
+                      className="cursor-pointer"
+                      onClick={() => {
+                        if (cart.checkoutStatus === "address") {
+                          dispatch(changeCheckoutStatus("cart"));
+                        } else if (cart.checkoutStatus === "payment") {
+                          dispatch(changeCheckoutStatus("address"));
+                        }
+                      }}
+                    >
+                      <ChevronLeft /> Go Back
+                    </Button>
+                  )}
+                  <p className="text-sm flex items-center gap-2 justify-center text-[#4B5563]">
+                    <Shield /> Safe and Secure Payments
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
+            {order?.shippingAddress && !(cart?.checkoutStatus === "cart") && (
+              <Card className="gap-2 lg:w-80">
+                <CardHeader className="text-xl font-medium">
+                  Delivery Address
+                </CardHeader>
+                <CardContent className="text-[sm]">
+                  <div>
+                    {order.shippingAddress.addressLine1}
+                  </div>
+                  <div>
+                    {order.shippingAddress.addressLine2}
+                  </div>
+                  <div>{order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.pin}</div>
+                  <div>Phone: {order.shippingAddress.phoneNumber}</div>
+                </CardContent>
+                <CardFooter>
+                  <Button
+                    variant="outline"
+                    className="ml-auto cursor-pointer"
+                    onClick={() => {
+                      setAddressDialogueStatus("selectAddress");
+                    }}
+                  >
+                    <MapPin />
+                    <span>Change Address</span>
+                  </Button>
+                </CardFooter>
+              </Card>
+            )}
+          </div>
         </section>
       </main>
     </>
