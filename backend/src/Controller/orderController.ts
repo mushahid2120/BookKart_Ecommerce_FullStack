@@ -13,7 +13,24 @@ export async function getOrderByUserId(
     const userId = req.id;
     const order = await Order.find({
       user: userId as unknown as ObjectId,
-    }).lean();
+    })
+      .populate(
+        "shippingAddress",
+        "addressLine1 addressLine2 city phoneNumber pin state",
+      )
+      .populate({
+        path: "items.product",
+        select: {
+          title: 1,
+          subject: 1,
+          author: 1,
+          finalPrice: 1,
+          price: 1,
+          shippingCharge: 1,
+          images: { $slice: 1 }, // Only fetches the first element in the array
+        },
+      })
+      .lean();
     if (!order) {
       response(res, 400, "Invalid User");
     }
@@ -31,7 +48,7 @@ export async function getOrderByOrderId(
 ) {
   try {
     const { orderId } = req.params;
-    if (!orderId) {
+    if (!orderId || orderId === "null") {
       return response(res, 400, "OrderId is required");
     }
     const order = await Order.findById(orderId)
@@ -39,6 +56,7 @@ export async function getOrderByOrderId(
         "shippingAddress",
         "addressLine1 addressLine2 city phoneNumber pin state",
       )
+      .populate("items.product", "title finalPrice price shippingCharge")
       .select(
         "items totalAmount paymentStatus paymentMethod status shippingAddress ",
       )
@@ -72,12 +90,21 @@ export async function createUpdateOrder(
 
     const cart = await Cart.findById(cartId)
       .populate("item.product", "quantity finalPrice shippingCharge _id")
-      .select("item -_id");
+      .select("item");
 
     // return res.status(400).json({cart})
     if (!cart || cart?.item?.length === 0) {
       return response(res, 400, "Cart is Empty");
     }
+
+    const itemTotalAmount = cart.item.reduce(
+      (acc: number, item: any) =>
+        acc +
+        item.product.finalPrice * item.quantity +
+        item.product.shippingCharge,
+      0,
+    );
+
     let order = await Order.findById(orderId);
 
     if (order) {
@@ -86,17 +113,10 @@ export async function createUpdateOrder(
           product: (it.product as any)._id,
           quantity: it.quantity,
         })) || order.items;
-      order.shippingAddress = shippingAddress ;
+      order.shippingAddress = shippingAddress;
       order.paymentMethod = paymentMethod || order.paymentMethod;
       order.status = status || order.status;
-      order.totalAmount =
-        cart.item.reduce(
-          (acc: number, item: any) =>
-            acc +
-            item.product.finalPrice * item.quantity +
-            item.product.shippingCharge,
-          0,
-        ) || order.totalAmount;
+      order.totalAmount = itemTotalAmount || order.totalAmount;
       if (paymentDetail) {
         order.paymentMethod = paymentMethod;
         order.paymentStatus = paymentStatus;
@@ -104,13 +124,28 @@ export async function createUpdateOrder(
       }
       await order.save();
     } else {
-      response(res, 404, "order has been not been created");
+      order = new Order({
+        user: userId,
+        items: cart.item.map((it) => ({
+          product: (it.product as any)._id,
+          quantity: it.quantity,
+        })),
+        totalAmount: itemTotalAmount,
+        shippingAddress,
+        paymentStatus,
+        paymentMethod,
+        paymentDetail,
+        status,
+      });
+      const orderResult = await order.save();
+      cart.orderId = orderResult._id as unknown as ObjectId;
+      const cartResult = await cart.save();
     }
 
     if (paymentDetail) {
       await Cart.findOneAndUpdate(
         { user: userId as unknown as ObjectId },
-        { $set: { item: [] } },
+        { $set: { item: [], orderId: null } },
       );
     }
     return response(res, 200, "Order Created Successfully");

@@ -33,9 +33,9 @@ const cartSlice = createSlice({
   initialState,
   reducers: {
     setCart: (state, action: PayloadAction<cartState>) => {
-      state.item = action.payload.item;
       state.orderId = action.payload.orderId;
       state.cartId = action.payload.cartId;
+      state.item = action.payload.item;
     },
     changeCheckoutStatus: (
       state,

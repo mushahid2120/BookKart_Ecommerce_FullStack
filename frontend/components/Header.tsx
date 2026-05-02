@@ -19,12 +19,14 @@ import {
 import DropDownMenu from "./DropDownMenu";
 import DrawerMenu from "./DrawerMenu";
 import LoginSignupDialouge from "./LoginSignupDialouge";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleLoginDialog } from "@/store/slice/userSlice";
 import { RootState } from "@/store/store";
+import { useLazyGetCartQuery } from "@/store/api";
+import { setCart } from "@/store/slice/cartSlice";
 
 export interface EachMenuItemType {
   title: string;
@@ -49,7 +51,9 @@ export default function Header() {
   const user = useSelector((state: RootState) => state.user.user);
   const dispatch = useDispatch();
   const router = useRouter();
-  const cart=useSelector((state:RootState)=>state.cart)
+  const cart=useSelector((state:RootState)=>state.cart);
+  const [getCart]=useLazyGetCartQuery();
+  const pathname=usePathname();
   
   const handleProtectNav = (href: string) => {
     if (user) {
@@ -94,6 +98,23 @@ export default function Header() {
     { title: "Privacy Policy", icon: <BookLock />, path: "privacy-policy" },
     { title: "Help", icon: <CircleQuestionMark />, path: "help" },
   ];
+
+  useEffect(()=>{
+    if(/^\/book\/[^\/]+$/.test(pathname) || pathname!=="/checkout/cart"){
+        fetchingCart();
+    }
+  },[pathname])
+
+  const fetchingCart=async()=>{
+    try {
+      const response=await getCart({}).unwrap();
+      if(response.isSuccess){
+        dispatch(setCart(response.data))
+      }
+    } catch (error:any) {
+      console.log(error)
+    }
+  }
 
 
   return (

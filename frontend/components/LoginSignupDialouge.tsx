@@ -89,8 +89,9 @@ export default function LoginSignupDialouge({
         const res = await checkUser({}).unwrap();
         if (res.isSuccess) {
           dispatch(setUser(res.data));
+          dispatch(setEmailVerified(response.data.isEmailVerified));
+          window.location.reload();
         }
-        dispatch(setEmailVerified(response.data.isEmailVerified));
       }
     } catch (error: any) {
       console.log(error);

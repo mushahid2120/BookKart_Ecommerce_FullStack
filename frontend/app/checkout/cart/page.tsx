@@ -97,6 +97,7 @@ export default function page() {
       if (response.isSuccess) {
         fetchingCart();
         toast.success("product has been remove from cart");
+        dispatch(changeCheckoutStatus("cart"))
       }
     } catch (error: any) {
       console.log(error);
@@ -134,18 +135,7 @@ export default function page() {
     }
   };
 
-  const fetchingCart = async () => {
-    try {
-      const response = await getCart({}).unwrap();
-      if (response.isSuccess) {
-        dispatch(setCart(response.data));
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const fetchingAddress = async () => {
+    const fetchingAddress = async () => {
     try {
       const response = await getUserAddress({}).unwrap();
       if (response.isSuccess) {
@@ -158,6 +148,19 @@ export default function page() {
       }
     }
   };
+
+  const fetchingCart = async () => {
+    try {
+      const response = await getCart({}).unwrap();
+      if (response.isSuccess) {
+        dispatch(setCart(response.data));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
 
   const fetchingOrder = async () => {
     try {
@@ -176,7 +179,7 @@ export default function page() {
 
   const handleCreateOrder = async () => {
     if (isCreateOrderLoading) return;
-    if (!cart || cart?.item.length === 0 || !cart.orderId) {
+    if (!cart || cart?.item.length === 0 ) {
       console.log("cart is empty");
       return;
     }
@@ -189,7 +192,7 @@ export default function page() {
       }).unwrap();
 
       if (response.isSuccess) {
-        await fetchingOrder();
+        await fetchingCart();
         dispatch(changeCheckoutStatus("address"));
         toast.success("Order has been created");
       }
@@ -269,15 +272,16 @@ export default function page() {
     }
   }, [cart.checkoutStatus]);
 
-  useEffect(() => {
-    if (!!cart?.orderId) {
-      fetchingOrder();
-    }
-  }, [cart.orderId]);
-
   useEffect(()=>{
     dispatch(changeCheckoutStatus("cart"))
   },[pathname])
+
+  useEffect(() => {
+  if (!!cart.orderId && cart.orderId!=="null"  && cart.checkoutStatus!=="cart") {
+    fetchingOrder();
+  }
+}, [cart.orderId,cart.checkoutStatus]);
+
 
   return (
     <>
