@@ -26,7 +26,7 @@ const Api_Urls = {
   getOrderByOrderId: (orderId: string) =>
     `${BASE_URL}/order/get-order-by-orderid/${orderId}`,
   createOrUpdateOrder: `${BASE_URL}/order/create-update-order`,
-  createPayment: `${BASE_URL}/order/create-payment`,
+  createOrder: `${BASE_URL}/order/create-order`,
   handleRazorpayWebhook: `${BASE_URL}/order/handle-razorpay-webhook`,
 
   //Cart
@@ -178,10 +178,11 @@ export const api = createApi({
         { type: "Order", id: "getByUserId" },
       ],
     }),
-    createPayment: builder.mutation({
-      query: () => ({
-        url: Api_Urls.createPayment,
+    createOrder: builder.mutation({
+      query: (data) => ({
+        url: Api_Urls.createOrder,
         method: "POST",
+        body: data
       }),
     }),
 
@@ -284,7 +285,7 @@ export const {
   useLazyGetOrderByUserIdQuery,
   useLazyGetOrderByOrderIdQuery,
   useCreateOrUpdateOrderMutation,
-  useCreatePaymentMutation,
+  useCreateOrderMutation,
   useLazyGetCartQuery,
   useAddToCartMutation,
   useRemoveFromCartMutation,

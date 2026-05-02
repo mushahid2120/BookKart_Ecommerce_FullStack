@@ -11,9 +11,8 @@ interface IOrder extends Document {
   totalAmount: number;
   shippingAddress?: Schema.Types.ObjectId | null;
   paymentStatus: "pending" | "complete" | "failed" | null;
-  paymentMethod?: "UPI" | "Bank Account" | null;
   paymentDetail?: {
-    razorpay_order?: string;
+    razorpay_order_id?: string;
     razorpay_payment_id?: string;
     razorpay_signature?: string;
   } | null;
@@ -35,13 +34,8 @@ const OrderSchema = new Schema<IOrder>({
     enum: ["pending", "complete", "failed", null],
     default: null,
   },
-  paymentMethod: {
-    type: String,
-    enum: ["UPI", "Bank Account", null],
-    default: null,
-  },
   paymentDetail: {
-    razorpay_order: { type: String },
+    razorpay_order_id: { type: String },
     razorpay_payment_id: { type: String },
     razorpay_signature: { type: String },
   },

@@ -17,14 +17,14 @@ interface cartItemState {
 interface cartState {
   item: cartItemState[];
   checkoutStatus: "cart" | "address" | "payment";
-  orderId: string;
+  orderId: string | null;
   cartId: string;
 }
 
 const initialState: cartState = {
   item: [],
   checkoutStatus: "cart",
-  orderId: "",
+  orderId: null,
   cartId: "",
 };
 

@@ -3,6 +3,8 @@ import Cart from "../Model/Cart.js";
 import { ObjectId } from "mongoose";
 import response from "../Utility/response.js";
 import Order from "../Model/Order.js";
+import Razorpay from "razorpay";
+import { RAZORPAY_KEY, RAZORPAY_SECRET_KEY } from "../Config/env.js";
 
 export async function getOrderByUserId(
   req: Request,
@@ -114,13 +116,13 @@ export async function createUpdateOrder(
           quantity: it.quantity,
         })) || order.items;
       order.shippingAddress = shippingAddress;
-      order.paymentMethod = paymentMethod || order.paymentMethod;
       order.status = status || order.status;
       order.totalAmount = itemTotalAmount || order.totalAmount;
+      
       if (paymentDetail) {
-        order.paymentMethod = paymentMethod;
+        const parsePaymentDetail=JSON.parse(paymentDetail)
         order.paymentStatus = paymentStatus;
-        order.paymentDetail = paymentDetail;
+        order.paymentDetail = parsePaymentDetail;
       }
       await order.save();
     } else {
@@ -142,7 +144,7 @@ export async function createUpdateOrder(
       const cartResult = await cart.save();
     }
 
-    if (paymentDetail) {
+    if (paymentDetail && paymentStatus==="complete") {
       await Cart.findOneAndUpdate(
         { user: userId as unknown as ObjectId },
         { $set: { item: [], orderId: null } },
@@ -155,11 +157,35 @@ export async function createUpdateOrder(
   }
 }
 
-export async function createPaymentWithRazorPay(
+export async function createOrderWithRazorPay(
   req: Request,
   res: Response,
   next: NextFunction,
-) {}
+) {
+  try {
+    const userId = req.id;
+    const { orderId, totalAmount } = req.body;
+    if(!orderId || !totalAmount){
+      response(res,404,"OrderId and totalAmount is required")
+    }
+    const rzpIntance = new Razorpay({
+      key_id: RAZORPAY_KEY,
+      key_secret: RAZORPAY_SECRET_KEY,
+    });
+    const order = await rzpIntance.orders.create({
+      amount: totalAmount * 100,
+      currency: "INR",
+      notes: {
+        customer_id: userId || 'unknown',
+        orderId
+      },
+    });
+
+    response(res,200,"You Order Id ",{orderid:order.id})
+  } catch (error: any) {
+    console.log(error);
+  }
+}
 
 export async function handleRazorPayWebhook(
   req: Request,

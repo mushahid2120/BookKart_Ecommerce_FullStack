@@ -20,12 +20,11 @@ export interface IOrder {
   totalAmount?: number;
   shippingAddress?: IAddress ;
   paymentStatus?: "pending" | "complete" | "failed";
-  paymentMethod?: "UPI" | "Bank Account";
   paymentDetail?: {
-    razorpay_order?: string;
+    razorpay_order_id?: string;
     razorpay_payment_id?: string;
     razorpay_signature?: string;
-  };
+  } | null;
   status?: "processing" | "shipped" | "delivered" | "cancelled";
 }
 
@@ -45,12 +44,7 @@ const initialState: IOrder = {
   totalAmount: 0,
   shippingAddress: undefined,
   paymentStatus: "pending",
-  paymentMethod: "UPI",
-  paymentDetail: {
-    razorpay_order: "",
-    razorpay_payment_id: "",
-    razorpay_signature: "",
-  },
+  paymentDetail: null,
   status: "processing",
 };
 

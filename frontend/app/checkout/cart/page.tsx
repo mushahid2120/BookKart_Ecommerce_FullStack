@@ -7,9 +7,10 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { IOrderItem } from "@/lib/types/order";
+import { IOrderItem, RazorpayResponse } from "@/lib/types/order";
 import {
   useAddToWishlistMutation,
+  useCreateOrderMutation,
   useCreateOrUpdateAddressMutation,
   useCreateOrUpdateOrderMutation,
   useLazyGetAddressByUserIdQuery,
@@ -20,10 +21,7 @@ import {
   useRemoveFromWishlistMutation,
 } from "@/store/api";
 import { changeCheckoutStatus, setCart } from "@/store/slice/cartSlice";
-import {
-  IAddress,
-  setOrder,
-} from "@/store/slice/orderSlice";
+import { IAddress, setOrder } from "@/store/slice/orderSlice";
 import { setWishlist } from "@/store/slice/wishlistSlice";
 import { RootState } from "@/store/store";
 import {
@@ -36,12 +34,20 @@ import {
   Shield,
   ShoppingCart,
   Trash2,
+  UserCheck,
 } from "lucide-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import Script from "next/script";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
+
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
 
 export default function page() {
   const cart = useSelector((state: RootState) => state.cart);
@@ -68,8 +74,10 @@ export default function page() {
   const [getOrderByOrderId] = useLazyGetOrderByOrderIdQuery();
   const [userAddress, setUserAddress] = useState<IAddress[] | null>([]);
   const [isAddressLoading, setIsAddressLoading] = useState<boolean>(false);
-  const [editingAddressId,setEditingAddressId]=useState<string | null>(null);
-  const pathname= usePathname();
+  const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
+  const pathname = usePathname();
+  const user = useSelector((state: RootState) => state.user);
+  const [createRazorpayOrder] = useCreateOrderMutation();
 
   const handleAddToWishlist = async (productId: string) => {
     if (isWishlistLoading) return;
@@ -97,7 +105,7 @@ export default function page() {
       if (response.isSuccess) {
         fetchingCart();
         toast.success("product has been remove from cart");
-        dispatch(changeCheckoutStatus("cart"))
+        dispatch(changeCheckoutStatus("cart"));
       }
     } catch (error: any) {
       console.log(error);
@@ -135,7 +143,7 @@ export default function page() {
     }
   };
 
-    const fetchingAddress = async () => {
+  const fetchingAddress = async () => {
     try {
       const response = await getUserAddress({}).unwrap();
       if (response.isSuccess) {
@@ -160,13 +168,11 @@ export default function page() {
     }
   };
 
-
-
   const fetchingOrder = async () => {
     try {
       const response = await getOrderByOrderId(cart.orderId).unwrap();
-      if(response.isSuccess){
-        dispatch(setOrder(response.data))
+      if (response.isSuccess) {
+        dispatch(setOrder(response.data));
       }
     } catch (error: any) {
       console.log(error);
@@ -176,10 +182,9 @@ export default function page() {
     }
   };
 
-
   const handleCreateOrder = async () => {
     if (isCreateOrderLoading) return;
-    if (!cart || cart?.item.length === 0 ) {
+    if (!cart || cart?.item.length === 0) {
       console.log("cart is empty");
       return;
     }
@@ -204,10 +209,13 @@ export default function page() {
   };
 
   const handleAddress = async (address: IAddress) => {
-    if(isAddressLoading) return 
-    setIsAddressLoading(true)
+    if (isAddressLoading) return;
+    setIsAddressLoading(true);
     try {
-      const response = await addressUpdate({...address,addressId:editingAddressId}).unwrap();
+      const response = await addressUpdate({
+        ...address,
+        addressId: editingAddressId,
+      }).unwrap();
       if (response.isSuccess) {
         await fetchingAddress();
         await fetchingOrder();
@@ -219,7 +227,7 @@ export default function page() {
       if (error.status === 500) {
         toast.error("Something went wrong");
       }
-    }finally{
+    } finally {
       setIsAddressLoading(false);
     }
   };
@@ -261,30 +269,123 @@ export default function page() {
     }
   };
 
-  useEffect(() => {
-    fetchingCart();
-    fetchingWishlist();
-  }, []);
+  const handleAddPaymentDetailOnOrder = async ({
+    paymentDetail,
+    paymentStatus,
+  }: {
+    paymentDetail: RazorpayResponse | null;
+    paymentStatus: "pending" | "complete" | "failed";
+  }) => {
+    {
+      try {
+        const response = await createOrder({
+          orderId: cart.orderId,
+          cartId: cart.cartId,
+          paymentDetail: JSON.stringify(paymentDetail),
+          paymentStatus,
+        }).unwrap();
+
+        if (response.isSuccess) {
+          await fetchingCart();
+          toast.success("Order has been created");
+        }
+      } catch (error: any) {
+        console.log(error);
+      }
+    }
+  };
 
   useEffect(() => {
-    if (cart.checkoutStatus === "address") {
+    if (user.isLoggedIn) {
+      fetchingCart();
+      fetchingWishlist();
+    }
+  }, [user.isLoggedIn]);
+
+  useEffect(() => {
+    if (cart.checkoutStatus === "address" && user.isLoggedIn) {
       fetchingAddress();
     }
-  }, [cart.checkoutStatus]);
-
-  useEffect(()=>{
-    dispatch(changeCheckoutStatus("cart"))
-  },[pathname])
+  }, [cart.checkoutStatus, user.isLoggedIn]);
 
   useEffect(() => {
-  if (!!cart.orderId && cart.orderId!=="null"  && cart.checkoutStatus!=="cart") {
-    fetchingOrder();
-  }
-}, [cart.orderId,cart.checkoutStatus]);
+    if (user.isLoggedIn) {
+      dispatch(changeCheckoutStatus("cart"));
+    }
+  }, [pathname, user.isLoggedIn]);
 
+  useEffect(() => {
+    if (
+      !!cart.orderId &&
+      cart.orderId !== "null" &&
+      cart.checkoutStatus !== "cart" &&
+      user.isLoggedIn
+    ) {
+      fetchingOrder();
+    }
+  }, [cart.orderId, cart.checkoutStatus, user.isLoggedIn]);
+
+  const handlePay = async () => {
+    try {
+      console.log("isLoaded");
+
+      const response = await createRazorpayOrder({
+        orderId: order._id,
+        totalAmount: order.totalAmount,
+      }).unwrap();
+      if (response.isSuccess) {
+        popupOpen(response.data.orderid);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  console.log(process.env.NEXT_PUBLIC_RAZORPAY_KEY)
+  const popupOpen = (orderid: string) => {
+    console.log("popup");
+    const options = {
+      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY,
+      currency: "INR",
+      name: user?.user?.name,
+      order_id: orderid,
+      prefill: {
+        name: user?.user?.name,
+        email: user?.user?.email,
+        contact: user?.user?.phoneNumber,
+      },
+      handler: async function (res: RazorpayResponse) {
+        await handleAddPaymentDetailOnOrder({
+          paymentDetail: res,
+          paymentStatus: "complete",
+        });
+      },
+    };
+
+    const rzp1 = new window.Razorpay(options);
+    rzp1.on("payment.failed", async function (response: any) {
+      await handleAddPaymentDetailOnOrder({
+        paymentDetail: {
+          razorpay_order_id: response.error.metadata.order_id,
+          razorpay_payment_id: response.error.metadata.payment_id,
+        },
+        paymentStatus: "failed",
+      });
+    });
+    rzp1.open();
+  };
 
   return (
     <>
+      {cart.checkoutStatus === "payment" && (
+        <Script
+          id="razorpay-checkout"
+          src="https://checkout.razorpay.com/v1/checkout.js"
+          strategy="lazyOnload"
+          onLoad={() => console.log("razorpay loaded")}
+        />
+      )}
+
       <div className="flex items-center gap-4 font-medium text-lg bg-[#f3f4f6]  p-4">
         <ShoppingCart className="text-[#4b5563]" />{" "}
         <span>
@@ -516,6 +617,7 @@ export default function page() {
                           dispatch(changeCheckoutStatus("payment"));
                         }
                       } else if (cart.checkoutStatus === "payment") {
+                        await handlePay();
                         dispatch(changeCheckoutStatus("cart"));
                       }
                     }}
@@ -573,13 +675,12 @@ export default function page() {
                   Delivery Address
                 </CardHeader>
                 <CardContent className="text-[sm]">
+                  <div>{order.shippingAddress.addressLine1}</div>
+                  <div>{order.shippingAddress.addressLine2}</div>
                   <div>
-                    {order.shippingAddress.addressLine1}
+                    {order.shippingAddress.city}, {order.shippingAddress.state}{" "}
+                    {order.shippingAddress.pin}
                   </div>
-                  <div>
-                    {order.shippingAddress.addressLine2}
-                  </div>
-                  <div>{order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.pin}</div>
                   <div>Phone: {order.shippingAddress.phoneNumber}</div>
                 </CardContent>
                 <CardFooter>

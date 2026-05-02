@@ -11,3 +11,5 @@ export const JWT_SECRET=process.env.JWT_SECRET as string;
 export const CLOUDINARY_API_KEY=process.env.CLOUDINARY_API_KEY as string;
 export const CLOUDINARY_SECRET_KEY=process.env.CLOUDINARY_SECRET_KEY as string;
 export const CLOUDINARY_PROJECTNAME=process.env.CLOUDINARY_PROJECTNAME as string;
+export const RAZORPAY_KEY=process.env.RAZORPAY_KEY as string;
+export const RAZORPAY_SECRET_KEY=process.env.RAZORPAY_SECRET_KEY as string;

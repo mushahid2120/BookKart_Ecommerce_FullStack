@@ -20,12 +20,11 @@ export interface IOrder {
   shippingAddress?: IAddress;
   totalAmount: number;
   paymentStatus: "pending" | "complete" | "failed";
-  paymentMethod?: "UPI" | "Bank Account";
   paymentDetail?: {
-    razorpay_order?: string;
+    razorpay_order_id?: string;
     razorpay_payment_id?: string;
     razorpay_signature?: string;
-  };
+  } | null;
   status: "processing" | "shipped" | "delivered" | "cancelled";
   createdAt: string;
 }
@@ -38,4 +37,11 @@ export interface IAddress {
   city: string;
   state: string;
   pin: string;
+}
+
+
+export interface RazorpayResponse {
+  razorpay_payment_id?: string;  
+  razorpay_order_id?: string;    
+  razorpay_signature?: string;   
 }

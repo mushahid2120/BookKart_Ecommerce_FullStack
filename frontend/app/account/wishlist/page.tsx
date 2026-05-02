@@ -178,8 +178,8 @@ export default function page() {
                     <Trash2 />
                   )}
                 </Button>
-                {cart.product.findIndex(
-                  (product) => product._id === item._id,
+                {cart.item.findIndex(
+                  (it) => it.product._id === item._id,
                 ) === -1 ? (
                   <Button
                     className="bg-blue-600 text-white cursor-pointer"
