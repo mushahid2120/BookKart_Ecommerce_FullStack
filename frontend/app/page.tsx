@@ -17,7 +17,6 @@ import {
 import Link from "next/link";
 
 export default function Home() {
-
   const sellSteps = [
     {
       step: "Step 1",

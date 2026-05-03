@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 import { EachMenuItemType } from "./Header";
 import { useDispatch } from "react-redux";
 import { IUserState, logout, toggleLoginDialog } from "@/store/slice/userSlice";
-import {  useLogoutMutation } from "@/store/api";
+import { useLogoutMutation } from "@/store/api";
 import toast from "react-hot-toast";
 import UserCard from "./UserCard";
 
@@ -23,26 +23,25 @@ export default function MenuItem({
   const dispatch = useDispatch();
   const [logoutApi] = useLogoutMutation();
 
-  const handleLogout=async () => {
-              try {
-                if (setIsMenuOpen) setIsMenuOpen(false);
-                if (setIsDropDownMenuOpen) setIsDropDownMenuOpen(false);
-                const response = await logoutApi({}).unwrap();
-                if (response.isSuccess) {
-                  toast.success("Logout Successfull");
-                  dispatch(logout())
-                }
-              } catch (error) {
-                console.log(error);
-                toast.error("Something went Wrong");
-              }
-            }
-
+  const handleLogout = async () => {
+    try {
+      if (setIsMenuOpen) setIsMenuOpen(false);
+      if (setIsDropDownMenuOpen) setIsDropDownMenuOpen(false);
+      const response = await logoutApi({}).unwrap();
+      if (response.isSuccess) {
+        toast.success("Logout Successfull");
+        dispatch(logout());
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Something went Wrong");
+    }
+  };
 
   return (
     <>
       {user !== null ? (
-        <UserCard user={user}/>
+        <UserCard user={user} />
       ) : (
         <Button
           variant="ghost"
@@ -50,7 +49,7 @@ export default function MenuItem({
         >
           <div
             onClick={() => {
-              if(setIsMenuOpen) setIsMenuOpen(false);
+              if (setIsMenuOpen) setIsMenuOpen(false);
               if (setIsDropDownMenuOpen) setIsDropDownMenuOpen(false);
               dispatch(toggleLoginDialog());
             }}
