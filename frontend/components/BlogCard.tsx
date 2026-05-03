@@ -22,25 +22,25 @@ export default function BlogCard({
   icon: React.ReactNode;
 }) {
   return (
-    <Card className="relative mx-auto w-full max-w-sm md:max-h-100 lg:max-h-200 pt-0 overflow-hidden">
+    <Card className="relative mx-auto w-full max-w-sm md:max-h-100 lg:max-h-200 pt-0 overflow-hidden bg-(--color-card) shadow-md border border-(--color-header-border)">
       <div className="absolute inset-0 z-30 aspect-video" />
       <img
         src={imageSrc}
         alt="blog"
-        className="relative z-20 aspect-video w-full object-cover "
+        className="relative z-20 aspect-video w-full object-cover"
       />
-      <CardHeader className="md:h-40 " >
-        <CardTitle className="lg:text-xl text-base flex lg:gap-4 gap-4 md:gap-2 justify-center items-center">
+      <CardHeader className="md:h-40">
+        <CardTitle className="lg:text-lg text-base flex lg:gap-4 gap-4 md:gap-2 justify-center items-center font-medium text-(--color-header-text)">
           {icon}
           <div>{title}</div>
         </CardTitle>
-        <CardDescription className="lg:text-base text-sm font-normal">
+        <CardDescription className="lg:text-base text-sm font-normal text-(--color-text-muted)">
           {description}
         </CardDescription>
       </CardHeader>
-      <CardFooter className="flex items-center justify-center ">
+      <CardFooter className="flex items-center justify-center">
         <Link href="/">
-          <Button variant="link">Read More <ArrowRight/></Button>
+          <Button variant="link">Read More <ArrowRight /></Button>
         </Link>
       </CardFooter>
     </Card>

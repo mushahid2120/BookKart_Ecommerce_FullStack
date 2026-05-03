@@ -18,12 +18,12 @@ export default function FooterCard({
   description: string;
 }) {
   return (
-    <Card className="shadow-lg border-none  w-full md:max-w-80 min-h-36 bg-[#202736] ">
+    <Card className="shadow-md border border-(--color-header-border) w-full md:max-w-80 min-h-36 bg-(--color-footer-card-bg)">
       <CardHeader className="flex items-center gap-4 text-white">
         {icon}
         <div>
             <CardTitle className="text-lg">{heading}</CardTitle>
-        <CardDescription className="text-md font-normal text-[#4b5563]">
+        <CardDescription className="text-md font-normal text-(--color-footer-text)">
           {description}
         </CardDescription>
         </div>

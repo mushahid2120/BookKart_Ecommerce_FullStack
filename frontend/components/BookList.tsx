@@ -133,7 +133,7 @@ export default function BookList({ books }: { books: IBook[] }) {
                     {book.author}
                   </div>
 
-                  <h3 className="sm:text-lg text-[13px] font-semibold my-1">
+                  <h3 className="sm:text-lg text-[13px] font-semibold my-1 text-(--color-price-text)">
                     ₹{book.finalPrice}
                     <span className="line-through sm:text-sm text-[11px] font-normal sm:ml-2 ml-1">
                       ₹{book.price}

@@ -53,12 +53,12 @@ export default function Footer() {
   ]
 
   return (
-    <footer className="bg-[#111827] pt-12 text-white md:px-8 sm:px-4  px-2 pb-16">
+    <footer className="bg-(--color-footer-bg) pt-12 text-white md:px-8 sm:px-4 px-2 pb-16">
       <div className="flex justify-between flex-wrap  flex-col md:flex-row md:gap-3 gap-8">
         {footList.map(({ heading, items }, index) => (
           <div key={index}>
             <h2 className="text-xl font-semibold mb-3">{heading}</h2>
-            <div className="flex flex-col gap-2 text-[#d1d5db] focus:text-[#d1d511]">
+            <div className="flex flex-col gap-2 text-(--color-footer-text) focus:text-(--color-accent-yellow)">
               {items.map(({ path, name }, index) => (
                 <Link href={path} key={index}>
                   {name}
@@ -70,7 +70,7 @@ export default function Footer() {
 
         <div className="md:max-w-60 max-w-100">
           <h2 className="text-xl font-semibold mb-3">STAY CONNECTED</h2>
-          <div className="flex flex-col gap-2 text-[#d1d5db] focus:text-[#d1d5db]">
+          <div className="flex flex-col gap-2 text-(--color-footer-text) focus:text-(--color-footer-text)">
             <div>
               BookKart is a free platform where you can buy second hand books at
               very cheap prices. Buy used books online like college books,

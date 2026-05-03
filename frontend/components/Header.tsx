@@ -112,7 +112,7 @@ export default function Header() {
 
 
   return (
-    <header className="md:px-12 sm:px-10  px-6 md:py-4  sm:py-3 py-2 text-[#374151] bg-[#fffbebc1] backdrop-blur-lg sticky top-0 z-1000 border-solid border border-b-[#e5e7eb]">
+    <header className="md:px-12 sm:px-10 px-6 md:py-4 sm:py-3 py-2 text-(--color-header-text) bg-(--color-header-bg) backdrop-blur-lg sticky top-0 z-1000 border-solid border border-b-(--color-header-border) shadow-sm">
       <nav className="flex justify-center items-center gap-2 md:gap-4 sm:gap-1">
         <div className="lg:hidden">
           <DrawerMenu
@@ -124,7 +124,7 @@ export default function Header() {
           />
         </div>
 
-        <Link href="/">
+        <Link href="/" className="transition-transform hover:scale-105">
           <Image
             src="/Image/Logo.jpg"
             width={200}
@@ -135,15 +135,15 @@ export default function Header() {
           />
         </Link>
 
-        <div className="relative   grow md:min-w-40 min-w-32  ">
+        <div className="relative grow md:min-w-40 min-w-32">
           <Input
             placeholder="Book Name / Author / Subject"
-            className=" pr-8 focus-visible:outline-1"
+            className="pr-8 focus-visible:outline-1 focus:ring-2 focus:ring-(--color-button-yellow)"
           />
           <Button
             size="icon"
             variant="ghost"
-            className="absolute right-0 cursor-pointer"
+            className="absolute right-0 cursor-pointer hover:bg-(--color-surface-muted)"
           >
             <Search />
           </Button>
@@ -152,7 +152,7 @@ export default function Header() {
         <Link href="/book-sell">
           <Button
             variant="secondary"
-            className="bg-[#ffc400] hover:bg-[#e5b108] cursor-pointer hidden lg:block"
+            className="bg-(--color-button-yellow) hover:bg-(--color-button-yellow-hover) cursor-pointer hidden lg:block shadow-md transition-all duration-200"
           >
             Sell Used Books
           </Button>
@@ -207,7 +207,7 @@ export default function Header() {
           <Button variant="ghost" className="relative hover:bg-slate-100">
             <ShoppingCart />
             Cart
-            <div className="absolute top-0 left-4 px-1  bg-[#EF4444] text-white rounded-full text-[10px]">{cart.item?.length>0 && cart.item?.length}</div>
+            <div className="absolute top-0 left-4 px-1 bg-(--color-danger) text-white rounded-full text-[10px]">{cart.item?.length>0 && cart.item?.length}</div>
           </Button>
         </Link>
       </nav>

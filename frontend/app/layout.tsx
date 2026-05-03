@@ -21,7 +21,7 @@ export default function RootLayout({
         className={roboto.className}
       >
         <div className="flex justify-center">
-          <div className=" w-full max-w-325 bg-[#fffbeb]">
+          <div className="w-full max-w-325 bg-(--color-page-shell)">
             <LayoutWrapper>
               <Header />
               {children}

@@ -94,7 +94,7 @@ export default function Home() {
   return (
     <main>
       <Hero />
-      <section className="md:px-12 sm:px-10  px-6 bg-[#f9fafb]">
+      <section className="md:px-12 sm:px-10 px-6 bg-(--color-page-bg) py-16">
         <h1 className="pt-10 mb-8 text-xl md:text-3xl sm:text-2xl text-center font-semibold">
           Newly Added Books
         </h1>
@@ -103,7 +103,7 @@ export default function Home() {
 
         <Link href="/books" className="flex items-center justify-center my-8">
           <Button
-            className="bg-[#eab308] hover:bg-[#be951c] text-white text-lg font-normal h-12 "
+            className="bg-(--color-button-yellow) hover:bg-(--color-button-yellow-hover) text-white text-lg font-normal h-12 shadow-lg transition-all duration-200"
             size="lg"
           >
             Explore All Books
@@ -114,7 +114,7 @@ export default function Home() {
           <h1 className="text-3xl">
             How to SELL your old books online on BookKart?
           </h1>
-          <p className="font-normal text-[#885563] mt-4">
+          <p className="font-normal text-(--color-text-muted) mt-4">
             Earning money by selling your old books is just 3 steps away from
             you
           </p>
@@ -128,8 +128,8 @@ export default function Home() {
               title={title}
               description={description}
               icon={icon}
-              cardbg="bg-[#ffff]"
-              stepbg="bg-[#facc15]"
+              cardbg="bg-(--color-card)"
+              stepbg="bg-(--color-accent-yellow)"
             />
           ))}
         </div>
@@ -138,7 +138,7 @@ export default function Home() {
           <h1 className="text-3xl">
             How to BUY second hand books online on BookKart?
           </h1>
-          <p className="font-normal text-[#885563] mt-4">
+          <p className="font-normal text-(--color-text-muted) mt-4">
             Saving some good amount of money by buying used books is just 3
             steps away from you you
           </p>
@@ -152,18 +152,18 @@ export default function Home() {
               title={title}
               description={description}
               icon={icon}
-              cardbg="bg-[#facc15]"
-              stepbg="bg-[#ffff]"
+              cardbg="bg-(--color-accent-yellow)"
+              stepbg="bg-(--color-card)"
             />
           ))}
         </div>
       </section>
 
-      <section className="md:px-12 sm:px-10  px-6 pb-20 pt-8 mt-12   bg-[#ddeafe] ">
-        <h1 className=" pb-12 text-3xl font-semibld text-center">
+      <section className="md:px-12 sm:px-10 px-6 pb-20 pt-8 mt-12 bg-(--color-surface-soft)">
+        <h1 className="pb-12 text-3xl font-semibold text-center">
           Read from our Blog
         </h1>
-        <div className="grid md:grid-cols-3 grid-row-3 gap-8">
+        <div className="grid md:grid-cols-3 grid-cols-1 gap-8 max-w-6xl mx-auto">
           {blogPosts.map(({ imageSrc, icon, title, description }, index) => (
             <BlogCard
               key={index}

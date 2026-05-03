@@ -45,7 +45,7 @@ export default function MenuItem({
       ) : (
         <Button
           variant="ghost"
-          className="w-full hover:bg-slate-100 flex px-2  py-5 text-[#374151] font-normal"
+          className="w-full hover:bg-(--color-surface-muted) flex px-2 py-5 text-(--color-header-text) font-normal"
         >
           <div
             onClick={() => {
@@ -68,7 +68,7 @@ export default function MenuItem({
           return (
             <Button
               variant="ghost"
-              className="w-full hover:bg-slate-100 flex px-2  py-5 text-[#374151] font-normal"
+              className="w-full hover:bg-(--color-surface-muted) flex px-2 py-5 text-(--color-header-text) font-normal"
               key={item.title}
             >
               <Link
@@ -87,7 +87,7 @@ export default function MenuItem({
           return (
             <Button
               variant="ghost"
-              className="w-full hover:bg-slate-100 flex px-2  py-5 text-[#374151] font-normal"
+              className="w-full hover:bg-(--color-surface-muted) flex px-2 py-5 text-(--color-header-text) font-normal"
               key={item.title}
               onClick={item.onClick}
             >
@@ -104,7 +104,7 @@ export default function MenuItem({
       {user && (
         <Button
           variant="ghost"
-          className="w-full hover:bg-slate-100 flex px-2  py-5 text-[#374151] font-normal"
+          className="w-full hover:bg-(--color-surface-muted) flex px-2 py-5 text-(--color-header-text) font-normal"
         >
           <div
             onClick={handleLogout}

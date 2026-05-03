@@ -302,7 +302,7 @@ export default function BookCarousel() {
             className="px-2"
             style={{ minWidth: `${100 / visibleCards}%` }}
           >
-            <Card>
+            <Card className="bg-(--color-card) shadow-md border border-(--color-header-border)">
               <img
                 src={book.images[0]}
                 alt={book.title}
@@ -310,28 +310,28 @@ export default function BookCarousel() {
               />
 
               <CardContent>
-                <div className="font-semibold truncate">
+                <div className="font-medium truncate text-base">
                   {book.title}
                 </div>
 
                 <div className="flex justify-between mt-2">
-                  <h3 className="text-lg font-semibold">
+                  <h3 className="text-lg font-semibold text-(--color-button-yellow)">
                     ₹{book.finalPrice}
-                    <span className="line-through text-sm font-normal ml-2">
+                    <span className="line-through text-sm font-normal ml-2 text-(--color-text-muted)">
                       ₹{book.price}
                     </span>
                   </h3>
 
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-(--color-text-muted)">
                     {book.condition}
                   </span>
                 </div>
 
-                <div className="mt-2 text-orange-600 font-semibold text-sm">
+                <div className="mt-2 text-(--color-accent-yellow) font-medium text-sm">
                   {calculateDiscount(book.price, book.finalPrice)}% Off
                 </div>
 
-                <Button className="mt-3 w-full bg-[#eb5a0d]">
+                <Button className="mt-3 w-full bg-(--color-button-yellow) hover:bg-(--color-button-yellow-hover)">
                   Buy Now
                 </Button>
               </CardContent>
@@ -343,14 +343,14 @@ export default function BookCarousel() {
       {/* Navigation */}
       <button
         onClick={prevSlide}
-        className="absolute left-2 top-1/2 -translate-y-1/2 bg-white rounded-full shadow p-2"
+        className="absolute left-2 top-1/2 -translate-y-1/2 bg-(--color-card) rounded-full shadow p-2 border border-(--color-header-border)"
       >
         <ChevronLeft size={24} />
       </button>
 
       <button
         onClick={nextSlide}
-        className="absolute right-2 top-1/2 -translate-y-1/2 bg-white rounded-full shadow p-2"
+        className="absolute right-2 top-1/2 -translate-y-1/2 bg-(--color-card) rounded-full shadow p-2 border border-(--color-header-border)"
       >
         <ChevronRight size={24} />
       </button>
