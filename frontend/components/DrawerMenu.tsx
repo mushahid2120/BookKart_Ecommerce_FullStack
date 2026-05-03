@@ -1,9 +1,7 @@
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -11,7 +9,8 @@ import {
 import MenuItem from "./MenuItem";
 import { MenuIcon } from "lucide-react";
 import Image from "next/image";
-import { EachMenuItemType, User } from "./Header";
+import { EachMenuItemType } from "./Header";
+import { IUserState } from "@/store/slice/userSlice";
 
 export default function DrawerMenu({
   isMenuOpen,
@@ -23,7 +22,7 @@ export default function DrawerMenu({
 
   isMenuOpen: boolean;
   menuItem: EachMenuItemType[];
-  user: User | null;
+  user: IUserState | null;
   setIsMenuOpen: (arg0: boolean) => void;
   setIsDropDownMenuOpen: (arg0: boolean) => void;
 }) {

@@ -1,10 +1,9 @@
 import { ChevronRight, Lock, User } from "lucide-react";
 import Link from "next/link";
 import { Button } from "./ui/button";
-import { EachMenuItemType, User as UserType } from "./Header";
+import { EachMenuItemType } from "./Header";
 import { useDispatch } from "react-redux";
-import { logout, toggleLoginDialog } from "@/store/slice/userSlice";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { IUserState, logout, toggleLoginDialog } from "@/store/slice/userSlice";
 import {  useLogoutMutation } from "@/store/api";
 import toast from "react-hot-toast";
 import UserCard from "./UserCard";
@@ -16,7 +15,7 @@ export default function MenuItem({
   setIsDropDownMenuOpen,
 }: {
   menuItem: EachMenuItemType[];
-  user: UserType | null;
+  user: IUserState | null;
   setIsMenuOpen: (arg0: boolean) => void;
 
   setIsDropDownMenuOpen: (arg0: boolean) => void;

@@ -35,12 +35,6 @@ export interface EachMenuItemType {
   onClick?: () => void;
 }
 
-export interface User{
-  email:string;
-  name:string;
-  profilePic:string;
-}
-
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [isDropDownMenuOpen,setIsDropDownMenuOpen]=useState<boolean>(false);

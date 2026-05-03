@@ -5,7 +5,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import MenuItem from "./MenuItem";
-import { EachMenuItemType, User } from "./Header";
+import { EachMenuItemType} from "./Header";
+import { IUserState } from "@/store/slice/userSlice";
 
 export default function DropDownMenu({
   open,
@@ -20,7 +21,7 @@ export default function DropDownMenu({
   onOpenChange: (arg0:boolean) => void;
   children: React.ReactNode;
   menuItem: EachMenuItemType[];
-  user: User | null;
+  user: IUserState | null;
   setIsMenuOpen: (arg0: boolean) => void;
   setIsDropDownMenuOpen:(arg0: boolean) => void;
 }) {
