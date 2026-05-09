@@ -202,7 +202,7 @@ export default function Books() {
   }
 
   return (
-    <main className="md:px-10 sm:px-10  px-4 pb-16 pt-8   bg-[#ddeafe] ">
+    <main className="md:px-10 sm:px-10  px-4 pb-16 pt-8   bg-(--color-surface-soft) ">
       <div className="text-2xl font-semibold">
         Find from over 1000s of used books online
       </div>

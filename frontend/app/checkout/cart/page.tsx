@@ -341,7 +341,6 @@ export default function page() {
     }
   };
 
-  console.log(process.env.NEXT_PUBLIC_RAZORPAY_KEY)
   const popupOpen = (orderid: string) => {
     console.log("popup");
     const options = {
@@ -386,35 +385,35 @@ export default function page() {
         />
       )}
 
-      <div className="flex items-center gap-4 font-medium text-lg bg-[#f3f4f6]  p-4">
-        <ShoppingCart className="text-[#4b5563]" />{" "}
+      <div className="flex items-center gap-4 font-medium text-lg bg-(--color-surface-soft)  p-4">
+        <ShoppingCart className="text-(--color-header-text)" />{" "}
         <span>
           {cart.item.length !== 0 && cart.item.length} items in your cart
         </span>
       </div>
-      <main className="md:px-10 sm:px-10  px-4 pb-16    bg-[#ddeafe] ">
+      <main className="md:px-10 sm:px-10  px-4 pb-16    bg-(--color-surface-soft) ">
         <section className="flex items-center justify-center gap-4 p-6">
           <div className="flex items-center justify-center gap-2">
             <span
-              className={`p-2.5 rounded-full text-white bg-blue-300 shadow-xl ${cart.checkoutStatus === "cart" && "bg-blue-700"}`}
+              className={`p-2.5 rounded-full text-white bg-(--color-surface-soft) shadow-xl ${cart.checkoutStatus === "cart" && "bg-[#d4a574]"}`}
             >
               <ShoppingCart />
             </span>
             <p className="font-medium">Cart</p>
           </div>
-          <ChevronRight strokeWidth={2} className="text-[#c8cacf]" />
+          <ChevronRight strokeWidth={2} className="text-(--color-text-muted)" />
           <div className="flex items-center justify-center gap-2">
             <span
-              className={`p-2.5 rounded-full text-white bg-blue-300 shadow-xl  ${cart.checkoutStatus === "address" && "bg-blue-700"}`}
+              className={`p-2.5 rounded-full text-white bg-(--color-surface-soft) shadow-xl  ${cart.checkoutStatus === "address" && "bg-[#d4a574]"}`}
             >
               <MapPin />
             </span>
             <p className="font-medium">Address</p>
           </div>
-          <ChevronRight strokeWidth={2} className="text-[#c8cacf]" />
+          <ChevronRight strokeWidth={2} className="text-(--color-text-muted)" />
           <div className="flex items-center justify-center gap-2">
             <span
-              className={`p-2.5 rounded-full text-white bg-blue-300 shadow-xl ${cart.checkoutStatus === "payment" && "bg-blue-700"}`}
+              className={`p-2.5 rounded-full text-white bg-(--color-surface-soft) shadow-xl ${cart.checkoutStatus === "payment" && "bg-[#d4a574]"}`}
             >
               <CreditCard />
             </span>
@@ -425,7 +424,7 @@ export default function page() {
           <Card className="gap-4 grow max-h-160 overflow-y-scroll">
             <CardHeader className="gap-0">
               <h1 className="text-2xl font-medium">Order Summary</h1>
-              <p className="text-[#737373] text-sm">Review your items</p>
+              <p className="text-(--color-text-muted) text-sm">Review your items</p>
             </CardHeader>
             <CardContent>
               {cart.item &&
@@ -446,18 +445,18 @@ export default function page() {
                       )}
                       <div className="space-y-1">
                         <h1 className="font-medium">{item.product.title}</h1>
-                        <p className="text-[#6B7280] text-sm font-light">
+                        <p className="text-(--color-text-muted) text-sm font-light">
                           Quantity: {item.quantity}
                         </p>
                         <div>
-                          <span className="text-[#6B7280] font-medium line-through text-sm">
+                          <span className="text-(--color-text-muted) font-medium line-through text-sm">
                             ₹{item.product.price}
                           </span>{" "}
                           <span className="font-medium">
                             ₹{item.product.finalPrice}
                           </span>
                         </div>
-                        <p className="text-[#16A34A] text-sm font-medium ">
+                        <p className="text-(--color-accent-yellow) text-sm font-medium ">
                           {item.product.shippingCharge === 0
                             ? "Free Shipping"
                             : `Shipping Charge: ₹${item.product.shippingCharge}`}
@@ -559,7 +558,7 @@ export default function page() {
                       )}
                     </span>
                   </div>
-                  <div className="text-[#16A34A] flex items-center justify-between">
+                  <div className="text-(--color-accent-yellow) flex items-center justify-between">
                     <span>Discount</span>
                     <span>
                       - ₹
@@ -597,7 +596,7 @@ export default function page() {
                     </span>
                   </div>
                   <Button
-                    className="bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                    className="bg-blue-600 hover:bg-(--color-button-yellow) cursor-pointer"
                     onClick={async () => {
                       if (cart.checkoutStatus === "cart") {
                         await handleCreateOrder();
@@ -662,7 +661,7 @@ export default function page() {
                       <ChevronLeft /> Go Back
                     </Button>
                   )}
-                  <p className="text-sm flex items-center gap-2 justify-center text-[#4B5563]">
+                  <p className="text-sm flex items-center gap-2 justify-center text-(--color-header-text)">
                     <Shield /> Safe and Secure Payments
                   </p>
                 </CardContent>

@@ -110,7 +110,7 @@ export default function Address({
                 })}
               />
               {errors.phoneNumber && (
-                <p className="text-red-500 text-[10px] font-normal absolute -bottom-4 right-0">
+                <p className="text-(--color-danger) text-[10px] font-normal absolute -bottom-4 right-0">
                   {errors.phoneNumber?.message}
                 </p>
               )}
@@ -150,7 +150,7 @@ export default function Address({
                 })}
               />
               {errors.addressLine2 && (
-                <p className="text-red-500 text-[10px] font-normal absolute -bottom-4 right-0">
+                <p className="text-(--color-danger) text-[10px] font-normal absolute -bottom-4 right-0">
                   {errors.addressLine2?.message}
                 </p>
               )}
@@ -174,7 +174,7 @@ export default function Address({
                   })}
                 />
                 {errors.city && (
-                  <p className="text-red-500 text-[10px] font-normal absolute -bottom-4 right-0">
+                  <p className="text-(--color-danger) text-[10px] font-normal absolute -bottom-4 right-0">
                     {errors.city?.message}
                   </p>
                 )}
@@ -196,7 +196,7 @@ export default function Address({
                   })}
                 />
                 {errors.state && (
-                  <p className="text-red-500 text-[10px] font-normal absolute -bottom-4 right-0">
+                  <p className="text-(--color-danger) text-[10px] font-normal absolute -bottom-4 right-0">
                     {errors.state?.message}
                   </p>
                 )}
@@ -224,14 +224,14 @@ export default function Address({
                 })}
               />
               {errors.pin && (
-                <p className="text-red-500 text-[10px] font-normal absolute -bottom-4 right-0">
+                <p className="text-(--color-danger) text-[10px] font-normal absolute -bottom-4 right-0">
                   {errors.pin?.message}
                 </p>
               )}
             </fieldset>
             <Button
               type="submit"
-              className="bg-blue-600 hover:bg-blue-700 cursor-pointer"
+              className="bg-blue-600 hover:bg-(--color-button-yellow) cursor-pointer"
             >
               {isAddressLoading ? (
                 <Loader className="animate-spin cursor-not-allowed" />
@@ -281,7 +281,7 @@ export default function Address({
                       <Edit size={20} />
                     </Button>
                   </CardHeader>
-                  <CardContent className="text-[#4B5563] text-sm">
+                  <CardContent className="text-(--color-header-text) text-sm">
                     <div>{add.addressLine1}</div>
                     <div>{add.addressLine2}</div>
                     <div>

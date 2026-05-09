@@ -4,6 +4,7 @@ export interface IUserState {
   email:string;
   name:string;
   profilePic:string;
+  phoneNumber:string;
 }
 
 interface UserState {

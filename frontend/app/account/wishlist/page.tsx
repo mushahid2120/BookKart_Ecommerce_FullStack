@@ -126,12 +126,12 @@ export default function page() {
             />
           </div>
           <h1 className="text-2xl font-medium">Your wishlist is empty.</h1>
-          <p className="text-[#4B5563] font-ligth">
+          <p className="text-(--color-header-text) font-ligth">
             Looks like you haven't added any items to your wishlist yet. Browse
             our collection and save your favorites!
           </p>
           <Link href="/books">
-            <Button className="bg-linear-to-r from-[#22c55e] to-[#10b981] hover:from-[#12c754] hover:to-[#08cf8d] cursor-pointer">
+            <Button className="bg-linear-to-r from-(--color-accent-yellow) to-(--color-button-yellow-hover) hover:from-(--color-accent-yellow) hover:to-(--color-button-yellow-hover) cursor-pointer">
               Browse Books
             </Button>
           </Link>
@@ -152,7 +152,7 @@ export default function page() {
             <Card className="w-72 gap-2 py-4" key={index}>
               <CardHeader className="gap-0">
                 <h2 className="text-sm font-medium ">{item.title}</h2>
-                <p className="text-[#737373] font-light text-sm">
+                <p className="text-(--color-text-muted) font-light text-sm">
                   ${item.finalPrice}
                 </p>
               </CardHeader>
@@ -167,7 +167,7 @@ export default function page() {
               </div>
               <CardFooter className="flex items-center justify-between">
                 <Button
-                  className="bg-red-500 cursor-pointer"
+                  className="bg-(--color-danger) cursor-pointer"
                   onClick={() => {
                     removeFromWishlistByProductId(item._id);
                   }}
@@ -182,7 +182,7 @@ export default function page() {
                   (it) => it.product._id === item._id,
                 ) === -1 ? (
                   <Button
-                    className="bg-blue-600 text-white cursor-pointer"
+                    className="bg-(--color-button-yellow) text-white cursor-pointer"
                     onClick={() => {
                       handleRemoveFromCart(item._id);
                       handleAddToCart({ productid: item._id, quantity: 1 });
@@ -192,7 +192,7 @@ export default function page() {
                   </Button>
                 ) : (
                   <Button
-                    className="bg-[#8b8b8b] text-white cursor-pointer"
+                    className="bg-(--color-surface-muted) text-white cursor-pointer"
                     onClick={() => {
                       handleRemoveFromCart(item._id);
                     }}

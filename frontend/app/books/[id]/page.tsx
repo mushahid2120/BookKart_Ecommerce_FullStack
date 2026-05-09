@@ -105,7 +105,7 @@ export default function page() {
   }, []);
 
   useEffect(() => {
-    if (book && wishlist && wishlist.length !== 0 ) {
+    if (book && wishlist) {
       setIsWishlist(!!wishlist.find((item) => item._id === book._id));
     }
   }, [book, wishlist]);
@@ -218,7 +218,7 @@ export default function page() {
 
   if (book) {
     return (
-      <main className="md:px-20 sm:px-10  px-6 py-8 bg-[#ddeafe]">
+      <main className="md:px-20 sm:px-10  px-6 py-8 bg-(--color-surface-soft)">
         <section className="flex lg:flex-row flex-col items-start gap-12">
           <div className="w-full ">
             <Card className="lg:max-w-125 lg:min-h-100 flex justify-center rounded-md">
@@ -284,13 +284,13 @@ export default function page() {
             </p>
             <div className="flex items-end gap-6">
               <h1 className="text-3xl font-medium">₹{book.finalPrice}</h1>
-              <p className="text-[#16A34A] text-sm font-medium ">
+              <p className="text-(--color-accent-yellow) text-sm font-medium ">
                 Shipping available
               </p>
             </div>
             <Button
               size="lg"
-              className={`${isPresentInCart ? "bg-red-500" : "bg-[#1d4ed8]"} text-lg w-full max-w-55 min-h-11 my-4 cursor-pointer`}
+              className={`${isPresentInCart ? "bg-red-500" : "bg-(--color-button-yellow)"} text-lg w-full max-w-55 min-h-11 my-4 cursor-pointer`}
               onClick={() => {
                 if (isPresentInCart) {
                   handleRemoveFromCart(book._id);
@@ -367,21 +367,21 @@ export default function page() {
           <Card className="gap-2 w-full md:w-1/2 min-h-100 md:min-h-100 lg:min-h-80 ">
             <CardHeader className="font-semibold text-lg">Sold By</CardHeader>
             <CardContent className="flex gap-4 items-center w-full">
-              <div className="bg-[#dbeafe] rounded-full p-4 text-blue-500">
+              <div className="bg-(--color-surface-soft) rounded-full p-4 text-(--color-accent-yellow)">
                 <User />
               </div>
               <div>
                 <div className="flex gap-4 w-full">
                   <h2 className="text-base font-medium">{book.seller.name}</h2>{" "}
-                  <span className="flex gap-1 font-medium items-center p-1 text-green-600 text-[10px] bg-[#f5f5f5] ">
+                  <span className="flex gap-1 font-medium items-center p-1 text-green-600 text-[10px] bg-(--color-surface-soft) ">
                     <CircleCheck className="size-4" /> Verified
                   </span>
                 </div>
                 <p className="text-[14px] font-normal flex">
                   {" "}
                   <MapPin />{" "}
-                  {book?.seller?.address
-                    ? `${book.seller.address.addressLine1} ${book.seller.address.addressLine1} ${book.seller.address.city} ${book.seller.address.state} ${book.seller.address.pin}`
+                  {book?.seller?.address?.length!=0
+                    ? `${book.seller.address[0].addressLine1} ${book.seller.address[0].addressLine1} ${book.seller.address[0].city} ${book.seller.address[0].state} ${book.seller.address[0].pin}`
                     : "Address Not Specified"}
                 </p>
               </div>
@@ -396,7 +396,7 @@ export default function page() {
             {howWork.map(({ step, title, description, image }, index) => (
               <Card
                 key={index}
-                className="w-full gap-0 max-w-100 max-h-125 min-h-115 bg-linear-to-tl from-[#fef3c8] to-[#fffbe9]"
+                className="w-full gap-0 max-w-100 max-h-125 min-h-115 bg-linear-to-tl from-(--color-surface-soft) to-(--color-page-bg)"
               >
                 <CardHeader className="mb-1">
                   <span className="text-sm mb-2 bg-black rounded-md text-white max-w-17.5 text-center">
@@ -404,7 +404,7 @@ export default function page() {
                   </span>
                   <span className="text-lg font-medium">{title}</span>
                 </CardHeader>
-                <CardContent className="text-[14px] text-[#737373]">
+                <CardContent className="text-[14px] text-(--color-text-muted)">
                   {description}
                 </CardContent>
                 <div className="flex item-center justify-center my-4">

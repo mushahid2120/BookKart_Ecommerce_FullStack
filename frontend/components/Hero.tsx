@@ -30,8 +30,8 @@ export default function Hero() {
         <br /> Online in India
       </h1>
       <div className="flex sm:flex-row gap-6 flex-col sm:gap-8  z-20 text-[4px] md:text-normal">
-        <Button className="w-auto px-28   max-w-44 rounded-2xl h-auto flex items-center gap-x-4 bg-[#1e50d9] hover:bg-[#1941b0]">
-          <div className="md:p-2 p-1 bg-[#5578d8] rounded-lg">
+        <Button className="w-auto px-28   max-w-44 rounded-2xl h-auto flex items-center gap-x-4 bg-(--color-button-yellow) hover:bg-(--color-button-yellow-hover)">
+          <div className="md:p-2 p-1 bg-(--color-surface-muted) rounded-lg">
             <ShoppingBagIcon />
           </div>
           <Link href="/books" className="flex flex-col">
@@ -39,8 +39,8 @@ export default function Hero() {
             <span className="font-semibold">Buy Used Books</span>
           </Link >
         </Button>
-        <Button className="w-auto px-28  max-w-44 rounded-2xl h-auto flex items-center gap-x-4 bg-[#cc8d04] hover:bg-[#ad7c13]">
-          <div className="md:p-2 p-1 bg-[#bf9f5a] rounded-lg">
+        <Button className="w-auto px-28  max-w-44 rounded-2xl h-auto flex items-center gap-x-4 bg-(--color-accent-yellow) hover:bg-(--color-button-yellow-hover)">
+          <div className="md:p-2 p-1 bg-(--color-surface-muted) rounded-lg">
             <BookOpen />
           </div>
           <Link href="/book-sell" className="flex flex-col">

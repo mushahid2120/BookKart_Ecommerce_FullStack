@@ -58,15 +58,15 @@ export default function page() {
 
   if (verificationStatus === "already verified") {
     return (
-      <main className="flex items-center justify-center bg-[#ddeafe]">
+      <main className="flex items-center justify-center bg-(--color-surface-soft)">
         <div className="flex justify-center items-center flex-col gap-2 bg-white p-8 m-4 rounded-md max-w-[400px]">
           <div>
-            <CircleAlert size={72} className="text-[#4d3bd7]" />
+            <CircleAlert size={72} className="text-(--color-accent-yellow)" />
           </div>
-          <h1 className="text-xl font-medium text-[#4d3bd7]">
+          <h1 className="text-xl font-medium text-(--color-accent-yellow)">
             Email already Verified!!
           </h1>
-          <p className="text-center text-[#686868] text-sm">
+          <p className="text-center text-(--color-text-muted) text-sm">
             Email Already Verified you can use our services
           </p>
           <Button
@@ -91,15 +91,15 @@ export default function page() {
 
   if (verificationStatus === "failed") {
     return (
-      <main className="flex items-center justify-center bg-[#ddeafe]">
+      <main className="flex items-center justify-center bg-(--color-surface-soft)">
         <div className="flex justify-center items-center flex-col gap-2 bg-white p-8 m-4 rounded-md max-w-[400px]">
           <div>
-            <CircleX size={72} className="text-[#e20909]" />
+            <CircleX size={72} className="text-(--color-danger)" />
           </div>
-          <h1 className="text-xl text-[#e20909] font-medium">
+          <h1 className="text-xl text-(--color-danger) font-medium">
             Email Verification Failed!!
           </h1>
-          <p className="text-center text-[#686868] text-sm">
+          <p className="text-center text-(--color-text-muted) text-sm">
             Email Verification failed. Resend the verification Email or May be
             you are already verified.Try again to Login your account
           </p>
@@ -125,7 +125,7 @@ export default function page() {
 
   if (verificationStatus === "loading") {
     return (
-      <main className="flex items-center justify-center bg-[#ddeafe]">
+      <main className="flex items-center justify-center bg-(--color-surface-soft)">
         <div className="flex justify-center items-center flex-col gap-2 bg-white p-8 m-4 rounded-md max-w-[400px]">
           <h2 className="text-2xl">Loading Please Wait...</h2>
         </div>
@@ -135,13 +135,13 @@ export default function page() {
 
   if (verificationStatus === "success") {
     return (
-      <main className="flex items-center justify-center bg-[#ddeafe]">
+      <main className="flex items-center justify-center bg-(--color-surface-soft)">
         <div className="flex justify-center items-center flex-col gap-2">
           <div>
-            <CircleCheckBig size={72} className="text-[#d7925a]" />
+            <CircleCheckBig size={72} className="text-(--color-accent-yellow)" />
           </div>
           <h1 className="text-xl font-medium">Email has been Verified</h1>
-          <p className="text-center text-[#686868] text-sm">
+          <p className="text-center text-(--color-text-muted) text-sm">
             Your Email has been Verified. you can use our services
           </p>
           <Button type="submit" className=" w-full">

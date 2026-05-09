@@ -71,12 +71,12 @@ export default function page() {
           <h1 className="text-2xl font-medium">
             You haven't sold any books yet.
           </h1>
-          <p className="text-[#4B5563] font-ligth">
+          <p className="text-(--color-header-text) font-ligth">
             Start selling your books to reach potential buyers. List your first
             book now and make it available to others.
           </p>
           <Link href="/book-sell">
-            <Button className="bg-linear-to-r from-[#22c55e] to-[#10b981] hover:from-[#12c754] hover:to-[#08cf8d] cursor-pointer">
+            <Button className="bg-linear-to-r from-(--color-accent-yellow) to-(--color-button-yellow-hover) hover:from-(--color-accent-yellow) hover:to-(--color-button-yellow-hover) cursor-pointer">
               Sell Your First Book
             </Button>
           </Link>
@@ -87,10 +87,10 @@ export default function page() {
 
   return (
     <div className="flex flex-col items-center justify-center gap-2">
-      <h1 className="text-4xl font-semibold text-[#9333ea]">
+      <h1 className="text-4xl font-semibold text-(--color-header-text)">
         Your Listed Books
       </h1>
-      <h3 className="text-[#4b5563] text-lg">
+      <h3 className="text-(--color-header-text) text-lg">
         Manage and track your book listings
       </h3>
       <div className="w-full grid mt-4 sm:grid-cols-2 gap-4">
@@ -99,12 +99,12 @@ export default function page() {
             className="relative overflow-hidden p-0 pb-4 w-full sm:max-w-80 gap-0"
             key={index}
           >
-            <div className="h-1 bg-[#eab308] w-full absolute top-0"></div>
-            <CardHeader className="flex flex-col text-lg text-blue-700 font-medium bg-[#eefdf5] p-3 gap-1 w-full">
+            <div className="h-1 bg-(--color-button-yellow) w-full absolute top-0"></div>
+            <CardHeader className="flex flex-col text-lg text-(--color-button-yellow-hover) font-medium bg-(--color-surface-soft) p-3 gap-1 w-full">
               <div className="flex items-center gap-3 my-2 min-w-0">
                 <span className="truncate w-full block">{book.title}</span>
               </div>
-              <p className="text-[#737373] text-sm truncate">{book.subject}</p>
+              <p className="text-(--color-text-muted) text-sm truncate">{book.subject}</p>
             </CardHeader>
             <div className="h-60 w-40  py-2 mx-auto">
               {book.images && (
@@ -119,7 +119,7 @@ export default function page() {
               <h3 className="truncate text-sm mb-1"> {book.category}</h3>
               <p className="text-sm mb-1.5">Class: {book.classType}</p>
               <div className="flex justify-between items-center ">
-                <span className="text-[#7d21a8] bg-[#f3e8ff] p-1 rounded-lg text-sm">
+                <span className="text-(--color-header-text) bg-(--color-surface-soft) p-1 rounded-lg text-sm">
                   ₹{book.finalPrice}
                 </span>
                 <span className="line-through text-sm">₹{book.price}</span>
@@ -127,13 +127,13 @@ export default function page() {
             </CardContent>
             <CardFooter className=" mt-3 gap-2 w-full block">
               <Link href={`/books/${book._id}`}>
-                <Button className=" bg-blue-700 hover:bg-blue-800 w-full font-medium cursor-pointer ">
+                <Button className=" bg-(--color-button-yellow) hover:bg-(--color-button-yellow-hover) w-full font-medium cursor-pointer ">
                   <View />
                   View
                 </Button>
               </Link>
               <Button
-                className="absolute top-2 right-2 bg-red-500 hover:bg-red-700 cursor-pointer"
+                className="absolute top-2 right-2 bg-(--color-danger) hover:bg-(--color-button-yellow-hover) cursor-pointer"
                 onClick={() => {
                   handleDeleteProduct(book._id);
                 }}

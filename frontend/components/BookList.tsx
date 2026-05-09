@@ -96,12 +96,12 @@ export default function BookList({ books }: { books: IBook[] }) {
                   className="relative aspect-video w-full object-cover"
                 />
 
-                <div className="absolute mt-2 bg-orange-600 text-white rounded-r-xl pl-1 pr-2 font-semibold text-sm z-100">
+                <div className="absolute mt-2 bg-(--color-accent-yellow) text-white rounded-r-xl pl-1 pr-2 font-semibold text-sm z-100">
                   {calculateDiscount(book.price, book.finalPrice)}% Off
                 </div>
 
                 <div
-                  className=" absolute top-2 right-2 p-1 text-red-500 bg-[#ddeafe] hover:bg-[#c5d5ee] hover:text-red-600 rounded-full z-100"
+                  className=" absolute top-2 right-2 p-1 text-(--color-danger) bg-(--color-surface-soft) hover:bg-(--color-surface-muted) hover:text-(--color-danger) rounded-full z-100"
                   onClick={(e) => {
                     e.preventDefault(); // stops Link navigation
                     e.stopPropagation();
@@ -129,7 +129,7 @@ export default function BookList({ books }: { books: IBook[] }) {
                   <div className="font-semibold truncate sm:py-0 sm:text-base text-[14px]">
                     {book.title}
                   </div>
-                  <div className="font-normal sm:text-sm text-[12px]  text-gray-500 ">
+                  <div className="font-normal sm:text-sm text-[12px]  text-(--color-text-muted) ">
                     {book.author}
                   </div>
 
@@ -140,11 +140,11 @@ export default function BookList({ books }: { books: IBook[] }) {
                     </span>
                   </h3>
                   <div className="flex justify-between items-center ">
-                    <p className="sm:text-[12px] text-[8px] text-gray-400">
+                    <p className="sm:text-[12px] text-[8px] text-(--color-text-muted)">
                       {monthDiff(book.createdAt)} month ago
                     </p>
 
-                    <span className="sm:text-[14px] text-[10px] text-gray-500">
+                    <span className="sm:text-[14px] text-[10px] text-(--color-text-muted)">
                       {book.condition}
                     </span>
                   </div>
@@ -176,7 +176,7 @@ export default function BookList({ books }: { books: IBook[] }) {
               <Button
                 variant="outline"
                 key={i}
-                className={` ${currentPage === i + 1 ? "bg-blue-400 text-white" : ""}`}
+                className={` ${currentPage === i + 1 ? "bg-(--color-accent-yellow) text-white" : ""}`}
                 onClick={() => {
                   setCurrentPage((prev) => i + 1);
                 }}

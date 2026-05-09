@@ -29,7 +29,7 @@ export interface IProduct {
 export interface ISeller{
     name:string;
     image:string;
-    address: IAddress
+    address: IAddress[];
 }
 
 export interface IAddress {

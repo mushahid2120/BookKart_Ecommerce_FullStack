@@ -20,6 +20,7 @@ const Api_Urls = {
   getProductBySellerId: `${BASE_URL}/product/product-seller-id`,
   createProduct: `${BASE_URL}/product/create-product`,
   deleteProduct: (productId: string) => `${BASE_URL}/product/delete-product/${productId}`,
+  getLatestProduct:`${BASE_URL}/product/latest-product`,
 
   //Order
   getOrderByUserId: `${BASE_URL}/order/get-order-by-userid`,
@@ -150,6 +151,12 @@ export const api = createApi({
       invalidatesTags: [
         { type: "Product", id: "getAllProduct" }
       ],
+    }),
+    getLatestProduct: builder.query({
+      query: () => ({
+        url: Api_Urls.getLatestProduct,
+        method: "GET",
+      })
     }),
 
     //Order
@@ -282,6 +289,7 @@ export const {
   useLazyGetProductBySellerIdQuery,
   useCreateProductMutation,
   useDeleteProductMutation,
+  useLazyGetLatestProductQuery,
   useLazyGetOrderByUserIdQuery,
   useLazyGetOrderByOrderIdQuery,
   useCreateOrUpdateOrderMutation,

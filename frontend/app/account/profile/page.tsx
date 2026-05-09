@@ -62,17 +62,17 @@ export default function page() {
 
   return (
     <div className="space-y-4">
-      <Card className=" rounded-md bg-linear-to-r from-[#ec4899] to-[#f43f5f] text-white gap-0">
+      <Card className=" rounded-md bg-linear-to-r from-(--color-accent-yellow) to-(--color-button-yellow-hover) text-white gap-0">
         <CardHeader className="text-4xl font-medium">My Profile</CardHeader>
         <CardDescription className="text-white font-light ml-6">
           Manage your personal information and preferences
         </CardDescription>
       </Card>
       <Card className="relative overflow-hidden p-0 ">
-        <div className="h-1 bg-[#ec4899] w-full absolute top-0"></div>
-        <CardHeader className="flex flex-col text-xl  text-[#be185d] font-medium gap-2 bg-[#eefdf5] py-4">
+        <div className="h-1 bg-(--color-accent-yellow) w-full absolute top-0"></div>
+        <CardHeader className="flex flex-col text-xl  text-(--color-button-yellow-hover) font-medium gap-2 bg-(--color-surface-soft) py-4">
           <span>Personal Information</span>{" "}
-          <p className="text-[#737373] text-sm font-normal">
+          <p className="text-(--color-text-muted) text-sm font-normal">
             Update your profile details and contact information
           </p>
         </CardHeader>
@@ -98,7 +98,7 @@ export default function page() {
                 })}
               />
               {errors?.userName && (
-                <p className="text-red-500 text-[10px] font-normal absolute -bottom-4 right-0">
+                <p className="text-(--color-danger) text-[10px] font-normal absolute -bottom-4 right-0">
                   {errors.userName.message}
                 </p>
               )}
@@ -120,7 +120,7 @@ export default function page() {
                 })}
               />
               {errors?.email && (
-                <p className="text-red-500 text-[10px] font-normal absolute -bottom-4 right-0">
+                <p className="text-(--color-danger) text-[10px] font-normal absolute -bottom-4 right-0">
                   {errors.email?.message}
                 </p>
               )}
@@ -142,7 +142,7 @@ export default function page() {
                 })}
               />
               {errors?.phoneNumber && (
-                <p className="text-red-500 text-[10px] font-normal absolute -bottom-4 right-0">
+                <p className="text-(--color-danger) text-[10px] font-normal absolute -bottom-4 right-0">
                   {errors.phoneNumber.message}
                 </p>
               )}
@@ -150,7 +150,7 @@ export default function page() {
           </form>
           {!isEditing && (
             <Button
-              className="bg-linear-to-r from-[#ec4899] to-[#f43f5f] text-white hover:bg-linear-to-r hover:from-[#e12e88] hover:to-[#f43f5f] cursor-pointer"
+              className="bg-linear-to-r from-(--color-accent-yellow) to-(--color-button-yellow-hover) text-white hover:bg-linear-to-r hover:from-(--color-accent-yellow) hover:to-(--color-button-yellow-hover) cursor-pointer"
               onClick={() => {
                 setIsEditing(true);
               }}
@@ -168,7 +168,7 @@ export default function page() {
               >
                 Discard Changes
               </Button>
-              <Button className="bg-linear-to-r from-[#ec4899] to-[#f43f5f] text-white hover:bg-linear-to-r hover:from-[#e12e88] hover:to-[#f43f5f] cursor-pointer"  onClick={()=>{
+              <Button className="bg-linear-to-r from-(--color-accent-yellow) to-(--color-button-yellow-hover) text-white hover:bg-linear-to-r hover:from-[#e12e88] hover:to-(--color-button-yellow-hover) cursor-pointer"  onClick={()=>{
                 const userData=watch();
                 handleUpdateUserData(userData)
               }}>

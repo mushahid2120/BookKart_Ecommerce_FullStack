@@ -193,7 +193,7 @@ export default function LoginSignupDialouge({
           </TabsList>
           <TabsContent value="login">
             <form
-              className="space-y-6 mt-5 text-[#686868]"
+              className="space-y-6 mt-5 text-(--color-text-muted)"
               onSubmit={handleLoginSubmit(handleLogin)}
             >
               <div className="relative">
@@ -239,7 +239,7 @@ export default function LoginSignupDialouge({
               </div>
               <div className="relative">
                 {loginError && (
-                  <p className="absolute -top-4 text-xs text-red-500 pl-2 font-medium w-full">
+                  <p className="absolute -top-4 text-xs text-(--color-danger) pl-2 font-medium w-full">
                     {loginError}
                   </p>
                 )}
@@ -252,20 +252,20 @@ export default function LoginSignupDialouge({
                 </Button>
               </div>
             </form>
-            <div className="flex justify-between items-center gap-1 my-2 text-sm text-[#686868]">
+            <div className="flex justify-between items-center gap-1 my-2 text-sm text-(--color-text-muted)">
               <hr className="grow" />
               or
               <hr className="grow" />
             </div>
             <div className="mb-2">Login with Google</div>
 
-            <p className="text-sm text-[#686868] text-center">
+            <p className="text-sm text-(--color-text-muted) text-center">
               By clicking "agree", you agree to our{" "}
-              <Link href="term-of-use" className="text-blue-500">
+              <Link href="term-of-use" className="text-(--color-accent-yellow)">
                 Terms of Use
               </Link>
               ,{" "}
-              <Link href="privacy-policy" className="text-blue-500">
+              <Link href="privacy-policy" className="text-(--color-accent-yellow)">
                 Privac Policy
               </Link>
             </p>
@@ -273,12 +273,12 @@ export default function LoginSignupDialouge({
 
           <TabsContent value="signup">
             <form
-              className="space-y-6 mt-5 text-[#686868]"
+              className="space-y-6 mt-5 text-(--color-text-muted)"
               onSubmit={handleSignupSubmit(handleSignup)}
             >
               <div className="relative">
                 {signupError.name && (
-                  <p className="absolute -top-4 text-xs text-red-500 text-right pl-2 font-medium w-full">
+                  <p className="absolute -top-4 text-xs text-(--color-danger) text-right pl-2 font-medium w-full">
                     {signupError.name}
                   </p>
                 )}
@@ -301,7 +301,7 @@ export default function LoginSignupDialouge({
 
               <div className="relative">
                 {signupError.email && (
-                  <p className="absolute -top-4 text-xs text-red-500 text-right pl-2 font-medium w-full">
+                  <p className="absolute -top-4 text-xs text-(--color-danger) text-right pl-2 font-medium w-full">
                     {signupError.email}
                   </p>
                 )}
@@ -323,7 +323,7 @@ export default function LoginSignupDialouge({
               </div>
               <div className="relative">
                 {signupError.password && (
-                  <p className="absolute -top-4 text-xs text-red-500 text-right pl-2 font-medium w-full">
+                  <p className="absolute -top-4 text-xs text-(--color-danger) text-right pl-2 font-medium w-full">
                     {signupError.password}
                   </p>
                 )}
@@ -367,13 +367,13 @@ export default function LoginSignupDialouge({
               </Button>
             </form>
 
-            <p className="text-sm text-[#686868] mt-2 text-center">
+            <p className="text-sm text-(--color-text-muted) mt-2 text-center">
               By clicking "agree", you agree to our{" "}
-              <Link href="term-of-use" className="text-blue-500">
+              <Link href="term-of-use" className="text-(--color-accent-yellow)">
                 Terms of Use
               </Link>
               ,{" "}
-              <Link href="privacy-policy" className="text-blue-500">
+              <Link href="privacy-policy" className="text-(--color-accent-yellow)">
                 Privac Policy
               </Link>
             </p>
@@ -383,10 +383,10 @@ export default function LoginSignupDialouge({
             {isResetLinkSent ? (
               <div className="flex justify-center items-center flex-col gap-2">
                 <div>
-                  <CircleCheckBig size={72} className="text-[#d7925a]" />
+                  <CircleCheckBig size={72} className="text-(--color-accent-yellow)" />
                 </div>
                 <h1 className="text-xl font-medium">Reset Link Send</h1>
-                <p className="text-center text-[#686868] text-sm">
+                <p className="text-center text-(--color-text-muted) text-sm">
                   we've sent reset password link to your email. Please, check
                   you inbox and follow the instruction to reset your password
                 </p>
@@ -405,7 +405,7 @@ export default function LoginSignupDialouge({
             ) : (
               <>
                 <form
-                  className="space-y-4 mt-5 text-[#686868]"
+                  className="space-y-4 mt-5 text-(--color-text-muted)"
                   onSubmit={handleForgotPasswordSubmit(handleForgotPassword)}
                 >
                   <div className="relative">
@@ -428,13 +428,13 @@ export default function LoginSignupDialouge({
                   </Button>
                 </form>
 
-                <p className="text-sm text-[#686868] mt-2 text-center">
+                <p className="text-sm text-(--color-text-muted) mt-2 text-center">
                   By clicking "agree", you agree to our{" "}
-                  <Link href="term-of-use" className="text-blue-500">
+                  <Link href="term-of-use" className="text-(--color-accent-yellow)">
                     Terms of Use
                   </Link>
                   ,{" "}
-                  <Link href="privacy-policy" className="text-blue-500">
+                  <Link href="privacy-policy" className="text-(--color-accent-yellow)">
                     Privac Policy
                   </Link>
                 </p>

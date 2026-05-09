@@ -46,13 +46,13 @@ export default function page() {
 
   if (isPasswordChanged) {
     return (
-      <main className="flex items-center justify-center bg-[#ddeafe]">
+      <main className="flex items-center justify-center bg-(--color-surface-soft)">
         <div className="flex justify-center items-center flex-col gap-2 bg-white p-8 m-4 rounded-md max-w-[400px]">
           <div>
-            <CircleCheckBig size={72} className="text-[#d7925a]" />
+            <CircleCheckBig size={72} className="text-(--color-accent-yellow)" />
           </div>
           <h1 className="text-xl font-medium">Reset Password</h1>
-          <p className="text-center text-[#686868] text-sm">
+          <p className="text-center text-(--color-text-muted) text-sm">
             Password has been reset succesully. you can login into you Account.
           </p>
           <Button type="submit" className=" w-full" onClick={()=>{
@@ -71,9 +71,9 @@ export default function page() {
     );
   }
   return (
-    <main className="flex items-center justify-center bg-[#ddeafe]">
+    <main className="flex items-center justify-center bg-(--color-surface-soft)">
       <form
-        className="space-y-4 mt-5 text-[#686868] bg-white p-8 m-4 rounded-md w-full max-w-[400px]"
+        className="space-y-4 mt-5 text-(--color-text-muted) bg-white p-8 m-4 rounded-md w-full max-w-[400px]"
           onSubmit={handleSubmit(handleChangePassword)}
       >
         <h1 className="text-xl font-medium text-black text-center">

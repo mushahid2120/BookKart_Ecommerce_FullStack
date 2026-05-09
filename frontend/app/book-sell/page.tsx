@@ -294,12 +294,12 @@ export default function page() {
   }, [watchedImages]);
 
   return (
-    <main className="bg-[#eff6ff] space-y-4 flex flex-col items-center py-4 md:px-4 px-2">
+    <main className="bg-(--color-surface-soft) space-y-4 flex flex-col items-center py-4 md:px-4 px-2">
       <div className="text-center space-y-2 py-4">
-        <h1 className="text-[#2563eb] text-3xl font-semibold">
+        <h1 className="text-(--color-accent-yellow) text-3xl font-semibold">
           Sell Your Used Books
         </h1>
-        <p className="text-[#4b5563] text-xl">
+        <p className="text-(--color-header-text) text-xl">
           Submit a free classified ad to sell your used books for cash in India
         </p>
       </div>
@@ -310,8 +310,8 @@ export default function page() {
         <fieldset>
           {/* Book Details */}
           <Card className="relative overflow-hidden p-0 ">
-            <div className="h-1 bg-blue-600 w-full absolute top-0"></div>
-            <CardHeader className="flex text-xl items-center text-[#1d4ed8] font-medium bg-[#eef4ff] py-6">
+            <div className="h-1 bg-(--color-button-yellow) w-full absolute top-0"></div>
+            <CardHeader className="flex text-xl items-center text-(--color-button-yellow-hover) font-medium bg-(--color-surface-soft) py-6">
               <Book /> <span>Book Details</span>
             </CardHeader>
             <CardContent className="flex flex-col gap-6 md:m-4 my-2 pb-4">
@@ -331,7 +331,7 @@ export default function page() {
                   })}
                 />
                 {errors?.title && (
-                  <p className="text-red-500 text-[10px] font-normal absolute -bottom-4 right-0">
+                  <p className="text-(--color-danger) text-[10px] font-normal absolute -bottom-4 right-0">
                     {errors.title.message}
                   </p>
                 )}
@@ -345,7 +345,7 @@ export default function page() {
                   name="category"
                 />
                 {errors.category && (
-                  <p className="text-red-500 text-[10px] font-normal absolute -bottom-4 right-0">
+                  <p className="text-(--color-danger) text-[10px] font-normal absolute -bottom-4 right-0">
                     {errors?.category?.message}
                   </p>
                 )}
@@ -358,7 +358,7 @@ export default function page() {
                   name="condition"
                 />
                 {errors.condition && (
-                  <p className="text-red-500 text-[10px] font-normal absolute right-0">
+                  <p className="text-(--color-danger) text-[10px] font-normal absolute right-0">
                     error.condition.message
                   </p>
                 )}
@@ -372,7 +372,7 @@ export default function page() {
                   name="classType"
                 />
                 {errors.classType && (
-                  <p className="text-red-500 text-[10px] font-normal absolute -bottom-4 right-0">
+                  <p className="text-(--color-danger) text-[10px] font-normal absolute -bottom-4 right-0">
                     {errors.classType?.message}
                   </p>
                 )}
@@ -394,14 +394,14 @@ export default function page() {
                   })}
                 />
                 {errors.subject && (
-                  <p className="text-red-500 text-[10px] font-normal absolute -bottom-4 right-0">
+                  <p className="text-(--color-danger) text-[10px] font-normal absolute -bottom-4 right-0">
                     {errors.subject.message}
                   </p>
                 )}
               </div>
               <div className=" relative flex flex-col sm:gap-2 gap-1  text-sm font-medium ">
                 <label htmlFor="ad-title">Upload Photos</label>
-                <div className="text-[#2563eb] text-center flex flex-col items-center justify-center gap-2  border-dashed border-2 rounded-md p-4 border-[#93c5fd] bg-[#eff6ff] hover:underline cursor-pointer">
+                <div className="text-(--color-accent-yellow) text-center flex flex-col items-center justify-center gap-2  border-dashed border-2 rounded-md p-4 border-(--color-surface-muted) bg-(--color-surface-soft) hover:underline cursor-pointer">
                   {previewsImages.length > 0 ? (
                     <div className="flex gap-2 mt-2 flex-wrap">
                       {previewsImages.map((url, index) => (
@@ -450,7 +450,7 @@ export default function page() {
                   }}
                 />
                 {errors.images && (
-                  <p className="text-red-500 text-[10px] font-normal absolute -bottom-4 right-0">
+                  <p className="text-(--color-danger) text-[10px] font-normal absolute -bottom-4 right-0">
                     {errors.images?.message}
                   </p>
                 )}
@@ -461,12 +461,12 @@ export default function page() {
         <fieldset>
           {/* Optional Details */}
           <Card className="relative overflow-hidden p-0 ">
-            <div className="h-1 bg-[#22c55e] w-full absolute top-0"></div>
-            <CardHeader className="flex flex-col text-xl  text-[#15803d] font-medium bg-[#eefdf5] py-6">
+            <div className="h-1 bg-(--color-accent-yellow) w-full absolute top-0"></div>
+            <CardHeader className="flex flex-col text-xl  text-(--color-button-yellow-hover) font-medium bg-(--color-surface-soft) py-6">
               <div className="flex items-center gap-4">
                 <CircleQuestionMark /> <span>Optional Details</span>{" "}
               </div>
-              <p className="text-[#737373] text-sm font-light">
+              <p className="text-(--color-text-muted) text-sm font-light">
                 (Description, MRP, Author, etc...)
               </p>
             </CardHeader>
@@ -479,7 +479,7 @@ export default function page() {
           {/* Pricing Details */}
           <Card className="relative overflow-hidden p-0 ">
             <div className="h-1 bg-[#eab308] w-full absolute top-0"></div>
-            <CardHeader className="flex flex-col text-xl  text-[#a16207] font-medium bg-[#fefbea] py-6">
+            <CardHeader className="flex flex-col text-xl  text-(--color-button-yellow-hover) font-medium bg-(--color-surface-soft) py-6">
               <div className="flex items-center gap-4">
                 <DollarSign /> <span>Pricing Details</span>{" "}
               </div>
@@ -501,7 +501,7 @@ export default function page() {
                   })}
                 />
                 {errors.finalPrice && (
-                  <p className="text-red-500 text-[10px] font-normal absolute -bottom-4 right-0">
+                  <p className="text-(--color-danger) text-[10px] font-normal absolute -bottom-4 right-0">
                     {errors.finalPrice?.message}
                   </p>
                 )}
@@ -536,7 +536,7 @@ export default function page() {
                     <label htmlFor="freeShipping">Free Shipping</label>
                   </div>
                   {errors.shippingCharge && (
-                    <p className="text-red-500 text-[10px] font-normal absolute bottom-4 left-8">
+                    <p className="text-(--color-danger) text-[10px] font-normal absolute bottom-4 left-8">
                       {errors.shippingCharge?.message}
                     </p>
                   )}
@@ -552,7 +552,7 @@ export default function page() {
           {/* Bank Details */}
           <Card className="relative overflow-hidden p-0 pb-4 ">
             <div className="h-1 bg-[#eab308] w-full absolute top-0"></div>
-            <CardHeader className="flex flex-col text-xl  text-[#ca8a04] font-medium bg-[#e8f0ff] py-6">
+            <CardHeader className="flex flex-col text-xl  text-[#ca8a04] font-medium bg-(--color-surface-soft) py-6">
               <div className="flex items-center gap-4">
                 <CreditCard /> <span>Bank Details</span>{" "}
               </div>
@@ -571,7 +571,7 @@ export default function page() {
                     name="paymentMode"
                   />
                   {errors.paymentMode && (
-                    <p className="text-red-500 text-[10px] font-normal absolute bottom-0 right-0">
+                    <p className="text-(--color-danger) text-[10px] font-normal absolute bottom-0 right-0">
                       {errors.paymentMode?.message}
                     </p>
                   )}
@@ -604,7 +604,7 @@ export default function page() {
                     })}
                   />
                   {"UpiId" in (errors.paymentDetails || {}) && (
-                    <p className="text-red-500 text-[10px] font-normal absolute -bottom-4 right-0">
+                    <p className="text-(--color-danger) text-[10px] font-normal absolute -bottom-4 right-0">
                       {(errors.paymentDetails as any)?.UpiId?.message}
                     </p>
                   )}
@@ -632,7 +632,7 @@ export default function page() {
                       })}
                     />
                     {"AccountNumber" in (errors.paymentDetails || {}) && (
-                      <p className="text-red-500 text-[10px] font-normal absolute -bottom-4 right-0">
+                      <p className="text-(--color-danger) text-[10px] font-normal absolute -bottom-4 right-0">
                         {(errors.paymentDetails as any)?.AccountNumber?.message}
                       </p>
                     )}
@@ -656,7 +656,7 @@ export default function page() {
                       })}
                     />
                     {"IFSC" in (errors.paymentDetails || {}) && (
-                      <p className="text-red-500 text-[10px] font-normal absolute -bottom-4 right-0">
+                      <p className="text-(--color-danger) text-[10px] font-normal absolute -bottom-4 right-0">
                         {(errors.paymentDetails as any)?.IFSC?.message}
                       </p>
                     )}
@@ -671,7 +671,7 @@ export default function page() {
                       {...register("paymentDetails.BankName")}
                     />
                     {"BankName" in (errors.paymentDetails || {}) && (
-                      <p className="text-red-500 text-[10px] font-normal absolute -bottom-4 right-0">
+                      <p className="text-(--color-danger) text-[10px] font-normal absolute -bottom-4 right-0">
                         {(errors.paymentDetails as any)?.BankName?.message}
                       </p>
                     )}
@@ -683,7 +683,7 @@ export default function page() {
         </fieldset>
         <Button
           type="submit"
-          className=" w-full text-xl hover:bg-[#165deb] bg-[#3e7cf5] cursor-pointer"
+          className=" w-full text-xl hover:bg-(--color-button-yellow-hover) bg-(--color-button-yellow) cursor-pointer"
         >
           {isLoading ? (
             <Loader className="animate-spin cursor-pointer" />
@@ -692,13 +692,13 @@ export default function page() {
           )}
         </Button>
       </form>
-      <p className="text-xs font-light text-[#4b5563]">
+      <p className="text-xs font-light text-(--color-header-text)">
         By clicking "Post Your Book", you agree to our{" "}
-        <Link href="" className="text-blue-500">
+        <Link href="" className="text-(--color-accent-yellow)">
           Terms of Use
         </Link>
         ,{" "}
-        <Link className="text-blue-500" href="">
+        <Link className="text-(--color-accent-yellow)" href="">
           Privacy Policy
         </Link>
       </p>
