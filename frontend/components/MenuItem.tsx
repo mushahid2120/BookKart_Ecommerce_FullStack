@@ -31,6 +31,7 @@ export default function MenuItem({
       if (response.isSuccess) {
         toast.success("Logout Successfull");
         dispatch(logout());
+        window.location.reload();
       }
     } catch (error) {
       console.log(error);

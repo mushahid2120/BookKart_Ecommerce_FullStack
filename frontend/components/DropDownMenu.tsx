@@ -7,6 +7,7 @@ import {
 import MenuItem from "./MenuItem";
 import { EachMenuItemType} from "./Header";
 import { IUserState } from "@/store/slice/userSlice";
+import { useDispatch } from "react-redux";
 
 export default function DropDownMenu({
   open,
@@ -25,6 +26,7 @@ export default function DropDownMenu({
   setIsMenuOpen: (arg0: boolean) => void;
   setIsDropDownMenuOpen:(arg0: boolean) => void;
 }) {
+  const dispatch=useDispatch();
   return (
     <DropdownMenu open={open} onOpenChange={onOpenChange} >
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>

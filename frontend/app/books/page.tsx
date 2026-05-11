@@ -78,6 +78,8 @@ export default function Books() {
   const [getBooks]=useLazyGetAllProductQuery();
   const [books,setBooks]=useState<IBook[]>([])
   const [addToWishList]=useAddToWishlistMutation();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
   
 
   const [categoriesCheck, setCategoriesCheck] = useState<CategoriesCheckType>({
@@ -192,12 +194,17 @@ export default function Books() {
 
   const getAllBooks=async ()=>{
     try {
+      setIsLoading(true);
+      setError(null);
       const response=await getBooks({}).unwrap()
       if(response.isSuccess){
         setBooks(response.data);
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
+      setError("Failed to load books. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -322,6 +329,9 @@ export default function Books() {
           </div>
           <BookList
             books={filteredBooks.sort(bookSortFunc)}
+            isLoading={isLoading}
+            error={error}
+            onRetry={getAllBooks}
           />
         </div>
       </div>

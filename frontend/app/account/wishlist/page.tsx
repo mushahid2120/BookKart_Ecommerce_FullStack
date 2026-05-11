@@ -24,6 +24,8 @@ export default function page() {
   const wishlist = useSelector((state: RootState) => state.wishlist.product);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [isAddingToCart, setIsAddingToCart] = useState<boolean>(false);
+  const [isPageLoading, setIsPageLoading] = useState<boolean>(true);
+  const [pageError, setPageError] = useState<string | null>(null);
   const [getCart] = useLazyGetCartQuery();
   const [removeFromCart] = useRemoveFromCartMutation();
   const [addToCart] = useAddToCartMutation();
@@ -53,12 +55,16 @@ export default function page() {
 
   const fetchingWishlist = async () => {
     try {
+      setPageError(null);
       const response = await getWishlist({}).unwrap();
       if (response.isSuccess) {
         dispatch(setWishlist(response.data));
       }
     } catch (error) {
       console.log(error);
+      setPageError("Failed to load wishlist. Please try again.");
+    } finally {
+      setIsPageLoading(false);
     }
   };
 

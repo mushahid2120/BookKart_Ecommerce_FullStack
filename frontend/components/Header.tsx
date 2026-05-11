@@ -87,10 +87,10 @@ export default function Header() {
       icon: <Heart />,
       onClick: () => handleProtectNav("/account/wishlist"),
     },
-    { title: "About Us", icon: <UsersRound />, path: "about-us" },
-    { title: "Terms & Use", icon: <FileTerminal />, path: "term-of-use" },
-    { title: "Privacy Policy", icon: <BookLock />, path: "privacy-policy" },
-    { title: "Help", icon: <CircleQuestionMark />, path: "help" },
+    { title: "About Us", icon: <UsersRound />, path: "/about-us" },
+    { title: "Terms & Use", icon: <FileTerminal />, path: "/term-of-use" },
+    { title: "Privacy Policy", icon: <BookLock />, path: "/privacy-policy" },
+    { title: "Help", icon: <CircleQuestionMark />, path: "/help" },
   ];
 
   useEffect(()=>{

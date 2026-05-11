@@ -18,6 +18,7 @@ import {
   useRemoveFromWishlistMutation,
 } from "@/store/api";
 import { setCart } from "@/store/slice/cartSlice";
+import { toggleLoginDialog } from "@/store/slice/userSlice";
 import { setWishlist } from "@/store/slice/wishlistSlice";
 import { RootState } from "@/store/store";
 import {
@@ -97,12 +98,20 @@ export default function page() {
   const [getCart] = useLazyGetCartQuery();
   const [isPresentInCart, setIsPresentInCart] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isPageLoading, setIsPageLoading] = useState<boolean>(true);
+  const [pageError, setPageError] = useState<string | null>(null);
   const [removeFromCart] = useRemoveFromCartMutation();
+  const isLoggedIn = useSelector((state: RootState) => state.user.isLoggedIn);
 
   useEffect(() => {
     getSigleBook();
-    fetchingWishlist();
   }, []);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetchingWishlist();
+    }
+  }, [isLoggedIn]);
 
   useEffect(() => {
     if (book && wishlist) {
@@ -111,21 +120,26 @@ export default function page() {
   }, [book, wishlist]);
 
   useEffect(() => {
-    if (book && cart ) {
-        setIsPresentInCart(
-          !!cart.item.find((item) => item.product._id === book._id),
-        );
+    if (book && cart) {
+      setIsPresentInCart(
+        !!cart.item.find((item) => item.product._id === book._id),
+      );
     }
   }, [book, cart]);
 
   const getSigleBook = async () => {
     try {
+      setIsPageLoading(true);
+      setPageError(null);
       const response = await getBookData(id).unwrap();
       if (response.isSuccess) {
         setBook(response.data);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
+      setPageError("Failed to load book details. Please try again.");
+    } finally {
+      setIsPageLoading(false);
     }
   };
 
@@ -216,6 +230,73 @@ export default function page() {
     }
   };
 
+  // Loading State - Show Shimmer
+  if (isPageLoading) {
+    return (
+      <main className="md:px-20 sm:px-10 px-6 py-8 bg-(--color-surface-soft)">
+        <section className="flex lg:flex-row flex-col items-start gap-12">
+          <div className="w-full">
+            <Card className="lg:max-w-125 lg:min-h-100 flex justify-center rounded-md">
+              <div className="aspect-video w-full bg-(--color-surface-soft) animate-pulse"></div>
+            </Card>
+            <div className="flex gap-2 mt-2">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="w-15 h-15 bg-(--color-surface-soft) animate-pulse rounded-md"
+                ></div>
+              ))}
+            </div>
+          </div>
+          <div className="w-full space-y-4">
+            <div className="h-8 bg-(--color-surface-soft) animate-pulse rounded w-3/4"></div>
+            <div className="h-4 bg-(--color-surface-soft) animate-pulse rounded w-1/4"></div>
+            <div className="h-6 bg-(--color-surface-soft) animate-pulse rounded w-1/3"></div>
+            <div className="h-12 bg-(--color-surface-soft) animate-pulse rounded w-1/2"></div>
+            <div className="space-y-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-4 bg-(--color-surface-soft) animate-pulse rounded"
+                ></div>
+              ))}
+            </div>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  // Error State - Show Error with Retry
+  if (pageError) {
+    return (
+      <main className="md:px-20 sm:px-10 px-6 py-8 bg-(--color-surface-soft)">
+        <div className="flex items-center justify-center flex-col h-96">
+          <div className="max-w-md flex items-center flex-col justify-center text-center gap-4">
+            <div>
+              <img
+                src={`/Image/EmptyWishlist.png`}
+                alt="Error Image"
+                className="w-32 h-32"
+              />
+            </div>
+            <h1 className="text-2xl font-medium text-(--color-text-primary)">
+              Oops! Something went wrong
+            </h1>
+            <p className="text-(--color-text-muted) font-light">{pageError}</p>
+            <Button
+              className="bg-(--color-button-yellow) hover:bg-(--color-button-yellow-hover) text-white cursor-pointer px-8 py-2"
+              onClick={getSigleBook}
+            >
+              Try Again
+            </Button>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  // Success State - Show Book Details
   if (book) {
     return (
       <main className="md:px-20 sm:px-10  px-6 py-8 bg-(--color-surface-soft)">
@@ -254,16 +335,16 @@ export default function page() {
             <div className="flex justify-between items-center w-full ">
               <h2 className="text-2xl font-semibold">{book.title}</h2>
               <div className="font-normal text-sm space-x-4">
-                <Button variant={"outline"} className=" rounded-md">
-                  <Share /> Share
-                </Button>
                 <Button
                   variant={"outline"}
                   className=" rounded-md cursor-pointer"
                   onClick={(e) => {
                     e.preventDefault(); // stops Link navigation
                     e.stopPropagation();
-
+                    if (!isLoggedIn) {
+                      dispatch(toggleLoginDialog());
+                      return;
+                    }
                     if (isWishlist) {
                       removeFromWishlistByProductId(book._id);
                     } else {
@@ -292,6 +373,10 @@ export default function page() {
               size="lg"
               className={`${isPresentInCart ? "bg-red-500" : "bg-(--color-button-yellow)"} text-lg w-full max-w-55 min-h-11 my-4 cursor-pointer`}
               onClick={() => {
+                if (!isLoggedIn) {
+                  dispatch(toggleLoginDialog());
+                  return;
+                }
                 if (isPresentInCart) {
                   handleRemoveFromCart(book._id);
                 } else {
@@ -380,7 +465,7 @@ export default function page() {
                 <p className="text-[14px] font-normal flex">
                   {" "}
                   <MapPin />{" "}
-                  {book?.seller?.address?.length!=0
+                  {book?.seller?.address?.length != 0
                     ? `${book.seller.address[0].addressLine1} ${book.seller.address[0].addressLine1} ${book.seller.address[0].city} ${book.seller.address[0].state} ${book.seller.address[0].pin}`
                     : "Address Not Specified"}
                 </p>
@@ -423,4 +508,17 @@ export default function page() {
       </main>
     );
   }
+
+  // Fallback State
+  return (
+    <main className="md:px-20 sm:px-10 px-6 py-8 bg-(--color-surface-soft)">
+      <div className="flex items-center justify-center flex-col h-96">
+        <div className="text-center">
+          <h1 className="text-2xl font-medium text-(--color-text-primary)">
+            Loading...
+          </h1>
+        </div>
+      </div>
+    </main>
+  );
 }

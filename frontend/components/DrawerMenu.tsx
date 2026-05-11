@@ -43,7 +43,7 @@ export default function DrawerMenu({
             />
           </SheetTitle>
           <hr />
-          <SheetDescription >
+          <SheetDescription  onClick={()=>{setIsMenuOpen(false)}}>
             <MenuItem
               menuItem={menuItem}
               user={user}

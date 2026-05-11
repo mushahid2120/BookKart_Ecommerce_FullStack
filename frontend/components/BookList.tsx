@@ -6,7 +6,6 @@ import { ChevronLeft, ChevronRight, Heart } from "lucide-react";
 import Link from "next/link";
 import { IBook } from "@/app/books/page";
 import { monthDiff } from "@/lib/bookUploadTime";
-import { IWishlistItem } from "@/lib/types/product";
 import { useDispatch, useSelector } from "react-redux";
 import {
   useAddToWishlistMutation,
@@ -16,14 +15,26 @@ import {
 import {  setWishlist } from "@/store/slice/wishlistSlice";
 import toast from "react-hot-toast";
 import { RootState } from "@/store/store";
+import { toggleLoginDialog } from "@/store/slice/userSlice";
 
-export default function BookList({ books }: { books: IBook[] }) {
+export default function BookList({ 
+  books, 
+  isLoading = false, 
+  error = null, 
+  onRetry = () => {} 
+}: { 
+  books: IBook[]; 
+  isLoading?: boolean;
+  error?: string | null;
+  onRetry?: () => void;
+}) {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const dispatch = useDispatch();
   const [addProductToWishList] = useAddToWishlistMutation();
   const [getWishlist] = useLazyGetWishlistQuery();
   const [removeProductFromWishlist] = useRemoveFromWishlistMutation();
   const wishlist=useSelector((state:RootState)=>state.wishlist.product)
+  const isLoggedIn =useSelector((state:RootState)=>state.user.isLoggedIn)
 
   const calculateDiscount = (price: number, finalPrice: number) => {
     if (price > finalPrice && price > 0) {
@@ -70,18 +81,80 @@ export default function BookList({ books }: { books: IBook[] }) {
 
 
   useEffect(() => {
+    if(isLoggedIn)
     fetchingWishlist();
-  }, []);
+  }, [isLoggedIn]);
 
-  if (books.length === 0)
+  // Show loading shimmer
+  if (isLoading) {
     return (
-      <div className=" text-center py-12 text-2xl text-gray-700">
-        No Book Found
+      <div className="space-y-4">
+        <div className="grid lg:grid-cols-3 grid-cols-2 gap-4 mt-2 ml-2">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Card key={i} className="overflow-hidden pb-4">
+              <div className="aspect-video w-full bg-(--color-surface-soft) animate-pulse"></div>
+              <CardContent className="px-2 sm:px-4 pt-4">
+                <div className="h-4 bg-(--color-surface-soft) animate-pulse rounded mb-2"></div>
+                <div className="h-3 bg-(--color-surface-soft) animate-pulse rounded w-3/4 mb-3"></div>
+                <div className="h-5 bg-(--color-surface-soft) animate-pulse rounded mb-3"></div>
+                <div className="h-3 bg-(--color-surface-soft) animate-pulse rounded w-1/2"></div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     );
+  }
 
+  // Show error state
+  if (error) {
+    return (
+      <div className="flex items-center justify-center flex-col h-96">
+        <div className="max-w-120 flex items-center flex-col justify-center text-center gap-4">
+          <div>
+            <img
+              src={`/Image/EmptyWishlist.png`}
+              alt="Error Image"
+              className="w-32 h-32"
+            />
+          </div>
+          <h1 className="text-2xl font-medium text-(--color-text-primary)">Oops! Something went wrong</h1>
+          <p className="text-(--color-text-muted) font-light max-w-sm">
+            {error}
+          </p>
+          <Button 
+            className="bg-(--color-button-yellow) hover:bg-(--color-button-yellow-hover) text-white cursor-pointer"
+            onClick={onRetry}
+          >
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
+  // Show empty state
+  if (books.length === 0) {
+    return (
+      <div className="flex items-center justify-center flex-col h-96">
+        <div className="max-w-120 flex items-center flex-col justify-center text-center gap-4">
+          <div>
+            <img
+              src={`/Image/EmptyWishlist.png`}
+              alt="No books found"
+              className="w-32 h-32"
+            />
+          </div>
+          <h1 className="text-2xl font-medium">No Books Found</h1>
+          <p className="text-(--color-text-muted) font-light max-w-sm">
+            The books matching your filters are not available right now. Try adjusting your search filters!
+          </p>
+        </div>
+      </div>
+    );
+  }
 
+  // Show books list
   return (
     <div>
       <div className="grid lg:grid-cols-3 grid-cols-2 gap-4 mt-2 ml-2 ">
@@ -105,7 +178,10 @@ export default function BookList({ books }: { books: IBook[] }) {
                   onClick={(e) => {
                     e.preventDefault(); // stops Link navigation
                     e.stopPropagation();
-
+                    if(!isLoggedIn){
+                      dispatch(toggleLoginDialog());
+                      return
+                    }
                     if (wishlist.find((item)=>item._id===book._id)) {
                       removeFromWishlistByProductId(book._id);
                     } else {
@@ -203,5 +279,5 @@ export default function BookList({ books }: { books: IBook[] }) {
         </Button>
       </div>
     </div>
-  );
+  );    
 }

@@ -28,12 +28,15 @@ import {
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import Link from "next/link";
 
 export default function page() {
   const [isShowLess, setIsShowLess] = useState<boolean>(false);
   const [orders, setOrders] = useState<IOrder[]>([]);
   const [getAllOrderOfUser] = useLazyGetOrderByUserIdQuery();
   const [detailOrder, setDetailOrder] = useState<IOrder | null>(null);
+  const [isPageLoading, setIsPageLoading] = useState<boolean>(true);
+  const [pageError, setPageError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchingAllOrder();
@@ -41,12 +44,16 @@ export default function page() {
 
   const fetchingAllOrder = async () => {
     try {
+      setPageError(null);
       const response = await getAllOrderOfUser({}).unwrap();
       if (response.isSuccess) {
         setOrders(response.data);
       }
     } catch (error: any) {
       console.log(error);
+      setPageError("Failed to load orders. Please try again.");
+    } finally {
+      setIsPageLoading(false);
     }
   };
 
@@ -57,6 +64,63 @@ export default function page() {
 
   return (
     <>
+      {/* Loading State */}
+      {isPageLoading && (
+        <div className="space-y-4">
+          <Card className="bg-linear-to-r from-(--color-accent-yellow) to-(--color-button-yellow-hover) text-white gap-0">
+            <CardHeader className="h-10 bg-(--color-surface-soft) animate-pulse rounded"></CardHeader>
+          </Card>
+          <div className="grid sm:grid-cols-2 gap-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Card key={i} className="pt-0 overflow-hidden p-4 space-y-3">
+                <div className="h-6 bg-(--color-surface-soft) animate-pulse rounded w-1/2"></div>
+                <div className="h-4 bg-(--color-surface-soft) animate-pulse rounded"></div>
+                <div className="h-20 bg-(--color-surface-soft) animate-pulse rounded"></div>
+                <div className="h-10 bg-(--color-surface-soft) animate-pulse rounded"></div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Error State */}
+      {!isPageLoading && pageError && (
+        <div className="flex items-center justify-center flex-col h-96">
+          <div className="max-w-md flex items-center flex-col justify-center text-center gap-4">
+            <img src={`/Image/EmptyWishlist.png`} alt="Error" className="w-32 h-32" />
+            <h1 className="text-2xl font-medium">Something went wrong</h1>
+            <p className="text-(--color-text-muted) font-light">{pageError}</p>
+            <Button
+              className="bg-(--color-button-yellow) hover:bg-(--color-button-yellow-hover) text-white cursor-pointer px-8"
+              onClick={() => {
+                setIsPageLoading(true);
+                fetchingAllOrder();
+              }}
+            >
+              Try Again
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!isPageLoading && !pageError && orders.length === 0 && (
+        <div className="flex items-center justify-center flex-col h-96">
+          <div className="max-w-md flex items-center flex-col justify-center text-center gap-4">
+            <img src={`/Image/EmptyWishlist.png`} alt="No orders" className="w-32 h-32" />
+            <h1 className="text-2xl font-medium">No orders yet</h1>
+            <p className="text-(--color-text-muted) font-light">You haven't placed any orders yet. Shop now!</p>
+            <Link href="/books">
+              <Button className="bg-(--color-button-yellow) hover:bg-(--color-button-yellow-hover) text-white cursor-pointer px-8">
+                Start Shopping
+              </Button>
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* Success State */}
+      {!isPageLoading && !pageError && orders.length > 0 && (
       <div className="space-y-4">
         <Card className=" rounded-md bg-linear-to-r from-(--color-accent-yellow) to-(--color-button-yellow-hover) text-white gap-0">
           <CardHeader className="text-4xl font-medium">My Orders</CardHeader>

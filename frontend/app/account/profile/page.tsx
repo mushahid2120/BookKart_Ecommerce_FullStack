@@ -38,12 +38,14 @@ export default function page() {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [pageError, setPageError] = useState<string | null>(null);
   const [updateUser] = useUpdateUserMutation();
 
   const handleUpdateUserData = async (data: IUserData) => {
     console.log(data)
     try {
       setIsLoading(true);
+      setPageError(null);
       const response = await updateUser({ ...data }).unwrap();
       if (response.isSuccess) {
         toast.success("Your profile as been updated");
@@ -51,8 +53,8 @@ export default function page() {
       }
     } catch (error: any) {
       console.log(error);
-      console.log(error.status==="FETCH_ERROR")
       if (error.status === 500 ||error.status==="FETCH_ERROR") {
+        setPageError("Failed to update profile. Please try again.");
         toast.error("Something went wrong");
       }
     } finally {

@@ -21,6 +21,8 @@ export default function page() {
   const [sellingbook, setSellingBook] = useState<IProduct[]>([]);
   const [getMyPostedBooks] = useLazyGetProductBySellerIdQuery();
   const [isLoading, setIsLoading] = useState<string | null>(null);
+  const [isPageLoading, setIsPageLoading] = useState<boolean>(true);
+  const [pageError, setPageError] = useState<string | null>(null);
   const [deleteProduct] = useDeleteProductMutation();
 
   useEffect(() => {

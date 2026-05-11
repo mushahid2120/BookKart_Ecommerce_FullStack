@@ -1,5 +1,6 @@
 "use client";
 import Address from "@/components/Address";
+import LoginSignupDialouge from "@/components/LoginSignupDialouge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -22,6 +23,7 @@ import {
 } from "@/store/api";
 import { changeCheckoutStatus, setCart } from "@/store/slice/cartSlice";
 import { IAddress, setOrder } from "@/store/slice/orderSlice";
+import { toggleLoginDialog } from "@/store/slice/userSlice";
 import { setWishlist } from "@/store/slice/wishlistSlice";
 import { RootState } from "@/store/store";
 import {
@@ -65,6 +67,9 @@ export default function page() {
   );
   const [isCreateOrderLoading, setIsCreateOrderLoading] =
     useState<boolean>(false);
+  const [isPageLoading, setIsPageLoading] = useState<boolean>(true);
+  const [pageError, setPageError] = useState<string | null>(null);
+  const [showLoginDialog, setShowLoginDialog] = useState<boolean>(false);
   const [createOrder] = useCreateOrUpdateOrderMutation();
   const [addressDialogueStatus, setAddressDialogueStatus] = useState<
     "noAddress" | "selectAddress" | "openAddressForm" | null
@@ -159,12 +164,16 @@ export default function page() {
 
   const fetchingCart = async () => {
     try {
+      setPageError(null);
       const response = await getCart({}).unwrap();
       if (response.isSuccess) {
         dispatch(setCart(response.data));
       }
     } catch (error) {
       console.log(error);
+      setPageError("Failed to load cart. Please try again.");
+    } finally {
+      setIsPageLoading(false);
     }
   };
 
@@ -297,8 +306,11 @@ export default function page() {
 
   useEffect(() => {
     if (user.isLoggedIn) {
+      setIsPageLoading(true);
       fetchingCart();
       fetchingWishlist();
+    } else {
+      setIsPageLoading(false);
     }
   }, [user.isLoggedIn]);
 
@@ -374,331 +386,484 @@ export default function page() {
     rzp1.open();
   };
 
+  if (pageError) {
+    return (
+      <div className="flex items-center justify-center flex-col h-96 bg-(--color-surface-soft)">
+        <div className="max-w-md flex items-center flex-col justify-center text-center gap-4">
+          <div>
+            <img
+              src={`/Image/EmptyWishlist.png`}
+              alt="Error"
+              className="w-32 h-32"
+            />
+          </div>
+          <h1 className="text-2xl font-medium">Something went wrong</h1>
+          <p className="text-(--color-text-muted) font-light">{pageError}</p>
+          <Button
+            className="bg-(--color-button-yellow) hover:bg-(--color-button-yellow-hover) text-white cursor-pointer px-8 py-2"
+            onClick={() => {
+              setIsPageLoading(true);
+              fetchingCart();
+            }}
+          >
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
-      {cart.checkoutStatus === "payment" && (
-        <Script
-          id="razorpay-checkout"
-          src="https://checkout.razorpay.com/v1/checkout.js"
-          strategy="lazyOnload"
-          onLoad={() => console.log("razorpay loaded")}
-        />
+      {/* Not Logged In State */}
+      {!user.isLoggedIn && (
+        <div className="flex items-center justify-center flex-col h-screen bg-(--color-surface-soft)">
+          <div className="max-w-md flex items-center flex-col justify-center text-center gap-4">
+            <div>
+              <img
+                src={`/Image/EmptyWishlist.png`}
+                alt="Not logged in"
+                className="w-32 h-32"
+              />
+            </div>
+            <h1 className="text-2xl font-medium">You are not logged in</h1>
+            <p className="text-(--color-text-muted) font-light">
+              Please log in to your account to proceed with checkout.
+            </p>
+            <Button
+              className="bg-(--color-button-yellow) hover:bg-(--color-button-yellow-hover) text-white cursor-pointer px-8 py-2"
+              onClick={() => dispatch(toggleLoginDialog())}
+            >
+              Login
+            </Button>
+          </div>
+        </div>
       )}
 
-      <div className="flex items-center gap-4 font-medium text-lg bg-(--color-surface-soft)  p-4">
-        <ShoppingCart className="text-(--color-header-text)" />{" "}
-        <span>
-          {cart.item.length !== 0 && cart.item.length} items in your cart
-        </span>
-      </div>
-      <main className="md:px-10 sm:px-10  px-4 pb-16    bg-(--color-surface-soft) ">
-        <section className="flex items-center justify-center gap-4 p-6">
-          <div className="flex items-center justify-center gap-2">
-            <span
-              className={`p-2.5 rounded-full text-white bg-(--color-surface-soft) shadow-xl ${cart.checkoutStatus === "cart" && "bg-[#d4a574]"}`}
-            >
-              <ShoppingCart />
-            </span>
-            <p className="font-medium">Cart</p>
+      {/* Loading State - Shimmer Effect */}
+      {user.isLoggedIn && isPageLoading && (
+        <>
+          <div className="flex items-center gap-4 font-medium text-lg bg-(--color-surface-soft) p-4">
+            <div className="h-6 w-6 bg-(--color-surface-soft) animate-pulse rounded"></div>
+            <div className="h-4 w-32 bg-(--color-surface-soft) animate-pulse rounded"></div>
           </div>
-          <ChevronRight strokeWidth={2} className="text-(--color-text-muted)" />
-          <div className="flex items-center justify-center gap-2">
-            <span
-              className={`p-2.5 rounded-full text-white bg-(--color-surface-soft) shadow-xl  ${cart.checkoutStatus === "address" && "bg-[#d4a574]"}`}
-            >
-              <MapPin />
-            </span>
-            <p className="font-medium">Address</p>
-          </div>
-          <ChevronRight strokeWidth={2} className="text-(--color-text-muted)" />
-          <div className="flex items-center justify-center gap-2">
-            <span
-              className={`p-2.5 rounded-full text-white bg-(--color-surface-soft) shadow-xl ${cart.checkoutStatus === "payment" && "bg-[#d4a574]"}`}
-            >
-              <CreditCard />
-            </span>
-            <p className="font-medium">Payment</p>
-          </div>
-        </section>
-        <section className="flex lg:flex-row flex-col gap-8">
-          <Card className="gap-4 grow max-h-160 overflow-y-scroll">
-            <CardHeader className="gap-0">
-              <h1 className="text-2xl font-medium">Order Summary</h1>
-              <p className="text-(--color-text-muted) text-sm">Review your items</p>
-            </CardHeader>
-            <CardContent>
-              {cart.item &&
-                cart.item.map((item, index) => (
-                  <div key={index}>
+          <main className="md:px-10 sm:px-10 px-4 pb-16 bg-(--color-surface-soft)">
+            <section className="flex items-center justify-center gap-4 p-6">
+              <div className="flex gap-2 w-full justify-center">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-12 w-24 bg-(--color-surface-soft) animate-pulse rounded-full"
+                  ></div>
+                ))}
+              </div>
+            </section>
+            <section className="flex lg:flex-row flex-col gap-8">
+              <div className="gap-4 grow max-h-160 overflow-y-scroll space-y-4">
+                {Array.from({ length: 2 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="bg-(--color-card) p-4 rounded-lg space-y-3"
+                  >
+                    <div className="h-40 bg-(--color-surface-soft) animate-pulse rounded"></div>
+                    <div className="h-4 bg-(--color-surface-soft) animate-pulse rounded w-3/4"></div>
+                    <div className="h-4 bg-(--color-surface-soft) animate-pulse rounded w-1/2"></div>
+                  </div>
+                ))}
+              </div>
+              <div className="space-y-4">
+                <div className="lg:w-80 bg-(--color-card) p-4 rounded-lg space-y-3">
+                  <div className="h-6 bg-(--color-surface-soft) animate-pulse rounded w-1/2"></div>
+                  {Array.from({ length: 5 }).map((_, i) => (
                     <div
-                      className="flex flex-col sm:flex-row gap-8"
-                      key={index}
-                    >
-                      {item.product.image && (
-                        <Image
-                          src={item.product.image}
-                          width={200}
-                          height={200}
-                          alt="cartImage "
-                          className="w-60 h-60"
-                        />
-                      )}
-                      <div className="space-y-1">
-                        <h1 className="font-medium">{item.product.title}</h1>
-                        <p className="text-(--color-text-muted) text-sm font-light">
-                          Quantity: {item.quantity}
-                        </p>
-                        <div>
-                          <span className="text-(--color-text-muted) font-medium line-through text-sm">
-                            ₹{item.product.price}
-                          </span>{" "}
-                          <span className="font-medium">
-                            ₹{item.product.finalPrice}
+                      key={i}
+                      className="h-4 bg-(--color-surface-soft) animate-pulse rounded"
+                    ></div>
+                  ))}
+                </div>
+              </div>
+            </section>
+          </main>
+        </>
+      )}
+
+      {/* Empty Cart State */}
+      {user.isLoggedIn &&
+        !isPageLoading &&
+        !pageError &&
+        cart.item.length === 0 && (
+          <div className="flex items-center justify-center flex-col h-96 bg-(--color-surface-soft)">
+            <div className="max-w-md flex items-center flex-col justify-center text-center gap-4">
+              <div>
+                <img
+                  src={`/Image/EmptyWishlist.png`}
+                  alt="Empty Cart"
+                  className="w-32 h-32"
+                />
+              </div>
+              <h1 className="text-2xl font-medium">Your cart is empty</h1>
+              <p className="text-(--color-text-muted) font-light">
+                Add some books to your cart to proceed with checkout.
+              </p>
+              <Button
+                className="bg-(--color-button-yellow) hover:bg-(--color-button-yellow-hover) text-white cursor-pointer px-8 py-2"
+                onClick={() => (window.location.href = "/books")}
+              >
+                Continue Shopping
+              </Button>
+            </div>
+          </div>
+        )}
+
+      {/* Success State - Normal Checkout Flow */}
+      {user.isLoggedIn &&
+        !isPageLoading &&
+        !pageError &&
+        cart.item.length > 0 && (
+          <>
+            {cart.checkoutStatus === "payment" && (
+              <Script
+                id="razorpay-checkout"
+                src="https://checkout.razorpay.com/v1/checkout.js"
+                strategy="lazyOnload"
+                onLoad={() => console.log("razorpay loaded")}
+              />
+            )}
+
+            <div className="flex items-center gap-4 font-medium text-lg bg-(--color-surface-soft)  p-4">
+              <ShoppingCart className="text-(--color-header-text)" />{" "}
+              <span>
+                {cart.item.length !== 0 && cart.item.length} items in your cart
+              </span>
+            </div>
+            <main className="md:px-10 sm:px-10  px-4 pb-16    bg-(--color-surface-soft) ">
+              <section className="flex items-center justify-center gap-4 p-6">
+                <div className="flex items-center justify-center gap-2">
+                  <span
+                    className={`p-2.5 rounded-full text-white bg-(--color-surface-soft) shadow-xl ${cart.checkoutStatus === "cart" && "bg-[#d4a574]"}`}
+                  >
+                    <ShoppingCart />
+                  </span>
+                  <p className="font-medium">Cart</p>
+                </div>
+                <ChevronRight
+                  strokeWidth={2}
+                  className="text-(--color-text-muted)"
+                />
+                <div className="flex items-center justify-center gap-2">
+                  <span
+                    className={`p-2.5 rounded-full text-white bg-(--color-surface-soft) shadow-xl  ${cart.checkoutStatus === "address" && "bg-[#d4a574]"}`}
+                  >
+                    <MapPin />
+                  </span>
+                  <p className="font-medium">Address</p>
+                </div>
+                <ChevronRight
+                  strokeWidth={2}
+                  className="text-(--color-text-muted)"
+                />
+                <div className="flex items-center justify-center gap-2">
+                  <span
+                    className={`p-2.5 rounded-full text-white bg-(--color-surface-soft) shadow-xl ${cart.checkoutStatus === "payment" && "bg-[#d4a574]"}`}
+                  >
+                    <CreditCard />
+                  </span>
+                  <p className="font-medium">Payment</p>
+                </div>
+              </section>
+              <section className="flex lg:flex-row flex-col gap-8">
+                <Card className="gap-4 grow max-h-160 overflow-y-scroll">
+                  <CardHeader className="gap-0">
+                    <h1 className="text-2xl font-medium">Order Summary</h1>
+                    <p className="text-(--color-text-muted) text-sm">
+                      Review your items
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    {cart.item &&
+                      cart.item.map((item, index) => (
+                        <div key={index}>
+                          <div
+                            className="flex flex-col sm:flex-row gap-8"
+                            key={index}
+                          >
+                            {item.product.image && (
+                              <Image
+                                src={item.product.image}
+                                width={200}
+                                height={200}
+                                alt="cartImage "
+                                className="w-60 h-60"
+                              />
+                            )}
+                            <div className="space-y-1">
+                              <h1 className="font-medium">
+                                {item.product.title}
+                              </h1>
+                              <p className="text-(--color-text-muted) text-sm font-light">
+                                Quantity: {item.quantity}
+                              </p>
+                              <div>
+                                <span className="text-(--color-text-muted) font-medium line-through text-sm">
+                                  ₹{item.product.price}
+                                </span>{" "}
+                                <span className="font-medium">
+                                  ₹{item.product.finalPrice}
+                                </span>
+                              </div>
+                              <p className="text-(--color-accent-yellow) text-sm font-medium ">
+                                {item.product.shippingCharge === 0
+                                  ? "Free Shipping"
+                                  : `Shipping Charge: ₹${item.product.shippingCharge}`}
+                              </p>
+                              <div className="flex gap-4 mt-6">
+                                <Button
+                                  variant="outline"
+                                  className="text-xs cursor-pointer"
+                                  onClick={() => {
+                                    handleRemoveFromCart(item.product._id);
+                                  }}
+                                >
+                                  {isCartLoading &&
+                                  isCartLoading === item.product._id ? (
+                                    <Loader className="animate-spin cursor-not-allowed" />
+                                  ) : (
+                                    <>
+                                      <Trash2 />{" "}
+                                      <span className="hidden sm:block">
+                                        Remove
+                                      </span>
+                                    </>
+                                  )}
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  className="text-xs cursor-pointer"
+                                  onClick={() => {
+                                    if (
+                                      wishlist.find(
+                                        (book) => book._id === item.product._id,
+                                      )
+                                    ) {
+                                      removeFromWishlistByProductId(
+                                        item.product._id,
+                                      );
+                                    } else {
+                                      handleAddToWishlist(item.product._id);
+                                    }
+                                  }}
+                                >
+                                  {isWishlistLoading &&
+                                  isWishlistLoading === item.product._id ? (
+                                    <Loader className="animate-spin cursor-not-allowed" />
+                                  ) : (
+                                    <>
+                                      <Heart
+                                        fill={
+                                          item &&
+                                          wishlist &&
+                                          wishlist.find(
+                                            (book) =>
+                                              item.product._id === book._id,
+                                          )
+                                            ? "red"
+                                            : "none"
+                                        }
+                                      />{" "}
+                                      <span className="hidden sm:block">
+                                        Add to Wishlist
+                                      </span>
+                                    </>
+                                  )}
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                          <hr className="my-4" />
+                        </div>
+                      ))}
+                  </CardContent>
+                </Card>
+
+                {cart.checkoutStatus === "address" && (
+                  <Address
+                    handleAddress={handleAddress}
+                    addressDialogueStatus={addressDialogueStatus}
+                    setAddressDialogueStatus={setAddressDialogueStatus}
+                    userAddress={userAddress}
+                    orderAddress={order.shippingAddress}
+                    isAddressLoading={isAddressLoading}
+                    handleAddAddressOnOrder={handleAddAddressOnOrder}
+                    handleRemoveAddressOnOrder={handleRemoveAddressOnOrder}
+                    editingAddressId={editingAddressId}
+                    setEditingAddressId={setEditingAddressId}
+                  />
+                )}
+
+                <div className="space-y-4">
+                  {cart.item && (
+                    <Card className="lg:w-80 gap-2 h-90">
+                      <CardHeader className="text-xl font-medium ">
+                        Price Details
+                      </CardHeader>
+                      <CardContent className="flex flex-col gap-4 text-sm">
+                        <div className="flex items-center justify-between">
+                          <span>Price ({cart.item.length} items)</span>
+                          <span>
+                            ₹
+                            {cart.item.reduce(
+                              (acc: number, item: any) =>
+                                acc + item.product.price * item.quantity,
+                              0,
+                            )}
                           </span>
                         </div>
-                        <p className="text-(--color-accent-yellow) text-sm font-medium ">
-                          {item.product.shippingCharge === 0
-                            ? "Free Shipping"
-                            : `Shipping Charge: ₹${item.product.shippingCharge}`}
-                        </p>
-                        <div className="flex gap-4 mt-6">
-                          <Button
-                            variant="outline"
-                            className="text-xs cursor-pointer"
-                            onClick={() => {
-                              handleRemoveFromCart(item.product._id);
-                            }}
-                          >
-                            {isCartLoading &&
-                            isCartLoading === item.product._id ? (
-                              <Loader className="animate-spin cursor-not-allowed" />
-                            ) : (
-                              <>
-                                <Trash2 />{" "}
-                                <span className="hidden sm:block">Remove</span>
-                              </>
+                        <div className="text-(--color-accent-yellow) flex items-center justify-between">
+                          <span>Discount</span>
+                          <span>
+                            - ₹
+                            {cart.item.reduce(
+                              (acc: number, item: any) =>
+                                acc +
+                                (item.product.price -
+                                  item.product.finalPrice * item.quantity),
+                              0,
                             )}
-                          </Button>
-                          <Button
-                            variant="outline"
-                            className="text-xs cursor-pointer"
-                            onClick={() => {
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span>Delivery Charges</span>
+                          <span className="text-[16A34A]">
+                            {cart.item.reduce(
+                              (acc: number, item: any) =>
+                                acc +
+                                item.product.shippingCharge * item.quantity,
+                              0,
+                            )}
+                          </span>
+                        </div>
+                        <hr />
+                        <div className="flex items-center justify-between font-medium ">
+                          <span>Total Amount</span>
+                          <span>
+                            ₹
+                            {cart.item.reduce(
+                              (acc: number, item: any) =>
+                                acc +
+                                item.product.finalPrice * item.quantity +
+                                item.product.shippingCharge,
+                              0,
+                            )}
+                          </span>
+                        </div>
+                        <Button
+                          className="bg-blue-600 hover:bg-(--color-button-yellow) cursor-pointer"
+                          onClick={async () => {
+                            if (cart.checkoutStatus === "cart") {
+                              await handleCreateOrder();
+                            } else if (cart.checkoutStatus === "address") {
                               if (
-                                wishlist.find(
-                                  (book) => book._id === item.product._id,
+                                !!userAddress &&
+                                !order?.shippingAddress &&
+                                !userAddress.find(
+                                  (address) =>
+                                    order.shippingAddress?._id === address._id,
                                 )
                               ) {
-                                removeFromWishlistByProductId(item.product._id);
+                                if (userAddress.length === 0)
+                                  setAddressDialogueStatus("noAddress");
+                                setAddressDialogueStatus("selectAddress");
                               } else {
-                                handleAddToWishlist(item.product._id);
+                                dispatch(changeCheckoutStatus("payment"));
+                              }
+                            } else if (cart.checkoutStatus === "payment") {
+                              await handlePay();
+                              dispatch(changeCheckoutStatus("cart"));
+                            }
+                          }}
+                        >
+                          {isCreateOrderLoading ? (
+                            <Loader className="animate-spin cursor-not-allowed" />
+                          ) : (
+                            <>
+                              {cart.checkoutStatus === "cart" && (
+                                <>
+                                  {" "}
+                                  <ChevronRight /> Proceed to Checkout{" "}
+                                </>
+                              )}
+                              {cart.checkoutStatus === "address" && (
+                                <>
+                                  {" "}
+                                  <ChevronRight /> Proceed to Payment{" "}
+                                </>
+                              )}
+                              {cart.checkoutStatus === "payment" && (
+                                <>
+                                  {" "}
+                                  <ChevronRight /> Proceed to Pay{" "}
+                                </>
+                              )}
+                            </>
+                          )}
+                        </Button>
+                        {cart && cart.checkoutStatus !== "cart" && (
+                          <Button
+                            variant="outline"
+                            className="cursor-pointer"
+                            onClick={() => {
+                              if (cart.checkoutStatus === "address") {
+                                dispatch(changeCheckoutStatus("cart"));
+                              } else if (cart.checkoutStatus === "payment") {
+                                dispatch(changeCheckoutStatus("address"));
                               }
                             }}
                           >
-                            {isWishlistLoading &&
-                            isWishlistLoading === item.product._id ? (
-                              <Loader className="animate-spin cursor-not-allowed" />
-                            ) : (
-                              <>
-                                <Heart
-                                  fill={
-                                    item &&
-                                    wishlist &&
-                                    wishlist.find(
-                                      (book) => item.product._id === book._id,
-                                    )
-                                      ? "red"
-                                      : "none"
-                                  }
-                                />{" "}
-                                <span className="hidden sm:block">
-                                  Add to Wishlist
-                                </span>
-                              </>
-                            )}
+                            <ChevronLeft /> Go Back
                           </Button>
-                        </div>
-                      </div>
-                    </div>
-                    <hr className="my-4" />
-                  </div>
-                ))}
-            </CardContent>
-          </Card>
-
-          {cart.checkoutStatus === "address" && (
-            <Address
-              handleAddress={handleAddress}
-              addressDialogueStatus={addressDialogueStatus}
-              setAddressDialogueStatus={setAddressDialogueStatus}
-              userAddress={userAddress}
-              orderAddress={order.shippingAddress}
-              isAddressLoading={isAddressLoading}
-              handleAddAddressOnOrder={handleAddAddressOnOrder}
-              handleRemoveAddressOnOrder={handleRemoveAddressOnOrder}
-              editingAddressId={editingAddressId}
-              setEditingAddressId={setEditingAddressId}
-            />
-          )}
-
-          <div className="space-y-4">
-            {cart.item && (
-              <Card className="lg:w-80 gap-2 h-90">
-                <CardHeader className="text-xl font-medium ">
-                  Price Details
-                </CardHeader>
-                <CardContent className="flex flex-col gap-4 text-sm">
-                  <div className="flex items-center justify-between">
-                    <span>Price ({cart.item.length} items)</span>
-                    <span>
-                      ₹
-                      {cart.item.reduce(
-                        (acc: number, item: any) =>
-                          acc + item.product.price * item.quantity,
-                        0,
-                      )}
-                    </span>
-                  </div>
-                  <div className="text-(--color-accent-yellow) flex items-center justify-between">
-                    <span>Discount</span>
-                    <span>
-                      - ₹
-                      {cart.item.reduce(
-                        (acc: number, item: any) =>
-                          acc +
-                          (item.product.price -
-                            item.product.finalPrice * item.quantity),
-                        0,
-                      )}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>Delivery Charges</span>
-                    <span className="text-[16A34A]">
-                      {cart.item.reduce(
-                        (acc: number, item: any) =>
-                          acc + item.product.shippingCharge * item.quantity,
-                        0,
-                      )}
-                    </span>
-                  </div>
-                  <hr />
-                  <div className="flex items-center justify-between font-medium ">
-                    <span>Total Amount</span>
-                    <span>
-                      ₹
-                      {cart.item.reduce(
-                        (acc: number, item: any) =>
-                          acc +
-                          item.product.finalPrice * item.quantity +
-                          item.product.shippingCharge,
-                        0,
-                      )}
-                    </span>
-                  </div>
-                  <Button
-                    className="bg-blue-600 hover:bg-(--color-button-yellow) cursor-pointer"
-                    onClick={async () => {
-                      if (cart.checkoutStatus === "cart") {
-                        await handleCreateOrder();
-                      } else if (cart.checkoutStatus === "address") {
-                        if (
-                          !!userAddress &&
-                          !order?.shippingAddress &&
-                          !userAddress.find(
-                            (address) =>
-                              order.shippingAddress?._id === address._id,
-                          )
-                        ) {
-                          if (userAddress.length === 0)
-                            setAddressDialogueStatus("noAddress");
-                          setAddressDialogueStatus("selectAddress");
-                        } else {
-                          dispatch(changeCheckoutStatus("payment"));
-                        }
-                      } else if (cart.checkoutStatus === "payment") {
-                        await handlePay();
-                        dispatch(changeCheckoutStatus("cart"));
-                      }
-                    }}
-                  >
-                    {isCreateOrderLoading ? (
-                      <Loader className="animate-spin cursor-not-allowed" />
-                    ) : (
-                      <>
-                        {cart.checkoutStatus === "cart" && (
-                          <>
-                            {" "}
-                            <ChevronRight /> Proceed to Checkout{" "}
-                          </>
                         )}
-                        {cart.checkoutStatus === "address" && (
-                          <>
-                            {" "}
-                            <ChevronRight /> Proceed to Payment{" "}
-                          </>
-                        )}
-                        {cart.checkoutStatus === "payment" && (
-                          <>
-                            {" "}
-                            <ChevronRight /> Proceed to Pay{" "}
-                          </>
-                        )}
-                      </>
-                    )}
-                  </Button>
-                  {cart && cart.checkoutStatus !== "cart" && (
-                    <Button
-                      variant="outline"
-                      className="cursor-pointer"
-                      onClick={() => {
-                        if (cart.checkoutStatus === "address") {
-                          dispatch(changeCheckoutStatus("cart"));
-                        } else if (cart.checkoutStatus === "payment") {
-                          dispatch(changeCheckoutStatus("address"));
-                        }
-                      }}
-                    >
-                      <ChevronLeft /> Go Back
-                    </Button>
+                        <p className="text-sm flex items-center gap-2 justify-center text-(--color-header-text)">
+                          <Shield /> Safe and Secure Payments
+                        </p>
+                      </CardContent>
+                    </Card>
                   )}
-                  <p className="text-sm flex items-center gap-2 justify-center text-(--color-header-text)">
-                    <Shield /> Safe and Secure Payments
-                  </p>
-                </CardContent>
-              </Card>
-            )}
 
-            {order?.shippingAddress && !(cart?.checkoutStatus === "cart") && (
-              <Card className="gap-2 lg:w-80">
-                <CardHeader className="text-xl font-medium">
-                  Delivery Address
-                </CardHeader>
-                <CardContent className="text-[sm]">
-                  <div>{order.shippingAddress.addressLine1}</div>
-                  <div>{order.shippingAddress.addressLine2}</div>
-                  <div>
-                    {order.shippingAddress.city}, {order.shippingAddress.state}{" "}
-                    {order.shippingAddress.pin}
-                  </div>
-                  <div>Phone: {order.shippingAddress.phoneNumber}</div>
-                </CardContent>
-                <CardFooter>
-                  <Button
-                    variant="outline"
-                    className="ml-auto cursor-pointer"
-                    onClick={() => {
-                      setAddressDialogueStatus("selectAddress");
-                    }}
-                  >
-                    <MapPin />
-                    <span>Change Address</span>
-                  </Button>
-                </CardFooter>
-              </Card>
-            )}
-          </div>
-        </section>
-      </main>
+                  {order?.shippingAddress &&
+                    !(cart?.checkoutStatus === "cart") && (
+                      <Card className="gap-2 lg:w-80">
+                        <CardHeader className="text-xl font-medium">
+                          Delivery Address
+                        </CardHeader>
+                        <CardContent className="text-[sm]">
+                          <div>{order.shippingAddress.addressLine1}</div>
+                          <div>{order.shippingAddress.addressLine2}</div>
+                          <div>
+                            {order.shippingAddress.city},{" "}
+                            {order.shippingAddress.state}{" "}
+                            {order.shippingAddress.pin}
+                          </div>
+                          <div>Phone: {order.shippingAddress.phoneNumber}</div>
+                        </CardContent>
+                        <CardFooter>
+                          <Button
+                            variant="outline"
+                            className="ml-auto cursor-pointer"
+                            onClick={() => {
+                              setAddressDialogueStatus("selectAddress");
+                            }}
+                          >
+                            <MapPin />
+                            <span>Change Address</span>
+                          </Button>
+                        </CardFooter>
+                      </Card>
+                    )}
+                </div>
+              </section>
+            </main>
+          </>
+        )}
     </>
   );
 }
