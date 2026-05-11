@@ -261,11 +261,11 @@ export default function LoginSignupDialouge({
 
             <p className="text-sm text-(--color-text-muted) text-center">
               By clicking "agree", you agree to our{" "}
-              <Link href="term-of-use" className="text-(--color-accent-yellow)">
+              <Link href="/term-of-use" className="text-(--color-accent-yellow)">
                 Terms of Use
               </Link>
               ,{" "}
-              <Link href="privacy-policy" className="text-(--color-accent-yellow)">
+              <Link href="/privacy-policy" className="text-(--color-accent-yellow)">
                 Privac Policy
               </Link>
             </p>
@@ -369,11 +369,11 @@ export default function LoginSignupDialouge({
 
             <p className="text-sm text-(--color-text-muted) mt-2 text-center">
               By clicking "agree", you agree to our{" "}
-              <Link href="term-of-use" className="text-(--color-accent-yellow)">
+              <Link href="/term-of-use" className="text-(--color-accent-yellow)">
                 Terms of Use
               </Link>
               ,{" "}
-              <Link href="privacy-policy" className="text-(--color-accent-yellow)">
+              <Link href="/privacy-policy" className="text-(--color-accent-yellow)">
                 Privac Policy
               </Link>
             </p>
@@ -430,11 +430,11 @@ export default function LoginSignupDialouge({
 
                 <p className="text-sm text-(--color-text-muted) mt-2 text-center">
                   By clicking "agree", you agree to our{" "}
-                  <Link href="term-of-use" className="text-(--color-accent-yellow)">
+                  <Link href="/term-of-use" className="text-(--color-accent-yellow)">
                     Terms of Use
                   </Link>
                   ,{" "}
-                  <Link href="privacy-policy" className="text-(--color-accent-yellow)">
+                  <Link href="/privacy-policy" className="text-(--color-accent-yellow)">
                     Privac Policy
                   </Link>
                 </p>

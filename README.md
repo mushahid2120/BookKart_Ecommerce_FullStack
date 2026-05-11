@@ -199,6 +199,7 @@ BookKart_Ecommerce_FullStack/
    BREVO_API_KEY=your_brevo_api_key
    BREVO_EMAIL_FROM=your_email@example.com
    FRONTEND_URL=http://localhost:3000
+   COOKIES_SAMESITE=cookies_prefrence
    ```
 
 4. **Start the development server:**
@@ -380,7 +381,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 📞 Support
 
-For support, email support@bookkart.com or create an issue in the repository.
+For support, email md.mushahidansari@gmail.com or create an issue in the repository.
 
 ## 🙏 Acknowledgments
 

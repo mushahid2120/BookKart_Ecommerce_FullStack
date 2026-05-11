@@ -7,29 +7,29 @@ export default function Footer() {
     {
       heading: "ABOUT US",
       items: [
-        { name: "About Us", path: "about-us" },
-        { name: "Contact Us", path: "contactus" },
+        { name: "About Us", path: "/about-us" },
+        { name: "Contact Us", path: "/contactus" },
       ],
     },
     {
       heading: "USEFULL LINKS",
       items: [
-        { name: "How it works?", path: "howitwork" },
-        { name: "Blogs", path: "blog" },
+        { name: "How it works?", path: "/howitwork" },
+        { name: "Blogs", path: "/blog" },
       ],
     },
     {
       heading: "POLICIES",
       items: [
-        { name: "Terms Of Use", path: "term-of-use" },
-        { name: "Privacy Policy", path: "privacy-policy" },
+        { name: "Terms Of Use", path: "/term-of-use" },
+        { name: "Privacy Policy", path: "/privacy-policy" },
       ],
     },
     {
       heading: "STAY CONNECTED",
       items: [
-        { name: "Terms Of Use", path: "term-use" },
-        { name: "Privacy Policy", path: "privacy-policy" },
+        { name: "Terms Of Use", path: "/term-of-use" },
+        { name: "Privacy Policy", path: "/privacy-policy" },
       ],
     },
   ];
