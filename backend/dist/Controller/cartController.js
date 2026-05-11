@@ -1,6 +1,7 @@
 import response from "../Utility/response.js";
 import Cart from "../Model/Cart.js";
 import Product from "../Model/Product.js";
+import Order from "../Model/Order.js";
 export async function getCart(req, res, next) {
     try {
         const userId = req.id;
@@ -8,20 +9,26 @@ export async function getCart(req, res, next) {
             user: userId,
         })
             .populate("item.product", "title finalPrice price shippingCharge images")
-            .select("item -_id")
+            .select("item orderId")
             .lean();
         if (!cart) {
-            return response(res, 404, "Your cart is Empty");
+            return response(res, 200, "Your cart is Empty", []);
         }
-        return response(res, 200, "Your Cart Item", cart.item.map((cartItem) => ({
-            title: cartItem.product.title,
-            price: cartItem.product.price,
-            finalPrice: cartItem.product.finalPrice,
-            shippingCharge: cartItem.product.shippingCharge,
-            _id: cartItem.product._id,
-            image: cartItem.product.images[0],
-            quantity: cartItem.quantity
-        })));
+        return response(res, 200, "Your Cart Item", {
+            item: cart.item.map((cartItem) => ({
+                product: {
+                    title: cartItem.product.title,
+                    price: cartItem.product.price,
+                    finalPrice: cartItem.product.finalPrice,
+                    shippingCharge: cartItem.product.shippingCharge,
+                    _id: cartItem.product._id,
+                    image: cartItem.product.images[0],
+                },
+                quantity: cartItem.quantity,
+            })),
+            orderId: cart.orderId,
+            cartId: cart._id,
+        });
     }
     catch (error) {
         console.log(error);
@@ -43,16 +50,15 @@ export async function addToCart(req, res, next) {
             user: userId,
         });
         if (!cart) {
-            cart = new Cart({ user: userId, item: [] });
+            const order = new Order({
+                user: userId,
+                items: [],
+            });
+            const result = await order.save();
+            cart = new Cart({ user: userId, item: [], orderId: result._id });
         }
-        const existingItem = cart.item.find((item) => item.product.toString() === productid);
-        if (existingItem) {
-            existingItem.quantity += quantity;
-        }
-        else {
-            const newItem = { product: productid, quantity: quantity };
-            cart.item.push(newItem);
-        }
+        const newItem = { product: productid, quantity: quantity };
+        cart.item.push(newItem);
         await cart.save();
         return response(res, 200, "Product has been added to Cart");
     }

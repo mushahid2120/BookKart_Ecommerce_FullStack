@@ -31,13 +31,18 @@ export default function page() {
 
   const getAllPostedBooksByMe = async () => {
     try {
+      setPageError(null);
+      setIsPageLoading(true);
       const response = await getMyPostedBooks({}).unwrap();
 
       if (response.isSuccess) {
         setSellingBook(response.data);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
+      setPageError("Failed to load your listed books. Please try again.");
+    } finally {
+      setIsPageLoading(false);
     }
   };
 
@@ -59,26 +64,60 @@ export default function page() {
     }
   };
 
+  if (isPageLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="rounded-lg bg-(--color-card) p-6 animate-pulse h-24"></div>
+        <div className="grid sm:grid-cols-2 gap-4">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <div
+              key={index}
+              className="rounded-lg bg-(--color-card) p-6 animate-pulse h-80"
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (pageError) {
+    return (
+      <div className="flex items-center justify-center flex-col h-screen bg-(--color-surface-soft)">
+        <div className="max-w-md flex items-center flex-col justify-center text-center gap-4">
+          <img
+            src={`/Image/EmptyWishlist.png`}
+            alt="Error"
+            className="w-32 h-32"
+          />
+          <h1 className="text-2xl font-medium">Something went wrong</h1>
+          <p className="text-(--color-text-muted) font-light">{pageError}</p>
+          <Button
+            className="bg-(--color-button-yellow) hover:bg-(--color-button-yellow-hover) text-white px-8 py-2"
+            onClick={getAllPostedBooksByMe}
+          >
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   if (sellingbook.length === 0) {
     return (
-      <div className="flex items-center justify-center flex-col h-full">
-        <div className=" max-w-120 flex items-center flex-col justify-center text-center gap-2">
-          <div>
-            <img
-              src={`/Image/selling-book.png`}
-              alt="Hero Image"
-              className="w=full"
-            />
-          </div>
-          <h1 className="text-2xl font-medium">
-            You haven't sold any books yet.
-          </h1>
-          <p className="text-(--color-header-text) font-ligth">
+      <div className="flex items-center justify-center flex-col h-screen bg-(--color-surface-soft)">
+        <div className="max-w-md flex items-center flex-col justify-center text-center gap-4">
+          <img
+            src={`/Image/selling-book.png`}
+            alt="No listed books"
+            className="w-full max-w-xs"
+          />
+          <h1 className="text-2xl font-medium">You haven't sold any books yet.</h1>
+          <p className="text-(--color-text-muted) font-light">
             Start selling your books to reach potential buyers. List your first
             book now and make it available to others.
           </p>
           <Link href="/book-sell">
-            <Button className="bg-linear-to-r from-(--color-accent-yellow) to-(--color-button-yellow-hover) hover:from-(--color-accent-yellow) hover:to-(--color-button-yellow-hover) cursor-pointer">
+            <Button className="bg-linear-to-r from-(--color-accent-yellow) to-(--color-button-yellow-hover) hover:from-(--color-accent-yellow) hover:to-(--color-button-yellow-hover) cursor-pointer px-8 py-2">
               Sell Your First Book
             </Button>
           </Link>

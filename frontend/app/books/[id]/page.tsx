@@ -443,16 +443,16 @@ export default function page() {
                 book lovers across India who deliver happiness to each other!
               </p>
             </CardContent>
-            <CardFooter className="flex justify-between items-center w-full font-normal text-[14px]">
+            <CardFooter className="flex flex-col sm:flex-row gap-1 justify-between items-center w-full font-normal text-[14px]">
               <p>Ad Id: {book._id}</p>
               <p>Posted: {monthDiff(book.createdAt)} months ago</p>
             </CardFooter>
           </Card>
 
-          <Card className="gap-2 w-full md:w-1/2 min-h-100 md:min-h-100 lg:min-h-80 ">
+          <Card className="gap-2 w-full md:w-1/2 min-h-20 lg:min-h-80 ">
             <CardHeader className="font-semibold text-lg">Sold By</CardHeader>
-            <CardContent className="flex gap-4 items-center w-full">
-              <div className="bg-(--color-surface-soft) rounded-full p-4 text-(--color-accent-yellow)">
+            <CardContent className="flex gap-4  w-full">
+              <div className="bg-(--color-surface-soft) rounded-full p-4 h-14 w-20 text-(--color-accent-yellow)">
                 <User />
               </div>
               <div>
@@ -481,7 +481,7 @@ export default function page() {
             {howWork.map(({ step, title, description, image }, index) => (
               <Card
                 key={index}
-                className="w-full gap-0 max-w-100 max-h-125 min-h-115 bg-linear-to-tl from-(--color-surface-soft) to-(--color-page-bg)"
+                className="w-full gap-0 max-w-100 max-h-125 min-h-50 bg-linear-to-tl from-(--color-surface-soft) to-(--color-page-bg)"
               >
                 <CardHeader className="mb-1">
                   <span className="text-sm mb-2 bg-black rounded-md text-white max-w-17.5 text-center">

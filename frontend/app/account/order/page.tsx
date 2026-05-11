@@ -28,7 +28,6 @@ import {
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import Link from "next/link";
 
 export default function page() {
   const [isShowLess, setIsShowLess] = useState<boolean>(false);
@@ -121,6 +120,7 @@ export default function page() {
 
       {/* Success State */}
       {!isPageLoading && !pageError && orders.length > 0 && (
+        <>
       <div className="space-y-4">
         <Card className=" rounded-md bg-linear-to-r from-(--color-accent-yellow) to-(--color-button-yellow-hover) text-white gap-0">
           <CardHeader className="text-4xl font-medium">My Orders</CardHeader>
@@ -304,5 +304,6 @@ export default function page() {
         </DialogContent>
       </Dialog>
     </>
-  );
+  )}
+  </>)
 }

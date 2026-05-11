@@ -3,6 +3,7 @@ import userSlice from "./slice/userSlice";
 import wishlistSlice from "./slice/wishlistSlice";
 import cartSlice from "./slice/cartSlice";
 import orderSlice from "./slice/orderSlice"
+import productQuery from "./slice/productQuery"
 import {
   persistStore,
   persistReducer,
@@ -62,6 +63,7 @@ const store = configureStore({
     wishlist: persistedWishlistReducer,
     cart: persistedCartReducer,
     order:persistedOrderReducer,
+    productQuery,
     [api.reducerPath]: api.reducer,
   },
   // before changing the state passing through this

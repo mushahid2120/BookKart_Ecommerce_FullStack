@@ -537,7 +537,7 @@ export default function page() {
               </span>
             </div>
             <main className="md:px-10 sm:px-10  px-4 pb-16    bg-(--color-surface-soft) ">
-              <section className="flex items-center justify-center gap-4 p-6">
+              <section className="flex items-center justify-center gap-1 sm:gap-4 p-6">
                 <div className="flex items-center justify-center gap-2">
                   <span
                     className={`p-2.5 rounded-full text-white bg-(--color-surface-soft) shadow-xl ${cart.checkoutStatus === "cart" && "bg-[#d4a574]"}`}

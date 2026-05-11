@@ -19,7 +19,7 @@ import {
 import DropDownMenu from "./DropDownMenu";
 import DrawerMenu from "./DrawerMenu";
 import LoginSignupDialouge from "./LoginSignupDialouge";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { usePathname, useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
@@ -27,6 +27,7 @@ import { toggleLoginDialog } from "@/store/slice/userSlice";
 import { RootState } from "@/store/store";
 import { useLazyGetCartQuery } from "@/store/api";
 import { setCart } from "@/store/slice/cartSlice";
+import { setQuery } from "@/store/slice/productQuery";
 
 export interface EachMenuItemType {
   title: string;
@@ -37,27 +38,27 @@ export interface EachMenuItemType {
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-  const [isDropDownMenuOpen,setIsDropDownMenuOpen]=useState<boolean>(false);
-  // const [isLoginOpen, setIsLoginOpen] = useState<boolean>(false);
+  const [isDropDownMenuOpen, setIsDropDownMenuOpen] = useState<boolean>(false);
   const isLoginOpen = useSelector(
     (state: RootState) => state.user.isLogingDialogOpen,
   );
   const user = useSelector((state: RootState) => state.user.user);
   const dispatch = useDispatch();
   const router = useRouter();
-  const cart=useSelector((state:RootState)=>state.cart);
-  const [getCart]=useLazyGetCartQuery();
-  const pathname=usePathname();
-  
+  const cart = useSelector((state: RootState) => state.cart);
+  const [getCart] = useLazyGetCartQuery();
+  const pathname = usePathname();
+  const queryRef = useRef<HTMLInputElement>(null);
+
   const handleProtectNav = (href: string) => {
     if (user) {
       router.push(href);
       setIsMenuOpen(false);
-      setIsDropDownMenuOpen(false)
+      setIsDropDownMenuOpen(false);
     } else {
       dispatch(toggleLoginDialog());
       setIsMenuOpen(false);
-      setIsDropDownMenuOpen(false)
+      setIsDropDownMenuOpen(false);
     }
   };
 
@@ -93,23 +94,32 @@ export default function Header() {
     { title: "Help", icon: <CircleQuestionMark />, path: "/help" },
   ];
 
-  useEffect(()=>{
-    if(/^\/book\/[^\/]+$/.test(pathname) || pathname!=="/checkout/cart"){
-        fetchingCart();
+  useEffect(() => {
+    if (/^\/book\/[^\/]+$/.test(pathname) || pathname !== "/checkout/cart") {
+      fetchingCart();
     }
-  },[pathname])
+  }, [pathname]);
 
-  const fetchingCart=async()=>{
+  const fetchingCart = async () => {
     try {
-      const response=await getCart({}).unwrap();
-      if(response.isSuccess){
-        dispatch(setCart(response.data))
+      const response = await getCart({}).unwrap();
+      if (response.isSuccess) {
+        dispatch(setCart(response.data));
       }
-    } catch (error:any) {
-      console.log(error)
+    } catch (error: any) {
+      console.log(error);
     }
-  }
+  };
 
+  const handleProductQuery = (event: React.SubmitEvent) => {
+    event.preventDefault();
+    if (!queryRef.current) return;
+    const query = queryRef.current.value.toLowerCase();
+    dispatch(setQuery(query));
+    if(pathname!=="/books"){
+      router.push("/books")
+    }
+  };
 
   return (
     <header className="md:px-12 sm:px-10 px-6 md:py-4 sm:py-3 py-2 text-(--color-header-text) bg-(--color-header-bg) backdrop-blur-lg sticky top-0 z-1000 border-solid border border-b-(--color-header-border) shadow-sm">
@@ -136,17 +146,21 @@ export default function Header() {
         </Link>
 
         <div className="relative grow md:min-w-40 min-w-32">
-          <Input
-            placeholder="Book Name / Author / Subject"
-            className="pr-8 focus-visible:outline-1 focus:ring-2 focus:ring-(--color-button-yellow)"
-          />
-          <Button
-            size="icon"
-            variant="ghost"
-            className="absolute right-0 cursor-pointer hover:bg-(--color-surface-muted)"
-          >
-            <Search />
-          </Button>
+          <form onSubmit={handleProductQuery}>
+            <Input
+              placeholder="Book Name / Author "
+              className="pr-8 focus-visible:outline-1 focus:ring-2 focus:ring-(--color-button-yellow)"
+              ref={queryRef}
+            />
+            <Button
+              size="icon"
+              variant="ghost"
+              type="submit"
+              className="absolute right-0 cursor-pointer hover:bg-(--color-surface-muted)"
+            >
+              <Search />
+            </Button>
+          </form>
         </div>
 
         <Link href="/book-sell">
@@ -199,15 +213,15 @@ export default function Header() {
           </Button>
         </DropDownMenu>
 
-        <LoginSignupDialouge
-          isLoginOpen={isLoginOpen}
-        />
+        <LoginSignupDialouge isLoginOpen={isLoginOpen} />
 
         <Link href="/checkout/cart">
           <Button variant="ghost" className="relative hover:bg-slate-100">
             <ShoppingCart />
             Cart
-            <div className="absolute top-0 left-4 px-1 bg-(--color-danger) text-white rounded-full text-[10px]">{cart.item?.length>0 && cart.item?.length}</div>
+            <div className="absolute top-0 left-4 px-1 bg-(--color-danger) text-white rounded-full text-[10px]">
+              {cart.item?.length > 0 && cart.item?.length}
+            </div>
           </Button>
         </Link>
       </nav>

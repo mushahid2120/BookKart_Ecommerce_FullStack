@@ -12,18 +12,18 @@ import {
   useLazyGetWishlistQuery,
   useRemoveFromWishlistMutation,
 } from "@/store/api";
-import {  setWishlist } from "@/store/slice/wishlistSlice";
+import { setWishlist } from "@/store/slice/wishlistSlice";
 import toast from "react-hot-toast";
 import { RootState } from "@/store/store";
 import { toggleLoginDialog } from "@/store/slice/userSlice";
 
-export default function BookList({ 
-  books, 
-  isLoading = false, 
-  error = null, 
-  onRetry = () => {} 
-}: { 
-  books: IBook[]; 
+export default function BookList({
+  books,
+  isLoading = false,
+  error = null,
+  onRetry = () => {},
+}: {
+  books: IBook[];
   isLoading?: boolean;
   error?: string | null;
   onRetry?: () => void;
@@ -33,8 +33,11 @@ export default function BookList({
   const [addProductToWishList] = useAddToWishlistMutation();
   const [getWishlist] = useLazyGetWishlistQuery();
   const [removeProductFromWishlist] = useRemoveFromWishlistMutation();
-  const wishlist=useSelector((state:RootState)=>state.wishlist.product)
-  const isLoggedIn =useSelector((state:RootState)=>state.user.isLoggedIn)
+  const wishlist = useSelector((state: RootState) => state.wishlist.product);
+  const isLoggedIn = useSelector((state: RootState) => state.user.isLoggedIn);
+  const productQuery = useSelector(
+    (state: RootState) => state.productQuery.query,
+  );
 
   const calculateDiscount = (price: number, finalPrice: number) => {
     if (price > finalPrice && price > 0) {
@@ -43,11 +46,11 @@ export default function BookList({
     return 0;
   };
 
-  const handleAddToWishlist = async (productId:string) => {
+  const handleAddToWishlist = async (productId: string) => {
     try {
       const response = await addProductToWishList(productId).unwrap();
-      if(response.isSuccess){
-        await fetchingWishlist()
+      if (response.isSuccess) {
+        await fetchingWishlist();
       }
     } catch (error: any) {
       console.log(error);
@@ -60,8 +63,8 @@ export default function BookList({
   const removeFromWishlistByProductId = async (productid: string) => {
     try {
       const response = await removeProductFromWishlist(productid).unwrap();
-      if(response.isSuccess){
-        await fetchingWishlist()
+      if (response.isSuccess) {
+        await fetchingWishlist();
       }
     } catch (error) {
       console.log(error);
@@ -72,18 +75,17 @@ export default function BookList({
     try {
       const response = await getWishlist({}).unwrap();
       if (response.isSuccess) {
-        dispatch(setWishlist(response.data))
+        dispatch(setWishlist(response.data));
       }
     } catch (error) {
       console.log(error);
     }
   };
 
-
   useEffect(() => {
-    if(isLoggedIn)
-    fetchingWishlist();
+    if (isLoggedIn) fetchingWishlist();
   }, [isLoggedIn]);
+
 
   // Show loading shimmer
   if (isLoading) {
@@ -118,11 +120,13 @@ export default function BookList({
               className="w-32 h-32"
             />
           </div>
-          <h1 className="text-2xl font-medium text-(--color-text-primary)">Oops! Something went wrong</h1>
+          <h1 className="text-2xl font-medium text-(--color-text-primary)">
+            Oops! Something went wrong
+          </h1>
           <p className="text-(--color-text-muted) font-light max-w-sm">
             {error}
           </p>
-          <Button 
+          <Button
             className="bg-(--color-button-yellow) hover:bg-(--color-button-yellow-hover) text-white cursor-pointer"
             onClick={onRetry}
           >
@@ -147,7 +151,8 @@ export default function BookList({
           </div>
           <h1 className="text-2xl font-medium">No Books Found</h1>
           <p className="text-(--color-text-muted) font-light max-w-sm">
-            The books matching your filters are not available right now. Try adjusting your search filters!
+            The books matching your filters are not available right now. Try
+            adjusting your search filters!
           </p>
         </div>
       </div>
@@ -178,11 +183,11 @@ export default function BookList({
                   onClick={(e) => {
                     e.preventDefault(); // stops Link navigation
                     e.stopPropagation();
-                    if(!isLoggedIn){
+                    if (!isLoggedIn) {
                       dispatch(toggleLoginDialog());
-                      return
+                      return;
                     }
-                    if (wishlist.find((item)=>item._id===book._id)) {
+                    if (wishlist.find((item) => item._id === book._id)) {
                       removeFromWishlistByProductId(book._id);
                     } else {
                       handleAddToWishlist(book._id);
@@ -194,7 +199,7 @@ export default function BookList({
                     fill={
                       book &&
                       wishlist &&
-                      wishlist.find((item)=>item._id===book._id)
+                      wishlist.find((item) => item._id === book._id)
                         ? "red"
                         : "none"
                     }
@@ -279,5 +284,5 @@ export default function BookList({
         </Button>
       </div>
     </div>
-  );    
+  );
 }

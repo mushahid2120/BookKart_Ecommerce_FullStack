@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useUpdateUserMutation } from "@/store/api";
+import { IUserState } from "@/store/slice/userSlice";
 import { RootState } from "@/store/store";
 import { Loader } from "lucide-react";
 import { useState } from "react";
@@ -15,11 +16,6 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast/headless";
 import { useSelector } from "react-redux";
 
-export interface IUserData {
-  userName: string;
-  email: string;
-  phoneNumber: number;
-}
 
 export default function page() {
   const user = useSelector((state: RootState) => state.user.user);
@@ -28,9 +24,9 @@ export default function page() {
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm<IUserData>({
+  } = useForm<IUserState>({
     defaultValues: {
-      userName: user?.name || "",
+      name: user?.name || "",
       email: user?.email || "",
       phoneNumber: user?.phoneNumber || "",
     },
@@ -41,7 +37,7 @@ export default function page() {
   const [pageError, setPageError] = useState<string | null>(null);
   const [updateUser] = useUpdateUserMutation();
 
-  const handleUpdateUserData = async (data: IUserData) => {
+  const handleUpdateUserData = async (data: IUserState) => {
     console.log(data)
     try {
       setIsLoading(true);
@@ -84,24 +80,24 @@ export default function page() {
             onSubmit={handleSubmit(handleUpdateUserData)}
           >
             <fieldset className=" relative flex  flex-col gap-2  text-sm font-medium whitespace-nowrap">
-              <label htmlFor="userName">User Name</label>
+              <label htmlFor="name">User Name</label>
               <Input
                 type="text"
-                id="userName"
+                id="name"
                 className=" w-full md:max-w-140 sm:max-w-110 max-w-100 text-sm font-normal"
                 placeholder={user ? "" : "Enter your username "}
-                {...register("userName", {
+                {...register("name", {
                   required: "user Name is required ",
                   disabled: !isEditing,
                   maxLength: {
                     value: 50,
-                    message: "userName must be less than 50 character",
+                    message: "name must be less than 50 character",
                   },
                 })}
               />
-              {errors?.userName && (
+              {errors?.name && (
                 <p className="text-(--color-danger) text-[10px] font-normal absolute -bottom-4 right-0">
-                  {errors.userName.message}
+                  {errors.name.message}
                 </p>
               )}
             </fieldset>

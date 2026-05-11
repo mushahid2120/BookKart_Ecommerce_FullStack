@@ -19,19 +19,25 @@ import { Label } from "@/components/ui/label";
 import { Check, ChevronsUpDown } from "lucide-react";
 import BookList from "@/components/BookList";
 import { useEffect, useMemo, useState } from "react";
-import { useAddToWishlistMutation, useLazyGetAllProductQuery } from "@/store/api";
+import {
+  useAddToWishlistMutation,
+  useLazyGetAllProductQuery,
+} from "@/store/api";
 import { monthDiff } from "@/lib/bookUploadTime";
+import { RootState } from "@/store/store";
+import { useSelector, useDispatch } from "react-redux";
+import { setQuery } from "@/store/slice/productQuery";
 
-export interface IBook{
-  _id:string,
-  title:string;
-  author:string;
-  price:number;
-  finalPrice:number;
-  createdAt:Date;
-  condition:string;
-  category:string;
-  classType:string;
+export interface IBook {
+  _id: string;
+  title: string;
+  author: string;
+  price: number;
+  finalPrice: number;
+  createdAt: Date;
+  condition: string;
+  category: string;
+  classType: string;
 }
 
 interface ContiditionCheckType {
@@ -51,8 +57,8 @@ interface ClassTypeType {
   "B.Tech": boolean;
   "B.Sc": boolean;
   "B.Com": boolean;
-  "BCA": boolean;
-  "MBA": boolean;
+  BCA: boolean;
+  MBA: boolean;
   "M.Tech": boolean;
   "M.Sc": boolean;
   "Ph.D": boolean;
@@ -67,20 +73,25 @@ interface ClassTypeType {
 }
 
 export default function Books() {
+  const dispatch = useDispatch();
   const [sortBook, setSortBook] = useState<number>(0);
   const [isSortDropDownMenu, setIsSortDropDownMenu] = useState<boolean>(false);
-  const [bookSortFunc, setBookSortFunc] = useState<any>(() => (a: any, b: any) =>(a.price - b.price));
+  const [bookSortFunc, setBookSortFunc] = useState<any>(
+    () => (a: any, b: any) => a.price - b.price,
+  );
   const [conditionCheck, setConditionCheck] = useState<ContiditionCheckType>({
     Excellent: false,
     Good: false,
     Fair: false,
   });
-  const [getBooks]=useLazyGetAllProductQuery();
-  const [books,setBooks]=useState<IBook[]>([])
-  const [addToWishList]=useAddToWishlistMutation();
+  const [getBooks] = useLazyGetAllProductQuery();
+  const [books, setBooks] = useState<IBook[]>([]);
+  const [addToWishList] = useAddToWishlistMutation();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  
+  const productQuery = useSelector(
+    (state: RootState) => state.productQuery.query,
+  );
 
   const [categoriesCheck, setCategoriesCheck] = useState<CategoriesCheckType>({
     "College Books (Higher Education Textbooks)": false,
@@ -136,7 +147,7 @@ export default function Books() {
 
       return conditionMatch && categoryMatch && classMatch;
     });
-  }, [conditionCheck, categoriesCheck, classType,books]);
+  }, [conditionCheck, categoriesCheck, classType, books]);
 
   const BooksFilters = {
     condition: ["Excellent", "Good", "Fair"],
@@ -169,35 +180,34 @@ export default function Books() {
   const BooksSort = [
     {
       title: "Newest First",
-      sorting: ()=>(a: any, b: any) =>(monthDiff(a.createdAt) - monthDiff(b.createdAt))},
-    ,
+      sorting: () => (a: any, b: any) =>
+        monthDiff(a.createdAt) - monthDiff(b.createdAt),
+    },
     {
       title: "Oldest First",
-      sorting: ()=>(a: any, b: any) =>(
-        monthDiff(b.createdAt) - monthDiff(a.createdAt)),
+      sorting: () => (a: any, b: any) =>
+        monthDiff(b.createdAt) - monthDiff(a.createdAt),
     },
     {
       title: "Price: Low to High",
-      sorting: ()=>(a: any, b: any) => (a.finalPrice - b.finalPrice),
+      sorting: () => (a: any, b: any) => a.finalPrice - b.finalPrice,
     },
     {
       title: "Price: High to Low",
-      sorting: ()=>(a: any, b: any) => (b.finalPrice - a.finalPrice),
+      sorting: () => (a: any, b: any) => b.finalPrice - a.finalPrice,
     },
   ];
 
- 
+  useEffect(() => {
+    getAllBooks();
+  }, []);
 
-  useEffect(()=>{
-    getAllBooks()
-  },[])
-
-  const getAllBooks=async ()=>{
+  const getAllBooks = async () => {
     try {
       setIsLoading(true);
       setError(null);
-      const response=await getBooks({}).unwrap()
-      if(response.isSuccess){
+      const response = await getBooks({}).unwrap();
+      if (response.isSuccess) {
         setBooks(response.data);
       }
     } catch (error) {
@@ -206,7 +216,7 @@ export default function Books() {
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   return (
     <main className="md:px-10 sm:px-10  px-4 pb-16 pt-8   bg-(--color-surface-soft) ">
@@ -292,18 +302,38 @@ export default function Books() {
           </CardContent>
         </Card>
         <div className="w-full md:max-w-2/3 lg:max-w-3/4 relative z-50">
-          <div className="flex justify-end">
+          <div className="flex justify-between items-center">
+            {productQuery && (
+              <div className="flex text-xs flex-col ml-4 bg-(--color-card) px-2 py-1 rounded-lg border border-(--color-border) max-w-2/3">
+                <div className="flex justify-between items-center">
+                  <span className=" text-(--color-text-muted)">
+                    Search Results for:
+                  </span>
+                  <button
+                    onClick={() => {
+                      dispatch(setQuery(""));
+                    }}
+                    className="text-(--color-text-muted) hover:text-(--color-danger) text-sm underline ml-2 cursor-pointer"
+                  >
+                    Clear
+                  </button>
+                </div>
+                <span className=" text-(--color-button-yellow) bg-(--color-surface-soft) px-2  rounded truncate">
+                  "{productQuery}"
+                </span>
+              </div>
+            )}
             <DropdownMenu
               open={isSortDropDownMenu}
               onOpenChange={setIsSortDropDownMenu}
             >
-              <DropdownMenuTrigger asChild>
+              <DropdownMenuTrigger asChild className="ml-auto">
                 <Button
                   variant="ghost"
                   className="hover:bg-slate-300  flex outline-4 border border-solid border-black/40"
                 >
                   {BooksSort[sortBook as number]?.title}
-                  <ChevronsUpDown  />
+                  <ChevronsUpDown />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
@@ -316,7 +346,7 @@ export default function Books() {
                       onClick={() => {
                         setSortBook(index);
                         setIsSortDropDownMenu(false);
-                        setBookSortFunc(sort?.sorting)
+                        setBookSortFunc(sort?.sorting);
                       }}
                     >
                       <span>{sort?.title} </span>
@@ -328,7 +358,14 @@ export default function Books() {
             </DropdownMenu>
           </div>
           <BookList
-            books={filteredBooks.sort(bookSortFunc)}
+            books={filteredBooks
+              .sort(bookSortFunc)
+              .filter((book) =>
+                productQuery
+                  ? book.title.toLowerCase().includes(productQuery) ||
+                    book.author.includes(productQuery)
+                  : true,
+              )}
             isLoading={isLoading}
             error={error}
             onRetry={getAllBooks}

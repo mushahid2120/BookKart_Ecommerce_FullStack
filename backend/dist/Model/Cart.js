@@ -5,7 +5,7 @@ const CartSchema = new Schema({
             product: { type: Schema.Types.ObjectId, required: true, ref: 'Product' },
             quantity: { type: Number, required: true },
         }],
-    orderId: { type: Schema.Types.ObjectId, required: true, ref: 'Order' }
+    orderId: { type: Schema.Types.ObjectId, ref: 'Order' }
 }, { timestamps: true });
 const Cart = model("Cart", CartSchema);
 export default Cart;

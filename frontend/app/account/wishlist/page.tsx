@@ -10,6 +10,7 @@ import {
 } from "@/store/api";
 import { setCart } from "@/store/slice/cartSlice";
 import { setWishlist } from "@/store/slice/wishlistSlice";
+import { toggleLoginDialog } from "@/store/slice/userSlice";
 import { RootState } from "@/store/store";
 import { Check, Heart, Loader, ShoppingCart, Trash2 } from "lucide-react";
 import Link from "next/link";
@@ -19,6 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 export default function page() {
   const dispatch = useDispatch();
+  const isLoggedIn = useSelector((state: RootState) => state.user.isLoggedIn);
   const [getWishlist] = useLazyGetWishlistQuery();
   const [removeProductFromWishlist] = useRemoveFromWishlistMutation();
   const wishlist = useSelector((state: RootState) => state.wishlist.product);
@@ -120,6 +122,64 @@ export default function page() {
     }
   };
 
+  if (!isLoggedIn) {
+    return (
+      <div className="flex items-center justify-center flex-col h-full">
+        <div className="max-w-120 flex items-center flex-col justify-center text-center gap-2">
+          <div>
+            <img src={`/Image/EmptyWishlist.png`} alt="Hero Image" className="w-full" />
+          </div>
+          <h1 className="text-2xl font-medium">Please log in to view your wishlist.</h1>
+          <p className="text-(--color-header-text) font-light">
+            You need to be logged in to access your wishlist.
+          </p>
+          <Button
+            className="bg-linear-to-r from-(--color-accent-yellow) to-(--color-button-yellow-hover) hover:from-(--color-accent-yellow) hover:to-(--color-button-yellow-hover) cursor-pointer"
+            onClick={() => dispatch(toggleLoginDialog())}
+          >
+            Login
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (isPageLoading) {
+    return (
+      <div>
+        <h1 className="flex items-center text-xl font-medium my-4">
+          <Heart /> My WishList
+        </h1>
+        <div className="grid sm:grid-cols-2 gap-4">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <Card className="w-72 gap-2 py-4 animate-pulse" key={index}>
+              <CardHeader className="gap-0">
+                <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+              </CardHeader>
+              <div className="h-60 w-40 mx-auto bg-gray-300 rounded"></div>
+              <CardFooter className="flex items-center justify-between">
+                <div className="h-10 w-20 bg-gray-300 rounded"></div>
+                <div className="h-10 w-32 bg-gray-300 rounded"></div>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (pageError) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 gap-4">
+        <p className="text-red-500">{pageError}</p>
+        <Button onClick={fetchingWishlist} variant="outline">
+          Try Again
+        </Button>
+      </div>
+    );
+  }
+
   if (wishlist.length === 0) {
     return (
       <div className="flex items-center justify-center flex-col h-full">
@@ -146,71 +206,68 @@ export default function page() {
     );
   }
 
-  if (wishlist) {
-    return (
-      <div>
-        <h1 className="flex items-center text-xl font-medium my-4">
-          <Heart /> My WishList
-        </h1>
-
-        <div className="grid sm:grid-cols-2 gap-4">
-          {wishlist.map((item, index) => (
-            <Card className="w-72 gap-2 py-4" key={index}>
-              <CardHeader className="gap-0">
-                <h2 className="text-sm font-medium ">{item.title}</h2>
-                <p className="text-(--color-text-muted) font-light text-sm">
-                  ${item.finalPrice}
-                </p>
-              </CardHeader>
-              <div className="h-60 w-40 mx-auto">
-                {item.images && (
-                  <img
-                    src={item.images}
-                    alt="order image "
-                    className="object-cover h-full w-full"
-                  />
+  return (
+    <div>
+      <h1 className="flex items-center text-xl font-medium my-4">
+        <Heart /> My WishList
+      </h1>
+      <div className="grid sm:grid-cols-2 gap-4">
+        {wishlist.map((item, index) => (
+          <Card className="w-72 gap-2 py-4" key={index}>
+            <CardHeader className="gap-0">
+              <h2 className="text-sm font-medium ">{item.title}</h2>
+              <p className="text-(--color-text-muted) font-light text-sm">
+                ${item.finalPrice}
+              </p>
+            </CardHeader>
+            <div className="h-60 w-40 mx-auto">
+              {item.images && (
+                <img
+                  src={item.images}
+                  alt="order image "
+                  className="object-cover h-full w-full"
+                />
+              )}
+            </div>
+            <CardFooter className="flex items-center justify-between">
+              <Button
+                className="bg-(--color-danger) cursor-pointer"
+                onClick={() => {
+                  removeFromWishlistByProductId(item._id);
+                }}
+              >
+                {isDeleting ? (
+                  <Loader className="animate-spin cursor-pointer" />
+                ) : (
+                  <Trash2 />
                 )}
-              </div>
-              <CardFooter className="flex items-center justify-between">
+              </Button>
+              {cart.item.findIndex(
+                (it) => it.product._id === item._id,
+              ) === -1 ? (
                 <Button
-                  className="bg-(--color-danger) cursor-pointer"
+                  className="bg-(--color-button-yellow) text-white cursor-pointer"
                   onClick={() => {
-                    removeFromWishlistByProductId(item._id);
+                    handleRemoveFromCart(item._id);
+                    handleAddToCart({ productid: item._id, quantity: 1 });
                   }}
                 >
-                  {isDeleting ? (
-                    <Loader className="animate-spin cursor-pointer" />
-                  ) : (
-                    <Trash2 />
-                  )}
+                  <ShoppingCart /> Add to Cart
                 </Button>
-                {cart.item.findIndex(
-                  (it) => it.product._id === item._id,
-                ) === -1 ? (
-                  <Button
-                    className="bg-(--color-button-yellow) text-white cursor-pointer"
-                    onClick={() => {
-                      handleRemoveFromCart(item._id);
-                      handleAddToCart({ productid: item._id, quantity: 1 });
-                    }}
-                  >
-                    <ShoppingCart /> Add to Cart
-                  </Button>
-                ) : (
-                  <Button
-                    className="bg-(--color-surface-muted) text-white cursor-pointer"
-                    onClick={() => {
-                      handleRemoveFromCart(item._id);
-                    }}
-                  >
-                    <Check /> Item in Cart
-                  </Button>
-                )}
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
+              ) : (
+                <Button
+                  className="bg-(--color-surface-muted) text-white cursor-pointer"
+                  onClick={() => {
+                    handleRemoveFromCart(item._id);
+                  }}
+                >
+                  <Check /> Item in Cart
+                </Button>
+              )}
+            </CardFooter>
+          </Card>
+        ))}
       </div>
-    );
-  }
+    </div>
+  );
 }

@@ -63,7 +63,9 @@ export async function createProduct(req, res, next) {
             seller: userId,
         });
         const productResponse = await product.save();
-        return response(res, 200, "Product created Successfully", { productid: productResponse._id });
+        return response(res, 200, "Product created Successfully", {
+            productid: productResponse._id,
+        });
     }
     catch (error) {
         console.log(error);
@@ -114,7 +116,14 @@ export async function getProductById(req, res, next) {
             response(res, 404, "Invalid Product Id ");
         }
         const product = await Product.findById(productId)
-            .populate({ path: "seller", select: "name address", populate: { path: "address", select: "-_id addressLine1 phoneNumber city state pin" } })
+            .populate({
+            path: "seller",
+            select: "name address",
+            populate: {
+                path: "address",
+                select: "-_id addressLine1 phoneNumber city state pin",
+            },
+        })
             .lean();
         if (!product) {
             return response(res, 404, "product not found!!");
@@ -132,13 +141,38 @@ export async function getProductBySellerId(req, res, next) {
         if (!userId) {
             response(res, 404, "Invalid Seller Id");
         }
-        const product = await Product.find({ seller: userId })
+        const product = await Product.find({
+            seller: userId,
+        })
             .populate("seller", "name -_id")
             .lean();
         if (!product) {
             return response(res, 404, "product not found!!");
         }
         response(res, 200, "Product Details", product);
+    }
+    catch (error) {
+        console.log(error);
+        next(error);
+    }
+}
+export async function getLatestProduct(req, res, next) {
+    try {
+        const product = await Product.find({})
+            .select({
+            title: 1,
+            condition: 1,
+            price: 1,
+            finalPrice: 1,
+            images: { $slice: 1 },
+        })
+            .sort({ createdAt: -1 })
+            .limit(6)
+            .lean();
+        if (product.length === 0) {
+            response(res, 404, "Product is empty");
+        }
+        response(res, 200, "Your newly added Products are", product);
     }
     catch (error) {
         console.log(error);

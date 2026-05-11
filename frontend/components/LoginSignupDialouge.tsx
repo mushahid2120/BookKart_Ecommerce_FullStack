@@ -257,7 +257,7 @@ export default function LoginSignupDialouge({
               or
               <hr className="grow" />
             </div>
-            <div className="mb-2">Login with Google</div>
+            {/* <div className="mb-2">Login with Google</div> */}
 
             <p className="text-sm text-(--color-text-muted) text-center">
               By clicking "agree", you agree to our{" "}
