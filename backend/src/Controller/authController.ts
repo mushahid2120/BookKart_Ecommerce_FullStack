@@ -7,6 +7,7 @@ import {
   sendVerificationEmail,
 } from "../Config/emailConfig.js";
 import { generateToken } from "../Utility/generateTokens.js";
+import { COOKIES_SAMESITE } from "../Config/env.js";
 
 export async function register(
   req: Request,
@@ -32,28 +33,22 @@ export async function register(
     }
 
     if (name.length > 50) {
-      return res
-        .status(400)
-        .json({
-          isSuccess: false,
-          message: { name: "name should be less than 50 charater" },
-        });
+      return res.status(400).json({
+        isSuccess: false,
+        message: { name: "name should be less than 50 charater" },
+      });
     }
     if (email.length > 50) {
-      return res
-        .status(400)
-        .json({
-          isSuccess: false,
-          message: { email: "email should be less than 50 charater" },
-        });
+      return res.status(400).json({
+        isSuccess: false,
+        message: { email: "email should be less than 50 charater" },
+      });
     }
     if (name.length > 20) {
-      return res
-        .status(400)
-        .json({
-          isSuccess: false,
-          message: { password: "password should be less than 20 charater" },
-        });
+      return res.status(400).json({
+        isSuccess: false,
+        message: { password: "password should be less than 20 charater" },
+      });
     }
     const verificationToken = crypto.randomBytes(20).toString("hex");
     await User.insertOne({
@@ -113,8 +108,8 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     }
     if (!user.isVerified) {
       const verificationToken = crypto.randomBytes(20).toString("hex");
-      user.verificationToken=verificationToken;
-      await user.save()
+      user.verificationToken = verificationToken;
+      await user.save();
       const emailResponse = await sendVerificationEmail(
         email,
         verificationToken,
@@ -127,6 +122,8 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     res.cookie("token", accessToken, {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
+      sameSite: COOKIES_SAMESITE,
+      secure: true,
     });
     return response(res, 200, "Login Successfully", {
       isEmailVerified: user.isVerified,
@@ -219,6 +216,8 @@ export async function logout(req: Request, res: Response, next: NextFunction) {
   try {
     res.clearCookie("token", {
       httpOnly: true,
+      sameSite: COOKIES_SAMESITE,
+      secure: true,
     });
     response(res, 200, "Logout Successfully");
   } catch (error) {
