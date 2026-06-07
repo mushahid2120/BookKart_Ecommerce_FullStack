@@ -13,7 +13,8 @@ export interface  IUser extends Document{
     resetPasswordToken:string | null;
     resetPaswordExpires:Date | null;
     agreeTerms:boolean;
-    address:Schema.Types.ObjectId[]
+    address:Schema.Types.ObjectId[];
+    admin: boolean | null;
     comparePassword(candidatePassword:string):Promise<boolean>
 }
 

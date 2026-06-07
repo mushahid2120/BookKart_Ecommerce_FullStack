@@ -1,4 +1,4 @@
-import { IBookSale } from "@/app/book-sell/page";
+import { IBookSale } from "@/app/(main)/book-sell/page";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Control, Controller } from "react-hook-form";

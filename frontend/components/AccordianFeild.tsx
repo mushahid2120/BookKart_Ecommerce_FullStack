@@ -1,4 +1,4 @@
-import { IOptionalDetail } from "@/app/book-sell/page"
+import { IOptionalDetail } from "@/app/(main)/book-sell/page"
 import {
   Accordion,
   AccordionContent,

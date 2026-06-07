@@ -4,7 +4,7 @@ import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { ChevronLeft, ChevronRight, Heart } from "lucide-react";
 import Link from "next/link";
-import { IBook } from "@/app/books/page";
+import { IBook } from "@/app/(main)/books/page";
 import { monthDiff } from "@/lib/bookUploadTime";
 import { useDispatch, useSelector } from "react-redux";
 import {

@@ -10,6 +10,7 @@ import wishListRouter from "./Route/wishListRoutes.js";
 import addressRouter from "./Route/addressRoutes.js";
 import userRouter from "./Route/userRoutes.js";
 import orderRouter from "./Route/orderRoutes.js";
+import adminRouter from "./Route/adminRouter.js";
 
 await dbConnect();
 
@@ -34,6 +35,7 @@ app.use("/wishlist",wishListRouter)
 app.use("/address",addressRouter)
 app.use("/user",userRouter)
 app.use("/order",orderRouter)
+app.use("/admin",adminRouter)
 
 app.use((err:any, req:Request, res:Response, next:NextFunction) => {
   console.log("Global error handler");

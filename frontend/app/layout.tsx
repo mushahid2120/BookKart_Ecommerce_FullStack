@@ -1,8 +1,7 @@
 import { Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import LayoutWrapper from "@/components/LayoutWrapper";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+
 
 const roboto = Roboto_Mono({
   subsets: ["latin"],
@@ -23,9 +22,7 @@ export default function RootLayout({
         <div className="flex justify-center">
           <div className="w-full max-w-325 bg-(--color-page-shell)">
             <LayoutWrapper>
-              <Header />
               {children}
-              <Footer />
             </LayoutWrapper>
           </div>
         </div>

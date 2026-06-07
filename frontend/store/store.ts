@@ -3,6 +3,7 @@ import userSlice from "./slice/userSlice";
 import wishlistSlice from "./slice/wishlistSlice";
 import cartSlice from "./slice/cartSlice";
 import orderSlice from "./slice/orderSlice"
+import adminSlice from "./slice/adminSlice"
 import productQuery from "./slice/productQuery"
 import {
   persistStore,
@@ -17,6 +18,7 @@ import {
 import storage from "redux-persist/lib/storage";
 import { api } from "./api";
 import { setupListeners } from "@reduxjs/toolkit/query";
+
 
 const userPersistConfig = {
   key: "user",
@@ -63,6 +65,7 @@ const store = configureStore({
     wishlist: persistedWishlistReducer,
     cart: persistedCartReducer,
     order:persistedOrderReducer,
+    admin: adminSlice,
     productQuery,
     [api.reducerPath]: api.reducer,
   },

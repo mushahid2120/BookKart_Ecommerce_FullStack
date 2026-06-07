@@ -167,73 +167,103 @@ BookKart_Ecommerce_FullStack/
 ### Prerequisites
 - Node.js (v18 or higher)
 - MongoDB (local or cloud instance)
-- npm or yarn package manager
-- Cloudinary account (for image storage)
+- npm (or yarn)
+- Cloudinary account (for image uploads)
 - Razorpay account (for payments)
-- Brevo account (for email notifications)
+- Brevo / SMTP credentials (for email notifications)
 
-### Backend Setup
+This repository contains two separate projects: the backend API (Express + TypeScript) and the frontend (Next.js 16 + TypeScript). Run each service in its own terminal during development.
 
-1. **Navigate to backend directory:**
-   ```bash
-   cd backend
-   ```
+### Backend (Express + TypeScript)
 
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+1. Open a terminal and change into the `backend` folder:
 
-3. **Environment Configuration:**
-   Create a `.env` file in the backend root directory:
-   ```env
-   PORT=5000
-   MONGO_URI=mongodb://localhost:27017/bookkart
-   JWT_SECRET=your_jwt_secret_key
-   JWT_REFRESH_SECRET=your_refresh_secret_key
-   CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
-   CLOUDINARY_API_KEY=your_cloudinary_api_key
-   CLOUDINARY_API_SECRET=your_cloudinary_api_secret
-   RAZORPAY_KEY_ID=your_razorpay_key_id
-   RAZORPAY_KEY_SECRET=your_razorpay_key_secret
-   BREVO_API_KEY=your_brevo_api_key
-   BREVO_EMAIL_FROM=your_email@example.com
-   FRONTEND_URL=http://localhost:3000
-   COOKIES_SAMESITE=cookies_prefrence
-   ```
+```bash
+cd backend
+```
 
-4. **Start the development server:**
-   ```bash
-   npm run dev
-   ```
+2. Install dependencies:
 
-The backend server will start on `http://localhost:5000`
+```bash
+npm install
+```
 
-### Frontend Setup
+3. Create a `.env` file in `backend/` and set required variables (example values shown):
 
-1. **Navigate to frontend directory:**
-   ```bash
-   cd frontend
-   ```
+```env
+PORT=5000
+MONGO_URI=mongodb://localhost:27017/bookkart
+JWT_SECRET=your_jwt_secret_key
+JWT_REFRESH_SECRET=your_refresh_secret_key
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+RAZORPAY_KEY_ID=your_razorpay_key_id
+RAZORPAY_KEY_SECRET=your_razorpay_key_secret
+BREVO_API_KEY=your_brevo_api_key
+BREVO_EMAIL_FROM=your_email@example.com
+FRONTEND_URL=http://localhost:3000
+COOKIES_SAMESITE=Strict
+```
 
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+4. Run in development (uses `tsx watch`):
 
-3. **Environment Configuration:**
-   Create a `.env.local` file in the frontend root directory:
-   ```env
-   NEXT_PUBLIC_API_URL=http://localhost:5000/api
-   NEXT_PUBLIC_RAZORPAY_KEY_ID=your_razorpay_key_id
-   ```
+```bash
+npm run dev
+```
 
-4. **Start the development server:**
-   ```bash
-   npm run dev
-   ```
+- Dev script: `npm run dev` (runs `tsx watch src/index.ts`)
+- Build: `npm run build` (runs `tsc`)
+- Start (production): `npm start` (runs `node dist/index.js`)
 
-The frontend application will start on `http://localhost:3000`
+The backend default port is controlled by `PORT` (commonly `5000`).
+
+### Frontend (Next.js 16)
+
+1. Open a terminal and change into the `frontend` folder:
+
+```bash
+cd frontend
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Create a `.env.local` file in `frontend/` and set required variables (example):
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:5000/api
+NEXT_PUBLIC_RAZORPAY_KEY_ID=your_razorpay_key_id
+```
+
+4. Run the Next.js development server:
+
+```bash
+npm run dev
+```
+
+- Dev script: `npm run dev` (runs `next dev`)
+- Build: `npm run build` (runs `next build`)
+- Start (production): `npm run start` (runs `next start`)
+
+The frontend runs on `http://localhost:3000` by default.
+
+### Run both locally
+
+Open two terminals (or use a process manager) and start the backend and frontend separately:
+
+```bash
+# Terminal 1 - backend
+cd backend && npm install && npm run dev
+
+# Terminal 2 - frontend
+cd frontend && npm install && npm run dev
+```
+
+If you prefer a single command, add a root-level script using e.g. `concurrently` (not included by default).
 
 ## 📡 API Endpoints
 

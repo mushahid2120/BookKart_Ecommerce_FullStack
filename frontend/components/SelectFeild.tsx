@@ -1,4 +1,4 @@
-import { IBookSale } from "@/app/book-sell/page";
+import { IBookSale } from "@/app/(main)/book-sell/page";
 import {
   Select,
   SelectContent,
