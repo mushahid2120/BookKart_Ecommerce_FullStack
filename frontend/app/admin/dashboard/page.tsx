@@ -13,6 +13,7 @@ import { useSelector } from "react-redux";
 import {
   Bar,
   BarChart,
+  ResponsiveContainer,
   CartesianGrid,
   Legend,
   Pie,
@@ -273,16 +274,17 @@ const formatOrderStatusData = (orders: IOrder[]): IOrderStatusData[] => {
 };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-2">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between"></div>
 
-      <div className="grid  place-items-center  grid-cols-2 lg:grid-cols-3 xl:grid-cols-4  gap-2 ">
+      {/* Dashboard Cards Counter Data */}
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
         {stats.map((item, index) => {
           const Icon = item.icon;
           return (
             <div
               key={item.title}
-              className="rounded-3xl  bg-(--color-card) px-2 py-4 w-58  shadow-sm "
+              className="rounded-3xl bg-(--color-card) px-3 py-4  w-fit shadow-sm"
             >
               <div className="flex items-start justify-between gap-4">
                 <div>
@@ -298,7 +300,7 @@ const formatOrderStatusData = (orders: IOrder[]): IOrderStatusData[] => {
                 <div>
                   <p className="mt-3 text-3xl font-semibold">{dashboardCount[index]}</p>
                   <span>{item.delta}</span>
-                  <span>{item.description}</span>
+                  <span className="text-xs">{item.description}</span>
                 </div>
               </div>
             </div>
@@ -306,33 +308,35 @@ const formatOrderStatusData = (orders: IOrder[]): IOrderStatusData[] => {
         })}
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-2">
-        <section className="rounded-3xl max-h-80 border border-(--color-header-border) bg-(--color-card) px-2 py-4 shadow-sm">
+      <div className="grid gap-4 xl:grid-cols-2 ">
+        <section className="rounded-3xl  w-[94vw] sm:w-full border border-(--color-header-border) bg-(--color-card) px-2 py-4 shadow-sm">
           <div className="flex items-center justify-between gap-4">
             <p className="text-md text-(--color-text-muted)">Monthly Sales</p>
           </div>
 
-          <div className="flex items-center justify-center">
-            <BarChart width={450} height={300} data={salesData} margin={margin}>
-              <XAxis dataKey="month" stroke="#8884d8" />
-              <YAxis />
-              <Tooltip wrapperStyle={{ width: 100, backgroundColor: "#ccc" }} />
-              <Legend
-                width={100}
-                wrapperStyle={{
-                  bottom:20,
-                  right: 0,
-                  lineHeight: "40px",
-                }}
-              />
-              <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-              <Bar dataKey="sales" fill="#8884d8" barSize={30} />
-              <RechartsDevtools />
-            </BarChart>
+          <div className="w-full">
+            <ResponsiveContainer width="100%" height={400}>
+              <BarChart data={salesData} margin={margin}>
+                <XAxis dataKey="month" stroke="#8884d8" />
+                <YAxis />
+                <Tooltip wrapperStyle={{ width: 100, backgroundColor: "#ccc" }} />
+                <Legend
+                  width={100}
+                  wrapperStyle={{
+                    bottom: 20,
+                    right: 0,
+                    lineHeight: "40px",
+                  }}
+                />
+                <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
+                <Bar dataKey="sales" fill="#8884d8" barSize={30} />
+                <RechartsDevtools />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </section>
 
-        <section className="rounded-3xl flex flex-col justify-center items-center max-h-80 border border-(--color-header-border) bg-(--color-card) p-6 shadow-sm">
+        <section className="rounded-3xl flex flex-col justify-center items-center  w-[94vw] sm:w-full border border-(--color-header-border) bg-(--color-card) p-6 shadow-sm">
           <PieChart
             // 1. Force the internal Recharts wrappers to allow visible overflowing text
             className="[&_.recharts-surface]:overflow-visible [&_.recharts-wrapper]:overflow-visible"
@@ -359,7 +363,7 @@ const formatOrderStatusData = (orders: IOrder[]): IOrderStatusData[] => {
             />
             <RechartsDevtools />
           </PieChart>
-          <div className="flex gap-4 items-center justify-center text-xs">
+          <div className="flex sm:gap-4 gap-2 items-center justify-center sm:text-xs text-[10px]">
             <span className="flex justify-center items-center gap-1 text-[#0088FE]">
               <div className="w-3 h-3 bg-[#0088FE] rounded-full "></div>
               <p>Processing</p>
@@ -403,7 +407,7 @@ const formatOrderStatusData = (orders: IOrder[]): IOrderStatusData[] => {
                   <td className="py-4 pr-6 font-medium text-(--color-header-text)">
                     #{order._id?.slice(0,5)}
                   </td>
-                  <td className="py-4 pr-6 text-(--color-text-muted)">
+                  <td className="py-4 pr-6 text-(--color-text-muted) whitespace-nowrap">
                     {order.user.name}
                   </td>
                   <td className="py-4 pr-6 text-(--color-text-muted)">

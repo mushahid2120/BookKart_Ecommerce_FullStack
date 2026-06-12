@@ -17,10 +17,25 @@ await dbConnect();
 const app = express()
 
 
-app.use(cors({
-  origin: FRONTEND_URL,
-  credentials:true
-}))
+const allowedOrigins = FRONTEND_URL.split(",");
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  }),
+);
+
+
+
 app.use(express.json())
 app.use(cookieParser())
  

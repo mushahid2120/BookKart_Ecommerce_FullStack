@@ -386,7 +386,7 @@ export default function AdminOrdersPage() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex items-end gap-2">
+                <div className="flex flex-col sm:flex-row items-end gap-2">
                   <Button
                     type="submit"
                     className="flex-1 bg-(--color-accent-yellow) text-black hover:bg-(--color-button-yellow-hover)"
@@ -428,11 +428,11 @@ export default function AdminOrdersPage() {
                 <TableHeader>
                   <TableRow className="border-(--color-header-border)">
                     <TableHead>Order ID</TableHead>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>Date</TableHead>
+                    <TableHead className="hidden sm:table-cell">Customer</TableHead>
+                    <TableHead className="hidden sm:table-cell">Date</TableHead>
                     <TableHead>Amount</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Payment</TableHead>
+                    <TableHead className="hidden md:table-cell">Payment</TableHead>
                     <TableHead className="text-center">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -446,11 +446,9 @@ export default function AdminOrdersPage() {
                           key={order._id}
                           className="border-(--color-header-border) hover:bg-(--color-surface-muted)"
                         >
-                          <TableCell className="font-medium">
-                            #{order._id.slice(0, 6)}
-                          </TableCell>
-                          <TableCell>{customerName}</TableCell>
-                          <TableCell>{formatDate(order.createdAt)}</TableCell>
+                          <TableCell className="font-medium">#{order._id.slice(0, 6)}</TableCell>
+                          <TableCell className="hidden sm:table-cell">{customerName}</TableCell>
+                          <TableCell className="hidden sm:table-cell">{formatDate(order.createdAt)}</TableCell>
                           <TableCell>₹{order.totalAmount}</TableCell>
                           <TableCell>
                             <span
@@ -470,7 +468,7 @@ export default function AdminOrdersPage() {
                               {order.status}
                             </span>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="hidden md:table-cell">
                             <span
                               className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase ${getPaymentColor(
                                 order.paymentStatus || "pending",
@@ -531,7 +529,7 @@ export default function AdminOrdersPage() {
             </div>
 
             {/* Pagination */}
-            <div className="mt-6 flex items-center justify-between">
+            <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
               <p className="text-sm text-(--color-text-muted)">
                 Page {currentPage} of {totalPages || 1}
               </p>
