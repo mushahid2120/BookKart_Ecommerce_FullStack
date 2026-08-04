@@ -219,151 +219,207 @@ export default function Books() {
   };
 
   return (
-    <main className="md:px-10 sm:px-10  px-4 pb-16 pt-8   bg-(--color-surface-soft) ">
-      <div className="text-2xl font-semibold">
-        Find from over 1000s of used books online
-      </div>
-      <div className="flex items-start justify-center flex-col md:flex-row  w-full mt-2">
-        <Card className=" w-full  md:max-w-1/3 lg:max-w-1/4 self-start mb-4 ">
-          <CardContent>
-            <Accordion type="single" collapsible defaultValue="plans">
-              <AccordionItem value="condition">
-                <AccordionTrigger className="text-lg text-[#3b85f7]">
-                  Condition
-                </AccordionTrigger>
-                <AccordionContent className="space-y-2">
-                  {BooksFilters.condition.map((con, index) => (
-                    <div className="flex gap-2" key={index}>
-                      <Checkbox
-                        id={con}
-                        checked={
-                          conditionCheck[con as keyof ContiditionCheckType]
-                        }
-                        onCheckedChange={(checked) =>
-                          setConditionCheck((prev) => ({
-                            ...prev,
-                            [con]: Boolean(checked),
-                          }))
-                        }
-                      />
-                      <Label htmlFor={con}>{con}</Label>
-                    </div>
-                  ))}
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="category">
-                <AccordionTrigger className="text-lg text-[#3b85f7]">
-                  Category
-                </AccordionTrigger>
-                <AccordionContent className="space-y-2">
-                  {BooksFilters.category.map((con, index) => (
-                    <div className="flex gap-2 " key={index}>
-                      <Checkbox
-                        id={con}
-                        checked={
-                          categoriesCheck[con as keyof CategoriesCheckType]
-                        }
-                        onCheckedChange={(checked) =>
-                          setCategoriesCheck((prev) => ({
-                            ...prev,
-                            [con]: Boolean(checked),
-                          }))
-                        }
-                      />
-                      <Label htmlFor={con}>{con}</Label>
-                    </div>
-                  ))}
-                </AccordionContent>
-              </AccordionItem>
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-16 bg-background text-on-surface">
+      {/* Header Section */}
+      <header className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h1 className="text-3xl md:text-4xl font-bold text-on-surface tracking-tight mb-1">
+            Browse Textbooks
+          </h1>
+          <p className="text-on-surface-variant text-sm md:text-base">
+            {productQuery
+              ? `Showing results for "${productQuery}"`
+              : `Showing ${filteredBooks.length} results in Textbooks & Learning Materials`}
+          </p>
+        </div>
 
-              <AccordionItem value="classtype">
-                <AccordionTrigger className="text-lg text-[#3b85f7]">
-                  Class Type
-                </AccordionTrigger>
-                <AccordionContent className="space-y-2">
-                  {BooksFilters.classType.map((con, index) => (
-                    <div className="flex gap-2 " key={index}>
-                      <Checkbox
-                        id={con}
-                        checked={classType[con as keyof ClassTypeType]}
-                        onCheckedChange={(checked) =>
-                          setClassType((prev) => ({
-                            ...prev,
-                            [con]: Boolean(checked),
-                          }))
-                        }
-                      />
-                      <Label htmlFor={con}>{con}</Label>
-                    </div>
-                  ))}
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          </CardContent>
-        </Card>
-        <div className="w-full md:max-w-2/3 lg:max-w-3/4 relative z-50">
-          <div className="flex justify-between items-center">
-            {productQuery && (
-              <div className="flex text-xs flex-col ml-4 bg-(--color-card) px-2 py-1 rounded-lg border border-(--color-border) max-w-2/3">
-                <div className="flex justify-between items-center">
-                  <span className=" text-(--color-text-muted)">
-                    Search Results for:
-                  </span>
-                  <button
-                    onClick={() => {
-                      dispatch(setQuery(""));
-                    }}
-                    className="text-(--color-text-muted) hover:text-(--color-danger) text-sm underline ml-2 cursor-pointer"
-                  >
-                    Clear
-                  </button>
-                </div>
-                <span className=" text-(--color-button-yellow) bg-(--color-surface-soft) px-2  rounded truncate">
-                  "{productQuery}"
-                </span>
-              </div>
-            )}
+        <div className="flex items-center gap-3 self-start md:self-auto">
+          {productQuery && (
+            <div className="flex items-center gap-2 bg-surface-container-high px-3 py-1.5 rounded-full text-xs border border-outline-variant">
+              <span className="text-on-surface-variant font-medium">Search:</span>
+              <span className="text-primary font-semibold">"{productQuery}"</span>
+              <button
+                onClick={() => dispatch(setQuery(""))}
+                className="text-on-surface-variant hover:text-error text-xs font-semibold ml-1 cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs uppercase font-semibold text-on-surface-variant tracking-wider hidden sm:inline">
+              Sort by:
+            </span>
             <DropdownMenu
               open={isSortDropDownMenu}
               onOpenChange={setIsSortDropDownMenu}
             >
-              <DropdownMenuTrigger asChild className="ml-auto">
+              <DropdownMenuTrigger asChild>
                 <Button
-                  variant="ghost"
-                  className="hover:bg-slate-300  flex outline-4 border border-solid border-black/40"
+                  variant="outline"
+                  className="bg-surface-container-low border-outline-variant text-on-surface hover:bg-surface-container-high hover:text-on-surface text-sm rounded-lg px-4 py-2 font-medium flex items-center gap-2 cursor-pointer shadow-xs"
                 >
-                  {BooksSort[sortBook as number]?.title}
-                  <ChevronsUpDown />
+                  <span>{BooksSort[sortBook as number]?.title}</span>
+                  <ChevronsUpDown className="w-4 h-4 text-on-surface-variant" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuGroup className="relative flex flex-col space-y-2">
+              <DropdownMenuContent align="end" className="bg-surface-container-lowest border-outline-variant shadow-md rounded-xl p-1 min-w-45">
+                <DropdownMenuGroup className="flex flex-col gap-0.5">
                   {BooksSort.map((sort, index) => (
                     <Button
                       key={index}
                       variant="ghost"
-                      className="w-full hover:bg-slate-100 flex justify-between items-center px-2  py-5 text-[#374151] font-normal"
+                      className={`w-full justify-between items-center px-3 py-2 text-sm rounded-lg font-normal transition-colors cursor-pointer ${
+                        sortBook === index
+                          ? "bg-primary-container/20 text-on-primary-container font-semibold"
+                          : "text-on-surface hover:bg-surface-container-low"
+                      }`}
                       onClick={() => {
                         setSortBook(index);
                         setIsSortDropDownMenu(false);
                         setBookSortFunc(sort?.sorting);
                       }}
                     >
-                      <span>{sort?.title} </span>
-                      {sortBook === index && <Check size={16} />}
+                      <span>{sort?.title}</span>
+                      {sortBook === index && <Check className="w-4 h-4 text-primary" />}
                     </Button>
                   ))}
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
+        </div>
+      </header>
+
+      {/* Main Content Layout */}
+      <div className="flex flex-col lg:flex-row gap-8">
+        {/* Sidebar Filters */}
+        <aside className="w-full lg:w-64  space-y-4 lg:sticky lg:top-24 self-start">
+          <Card className="bg-surface-container-lowest border-outline-variant shadow-sm rounded-xl overflow-hidden">
+            <CardContent className="p-4">
+              <Accordion type="multiple" defaultValue={["condition", "category", "classtype"]} className="w-full">
+                <AccordionItem value="condition" className="border-b-outline-variant/60">
+                  <AccordionTrigger className="text-base font-semibold text-on-surface hover:no-underline py-3">
+                    Condition
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-2.5 pb-3">
+                    {BooksFilters.condition.map((con, index) => (
+                      <div className="flex items-center gap-2.5" key={index}>
+                        <Checkbox
+                          id={`cond-${index}`}
+                          checked={conditionCheck[con as keyof ContiditionCheckType]}
+                          onCheckedChange={(checked) =>
+                            setConditionCheck((prev) => ({
+                              ...prev,
+                              [con]: Boolean(checked),
+                            }))
+                          }
+                          className="w-4 h-4 border-outline text-primary rounded focus:ring-primary cursor-pointer"
+                        />
+                        <Label
+                          htmlFor={`cond-${index}`}
+                          className="text-sm font-normal text-on-surface cursor-pointer flex-1 select-none"
+                        >
+                          {con}
+                        </Label>
+                      </div>
+                    ))}
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="category" className="border-b-outline-variant/60">
+                  <AccordionTrigger className="text-base font-semibold text-on-surface hover:no-underline py-3">
+                    Category
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-2.5 pb-3">
+                    {BooksFilters.category.map((con, index) => (
+                      <div className="flex items-start gap-2.5" key={index}>
+                        <Checkbox
+                          id={`cat-${index}`}
+                          checked={categoriesCheck[con as keyof CategoriesCheckType]}
+                          onCheckedChange={(checked) =>
+                            setCategoriesCheck((prev) => ({
+                              ...prev,
+                              [con]: Boolean(checked),
+                            }))
+                          }
+                          className="w-4 h-4 border-outline text-primary rounded mt-0.5 focus:ring-primary cursor-pointer"
+                        />
+                        <Label
+                          htmlFor={`cat-${index}`}
+                          className="text-sm font-normal text-on-surface cursor-pointer flex-1 leading-snug select-none"
+                        >
+                          {con}
+                        </Label>
+                      </div>
+                    ))}
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="classtype" className="border-none">
+                  <AccordionTrigger className="text-base font-semibold text-on-surface hover:no-underline py-3">
+                    Class / Course
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-2.5 max-h-60 overflow-y-auto custom-scrollbar pr-1 pb-3">
+                    {BooksFilters.classType.map((con, index) => (
+                      <div className="flex items-center gap-2.5" key={index}>
+                        <Checkbox
+                          id={`clas-${index}`}
+                          checked={classType[con as keyof ClassTypeType]}
+                          onCheckedChange={(checked) =>
+                            setClassType((prev) => ({
+                              ...prev,
+                              [con]: Boolean(checked),
+                            }))
+                          }
+                          className="w-4 h-4 border-outline text-primary rounded focus:ring-primary cursor-pointer"
+                        />
+                        <Label
+                          htmlFor={`clas-${index}`}
+                          className="text-sm font-normal text-on-surface cursor-pointer flex-1 select-none"
+                        >
+                          {con}
+                        </Label>
+                      </div>
+                    ))}
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </CardContent>
+          </Card>
+
+          <Button
+            variant="outline"
+            onClick={() => {
+              setConditionCheck({ Excellent: false, Good: false, Fair: false });
+              setCategoriesCheck({
+                "College Books (Higher Education Textbooks)": false,
+                "Exam/Test Preparation Books": false,
+                "Reading Books (Novels, Children, Business, Literature, History, etc.)": false,
+                "School Books (up to 12th)": false,
+              });
+              setClassType({
+                "B.Tech": false, "B.Sc": false, "B.Com": false, BCA: false, MBA: false,
+                "M.Tech": false, "M.Sc": false, "Ph.D": false, "12th": false, "11th": false,
+                "10th": false, "9th": false, "8th": false, "7th": false, "6th": false, "5th": false,
+              });
+            }}
+            className="w-full py-2.5 bg-secondary text-on-secondary rounded-lg font-semibold text-xs tracking-wider uppercase hover:opacity-90 transition-all active:scale-[0.98] border-none shadow-xs cursor-pointer"
+          >
+            Clear All Filters
+          </Button>
+        </aside>
+
+        {/* Book Grid Area */}
+        <div className="flex-1 min-w-0">
           <BookList
             books={filteredBooks
               .sort(bookSortFunc)
               .filter((book) =>
                 productQuery
-                  ? book.title.toLowerCase().includes(productQuery) ||
-                    book.author.includes(productQuery)
+                  ? book.title.toLowerCase().includes(productQuery.toLowerCase()) ||
+                    book.author.toLowerCase().includes(productQuery.toLowerCase())
                   : true,
               )}
             isLoading={isLoading}
@@ -375,3 +431,4 @@ export default function Books() {
     </main>
   );
 }
+

@@ -21,7 +21,7 @@ export default function BookList({
   books,
   isLoading = false,
   error = null,
-  onRetry = () => {},
+  onRetry = () => { },
 }: {
   books: IBook[];
   isLoading?: boolean;
@@ -90,20 +90,20 @@ export default function BookList({
   // Show loading shimmer
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        <div className="grid lg:grid-cols-3 grid-cols-2 gap-4 mt-2 ml-2">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Card key={i} className="overflow-hidden pb-4">
-              <div className="aspect-video w-full bg-(--color-surface-soft) animate-pulse"></div>
-              <CardContent className="px-2 sm:px-4 pt-4">
-                <div className="h-4 bg-(--color-surface-soft) animate-pulse rounded mb-2"></div>
-                <div className="h-3 bg-(--color-surface-soft) animate-pulse rounded w-3/4 mb-3"></div>
-                <div className="h-5 bg-(--color-surface-soft) animate-pulse rounded mb-3"></div>
-                <div className="h-3 bg-(--color-surface-soft) animate-pulse rounded w-1/2"></div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 mt-2">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <Card key={i} className="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden shadow-sm">
+            <div className="aspect-3/4 w-full bg-surface-container animate-pulse" />
+            <CardContent className="p-4 space-y-3">
+              <div className="h-5 bg-surface-container animate-pulse rounded w-4/5" />
+              <div className="h-3 bg-surface-container animate-pulse rounded w-1/2" />
+              <div className="flex justify-between items-center pt-2">
+                <div className="h-6 bg-surface-container animate-pulse rounded w-1/3" />
+                <div className="w-9 h-9 bg-surface-container animate-pulse rounded-full" />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
     );
   }
@@ -111,23 +111,19 @@ export default function BookList({
   // Show error state
   if (error) {
     return (
-      <div className="flex items-center justify-center flex-col h-96">
-        <div className="max-w-120 flex items-center flex-col justify-center text-center gap-4">
-          <div>
+      <div className="flex items-center justify-center flex-col py-16 px-4 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm my-4">
+        <div className="max-w-md flex items-center flex-col justify-center text-center gap-4">
+          <div className="p-4 bg-error-container/20 rounded-full">
             <img
-              src={`/Image/EmptyWishlist.png`}
-              alt="Error Image"
-              className="w-32 h-32"
+              src="/Image/EmptyWishlist.png"
+              alt="Error"
+              className="w-24 h-24 object-contain opacity-80"
             />
           </div>
-          <h1 className="text-2xl font-medium text-(--color-text-primary)">
-            Oops! Something went wrong
-          </h1>
-          <p className="text-(--color-text-muted) font-light max-w-sm">
-            {error}
-          </p>
+          <h2 className="text-xl font-bold text-on-surface">Oops! Something went wrong</h2>
+          <p className="text-sm text-on-surface-variant max-w-sm">{error}</p>
           <Button
-            className="bg-(--color-button-yellow) hover:bg-(--color-button-yellow-hover) text-white cursor-pointer"
+            className="bg-primary text-on-primary hover:bg-primary/90 font-semibold px-6 rounded-lg cursor-pointer"
             onClick={onRetry}
           >
             Try Again
@@ -140,19 +136,18 @@ export default function BookList({
   // Show empty state
   if (books.length === 0) {
     return (
-      <div className="flex items-center justify-center flex-col h-96">
-        <div className="max-w-120 flex items-center flex-col justify-center text-center gap-4">
-          <div>
+      <div className="flex items-center justify-center flex-col py-16 px-4 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm my-4">
+        <div className="max-w-md flex items-center flex-col justify-center text-center gap-4">
+          <div className="p-4 bg-surface-container-low rounded-full">
             <img
-              src={`/Image/EmptyWishlist.png`}
+              src="/Image/EmptyWishlist.png"
               alt="No books found"
-              className="w-32 h-32"
+              className="w-24 h-24 object-contain opacity-80"
             />
           </div>
-          <h1 className="text-2xl font-medium">No Books Found</h1>
-          <p className="text-(--color-text-muted) font-light max-w-sm">
-            The books matching your filters are not available right now. Try
-            adjusting your search filters!
+          <h2 className="text-xl font-bold text-on-surface">No Books Found</h2>
+          <p className="text-sm text-on-surface-variant max-w-sm">
+            The books matching your filters are not available right now. Try adjusting your search filters!
           </p>
         </div>
       </div>
@@ -162,127 +157,159 @@ export default function BookList({
   // Show books list
   return (
     <div>
-      <div className="grid lg:grid-cols-3 grid-cols-2 gap-4 mt-2 ml-2 ">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
         {books
           .slice((currentPage - 1) * 6, currentPage * 6)
-          .map((book: any) => (
-            <Link href={`/books/${book._id}`} key={book._id}>
-              <Card className="relative hover:shadow-2xl py-0 overflow-hidden pb-4 gap-2 sm:gap-4">
-                <img
-                  src={book.images[0]}
-                  alt={book.title}
-                  className="relative aspect-video w-full object-cover"
-                />
+          .map((book: any) => {
+            const isWishlisted = wishlist && wishlist.some((item) => item._id === book._id);
+            const discount = calculateDiscount(book.price, book.finalPrice);
 
-                <div className="absolute mt-2 bg-(--color-accent-yellow) text-white rounded-r-xl pl-1 pr-2 font-semibold text-sm z-100">
-                  {calculateDiscount(book.price, book.finalPrice)}% Off
-                </div>
+            return (
+              <Link href={`/books/${book._id}`} key={book._id} className="block group">
+                <Card className="bg-surface-container-lowest lg:max-h-100 md:max-h-120 max-h-100 max-w-90 p-0 gap-0 rounded-xl border border-outline-variant overflow-hidden book-card-hover transition-all cursor-pointer flex flex-col shadow-sm hover:shadow-md hover:-translate-y-0.5 group">
+                  {/* Image Cover Container with 3:4 Aspect Ratio */}
+                  <div className="aspect-3/4 h-2/5 relative overflow-hidden bg-surface-container">
+                    <img
+                      src={book.images?.[0] || "/placeholder-book.png"}
+                      alt={book.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
 
-                <div
-                  className=" absolute top-2 right-2 p-1 text-(--color-danger) bg-(--color-surface-soft) hover:bg-(--color-surface-muted) hover:text-(--color-danger) rounded-full z-100"
-                  onClick={(e) => {
-                    e.preventDefault(); // stops Link navigation
-                    e.stopPropagation();
-                    if (!isLoggedIn) {
-                      dispatch(toggleLoginDialog());
-                      return;
-                    }
-                    if (wishlist.find((item) => item._id === book._id)) {
-                      removeFromWishlistByProductId(book._id);
-                    } else {
-                      handleAddToWishlist(book._id);
-                    }
-                  }}
-                >
-                  <Heart
-                    width={22}
-                    fill={
-                      book &&
-                      wishlist &&
-                      wishlist.find((item) => item._id === book._id)
-                        ? "red"
-                        : "none"
-                    }
-                  />
-                </div>
+                    {/* Condition Badge (Top-Right) */}
+                    <div className="absolute top-3 right-3 z-10">
+                      <span
+                        className={`px-3 py-1 text-xs font-semibold rounded-full shadow-xs ${book.condition === "Excellent" || book.condition === "New" || book.condition === "Like New"
+                          ? "bg-tertiary-container text-on-tertiary-container"
+                          : "bg-surface-variant text-on-surface-variant"
+                          }`}
+                      >
+                        {book.condition || "Used"}
+                      </span>
+                    </div>
 
-                <CardContent className="px-2 sm:px-4">
-                  <div className="font-semibold truncate sm:py-0 sm:text-base text-[14px]">
-                    {book.title}
+                    {/* Discount Badge (Top-Left) */}
+                    {discount > 0 && (
+                      <div className="absolute top-3 left-3 z-10">
+                        <span className="px-2.5 py-1 bg-primary-container text-on-primary-container text-xs font-bold rounded-full shadow-xs">
+                          {discount}% OFF
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Wishlist Heart Button (Bottom-Right of Image) */}
+                    <button
+                      type="button"
+                      className="absolute bottom-3 right-3 z-10 p-2.5 bg-surface-container-lowest/90 hover:bg-surface-container-lowest text-on-surface-variant hover:text-error rounded-full shadow-md backdrop-blur-xs transition-all cursor-pointer"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (!isLoggedIn) {
+                          dispatch(toggleLoginDialog());
+                          return;
+                        }
+                        if (isWishlisted) {
+                          removeFromWishlistByProductId(book._id);
+                        } else {
+                          handleAddToWishlist(book._id);
+                        }
+                      }}
+                      title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+                    >
+                      <Heart
+                        className={`w-4 h-4 transition-colors ${isWishlisted
+                          ? "fill-error text-error"
+                          : "text-on-surface-variant hover:text-error"
+                          }`}
+                      />
+                    </button>
                   </div>
-                  <div className="font-normal sm:text-sm text-[12px]  text-(--color-text-muted) ">
-                    {book.author}
-                  </div>
 
-                  <h3 className="sm:text-lg text-[13px] font-semibold my-1 text-(--color-price-text)">
-                    ₹{book.finalPrice}
-                    <span className="line-through sm:text-sm text-[11px] font-normal sm:ml-2 ml-1">
-                      ₹{book.price}
-                    </span>
-                  </h3>
-                  <div className="flex justify-between items-center ">
-                    <p className="sm:text-[12px] text-[8px] text-(--color-text-muted)">
-                      {monthDiff(book.createdAt)} month ago
-                    </p>
+                  {/* Card Content Details */}
+                  <CardContent className="p-4 flex flex-col flex-1 gap-0">
+                    <div>
+                      <h2 className="font-semibold text-xl text-on-surface group-hover:text-primary transition-colors line-clamp-2 leading-snug">
+                        {book.title}
+                      </h2>
+                      <p className="text-xs text-on-surface-variant mt-1 truncate">
+                        By {book.author}
+                      </p>
+                    </div>
 
-                    <span className="sm:text-[14px] text-[10px] text-(--color-text-muted)">
-                      {book.condition}
-                    </span>
-                  </div>
+                    <div className="flex items-end justify-between mt-2 pt-2 border-t border-outline-variant/30">
+                      <div>
+                        <div className="flex items-baseline gap-1.5">
+                          <span className="font-bold text-lg text-on-surface">
+                            ₹{book.finalPrice}
+                          </span>
+                          {book.price > book.finalPrice && (
+                            <span className="text-xs text-on-surface-variant line-through">
+                              ₹{book.price}
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[11px] text-on-surface-variant block mt-0.5">
+                          {monthDiff(book.createdAt)} month ago
+                        </span>
+                      </div>
 
-                  {/* <Button className="mt-3 w-full bg-[#eb5a0d]">Buy Now</Button> */}
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
+                      <div className="w-9 h-9 rounded-full bg-surface-container-high group-hover:bg-primary-container text-on-surface group-hover:text-on-primary-container flex items-center justify-center transition-all shadow-xs">
+                        <span className="text-xs font-semibold">View</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            );
+          })}
       </div>
-      <div className="flex gap-2 justify-center items-center mt-8">
+
+      {/* Pagination Controls */}
+      <div className="mt-10 flex items-center justify-center gap-2">
         <Button
           variant="outline"
-          className={
-            currentPage === 1 ? "text-black/20 hover:text-black/20" : ""
-          }
+          size="icon"
+          disabled={currentPage === 1}
+          className="w-10 h-10 rounded-full border-outline-variant text-on-surface hover:bg-surface-variant transition-colors disabled:opacity-40 cursor-pointer"
           onClick={() => {
-            setCurrentPage((prev) => {
-              if (prev === 1) return prev;
-              return prev - 1;
-            });
+            setCurrentPage((prev) => Math.max(prev - 1, 1));
           }}
         >
-          <ChevronLeft />
+          <ChevronLeft className="w-5 h-5" />
         </Button>
+
         {Array.from({ length: Math.ceil(books.length / 6) }).map((_, i) => {
-          if (i + 1 <= currentPage + 2 && i + 1 >= currentPage - 1)
+          const pageNum = i + 1;
+          if (pageNum <= currentPage + 2 && pageNum >= currentPage - 1) {
             return (
               <Button
+                key={pageNum}
                 variant="outline"
-                key={i}
-                className={` ${currentPage === i + 1 ? "bg-(--color-accent-yellow) text-white" : ""}`}
-                onClick={() => {
-                  setCurrentPage((prev) => i + 1);
-                }}
+                className={`w-10 h-10 rounded-full border-outline-variant font-semibold text-sm transition-all cursor-pointer ${currentPage === pageNum
+                  ? "bg-primary text-on-primary border-primary shadow-xs"
+                  : "text-on-surface hover:bg-surface-variant"
+                  }`}
+                onClick={() => setCurrentPage(pageNum)}
               >
-                {i + 1}
+                {pageNum}
               </Button>
             );
+          }
+          return null;
         })}
+
         <Button
           variant="outline"
-          className={
-            currentPage === books.length / 6
-              ? "text-black/40 hover:text-black/40"
-              : ""
-          }
+          size="icon"
+          disabled={currentPage === Math.ceil(books.length / 6) || Math.ceil(books.length / 6) === 0}
+          className="w-10 h-10 rounded-full border-outline-variant text-on-surface hover:bg-surface-variant transition-colors disabled:opacity-40 cursor-pointer"
           onClick={() => {
-            setCurrentPage((prev) => {
-              if (prev === books.length / 6) return prev;
-              return prev + 1;
-            });
+            setCurrentPage((prev) => Math.min(prev + 1, Math.ceil(books.length / 6)));
           }}
         >
-          <ChevronRight />
+          <ChevronRight className="w-5 h-5" />
         </Button>
       </div>
     </div>
   );
 }
+
