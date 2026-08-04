@@ -188,7 +188,7 @@ export default function page() {
                 message: "description must be less than 100 character",
               },
             })}
-            className="w-full rounded-xl border border-outline-variant bg-surface text-on-surface text-sm font-normal focus:border-primary focus:ring-1 focus:ring-primary min-h-[100px]"
+            className="w-full rounded-xl border border-outline-variant bg-surface text-on-surface text-sm font-normal focus:border-primary focus:ring-1 focus:ring-primary min-h-25"
           />
         </div>
       ),
@@ -296,7 +296,7 @@ export default function page() {
   }, [watchedImages]);
 
   return (
-    <main className="w-full max-w-[1280px] mx-auto px-4 md:px-8 pt-6 pb-12 flex flex-col gap-6">
+    <main className="w-full max-w-7xl mx-auto px-4 md:px-8 pt-6 pb-12 flex flex-col gap-6">
       {/* Hero Header */}
       <section className="mb-2">
         <h1 className="font-headline-xl text-3xl md:text-4xl text-primary font-bold mb-2">
@@ -311,7 +311,7 @@ export default function page() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* Left Column: Image Upload (Sticky on Desktop) */}
-        <div className="lg:col-span-5 h-fit lg:sticky lg:top-[104px]">
+        <div className="lg:col-span-5 h-fit lg:sticky lg:top-26">
           <div className="bg-surface-container-lowest border border-outline-variant rounded-3xl shadow-sm overflow-hidden flex flex-col h-full">
             <div className="bg-surface-container-low px-6 py-4 border-b border-outline-variant flex items-center gap-3 rounded-t-3xl">
               <Camera className="text-primary w-6 h-6" />
@@ -352,7 +352,7 @@ export default function page() {
                     <span className="font-headline-md text-lg text-primary font-semibold mb-2">
                       Upload Photos
                     </span>
-                    <p className="font-body-sm text-xs text-on-surface-variant max-w-[220px]">
+                    <p className="font-body-sm text-xs text-on-surface-variant max-w-55">
                       Click or drag images here to upload up to 4 images (Size: 15MB max. each)
                     </p>
                   </div>
@@ -367,7 +367,7 @@ export default function page() {
                     <div
                       key={index}
                       onClick={() => fileInputRef.current?.click()}
-                      className={`min-w-[76px] h-[96px] rounded-xl border flex items-center justify-center cursor-pointer transition-all relative overflow-hidden ${
+                      className={`min-w-19 h-24 rounded-xl border flex items-center justify-center cursor-pointer transition-all relative overflow-hidden ${
                         isUploaded
                           ? "border-primary shadow-sm bg-surface"
                           : "border-dashed border-outline-variant bg-surface text-outline-variant hover:border-primary/50"

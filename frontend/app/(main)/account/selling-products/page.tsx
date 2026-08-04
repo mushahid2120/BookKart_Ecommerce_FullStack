@@ -108,7 +108,7 @@ export default function SellingProductsPage() {
           {Array.from({ length: 4 }).map((_, index) => (
             <div
               key={index}
-              className="rounded-2xl bg-surface-container-lowest border border-outline-variant/40 animate-pulse aspect-[3/4] flex flex-col p-4 space-y-3"
+              className="rounded-2xl bg-surface-container-lowest border border-outline-variant/40 animate-pulse aspect-3/4 flex flex-col p-4 space-y-3"
             >
               <div className="bg-surface-container-high rounded-xl flex-1 w-full"></div>
               <div className="h-4 bg-surface-container-high rounded w-3/4"></div>
@@ -124,7 +124,7 @@ export default function SellingProductsPage() {
   // Page error state
   if (pageError) {
     return (
-      <div className="flex items-center justify-center min-h-[450px] bg-surface-container-lowest border border-outline-variant/40 rounded-3xl p-8 text-center shadow-xs">
+      <div className="flex items-center justify-center min-h-112 bg-surface-container-lowest border border-outline-variant/40 rounded-3xl p-8 text-center shadow-xs">
         <div className="max-w-md flex flex-col items-center gap-4">
           <div className="w-16 h-16 rounded-full bg-error-container text-on-error-container flex items-center justify-center mb-1">
             <AlertCircle size={32} />
@@ -146,7 +146,7 @@ export default function SellingProductsPage() {
   // Empty state matching Stitch design
   if (sellingbook.length === 0) {
     return (
-      <div className="flex items-center justify-center min-h-[500px] bg-surface-container-lowest border border-outline-variant/40 rounded-3xl p-8 md:p-12 text-center shadow-xs">
+      <div className="flex items-center justify-center min-h-125 bg-surface-container-lowest border border-outline-variant/40 rounded-3xl p-8 md:p-12 text-center shadow-xs">
         <div className="max-w-md flex flex-col items-center gap-5">
           <div className="relative w-36 h-36 flex items-center justify-center rounded-3xl bg-surface-container-low/70 border border-outline-variant/30 p-4">
             <img
@@ -245,7 +245,7 @@ export default function SellingProductsPage() {
               </div>
 
               {/* Book Cover Image */}
-              <div className="aspect-[3/4] h-40 sm:h-50 md:h-60  w-full bg-surface-container-low relative overflow-hidden flex items-center justify-center">
+              <div className="aspect-3/4 h-40 sm:h-50 md:h-60  w-full bg-surface-container-low relative overflow-hidden flex items-center justify-center">
                 {book.images && book.images[0] ? (
                   <img
                     src={book.images[0]}
@@ -304,7 +304,7 @@ export default function SellingProductsPage() {
           {/* Add Listing Card Placeholder inside grid */}
           <Link
             href="/book-sell"
-            className="bg-surface-container-low/60 rounded-2xl border-2 border-dashed border-outline-variant/60 hover:border-primary hover:bg-surface-container-high/40 transition-all duration-300 overflow-hidden flex flex-col items-center justify-center p-6 aspect-[3/4] cursor-pointer group text-center"
+            className="bg-surface-container-low/60 rounded-2xl border-2 border-dashed border-outline-variant/60 hover:border-primary hover:bg-surface-container-high/40 transition-all duration-300 overflow-hidden flex flex-col items-center justify-center p-6 aspect-3/4 cursor-pointer group text-center"
           >
             <div className="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-xs">
               <Plus className="text-on-primary-container w-6 h-6" />

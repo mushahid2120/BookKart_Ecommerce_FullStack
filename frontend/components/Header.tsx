@@ -119,6 +119,8 @@ export default function Header() {
     }
   };
 
+
+
   return (
     <header className="sticky top-0 z-1000 w-full border-b border-outline-variant/20 bg-inverse-surface shadow-sm">
       <nav className="max-w-7xl mx-auto flex items-center justify-between  gap-2 md:gap-4 px-8 py-2">

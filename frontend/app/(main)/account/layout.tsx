@@ -87,7 +87,7 @@ export default function layout({
 
         {/* Logged Out Fallback State */}
         {!user.isLoggedIn && (
-          <div className="w-full flex-1 flex items-center justify-center min-h-[500px] bg-surface-container-lowest border border-outline-variant/40 rounded-3xl p-8 text-center shadow-xs">
+          <div className="w-full flex-1 flex items-center justify-center min-h-125 bg-surface-container-lowest border border-outline-variant/40 rounded-3xl p-8 text-center shadow-xs">
             <div className="max-w-md flex flex-col items-center gap-5">
               <div className="w-24 h-24 rounded-full bg-primary-container/30 flex items-center justify-center text-primary mb-2">
                 <User size={48} className="text-primary" />

@@ -126,7 +126,7 @@ export default function page() {
 
   if (!isLoggedIn) {
     return (
-      <div className="flex items-center justify-center flex-col min-h-[450px] py-12 px-4 bg-surface-container-lowest border border-outline-variant/30 rounded-3xl text-center shadow-xs">
+      <div className="flex items-center justify-center flex-col min-h-112 py-12 px-4 bg-surface-container-lowest border border-outline-variant/30 rounded-3xl text-center shadow-xs">
         <div className="max-w-md flex flex-col items-center justify-center text-center gap-4">
           <div className="w-20 h-20 rounded-full bg-primary-container/30 flex items-center justify-center text-primary mb-2">
             <Heart size={40} className="text-primary fill-primary/20" />
@@ -168,7 +168,7 @@ export default function page() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {Array.from({ length: 6 }).map((_, index) => (
             <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant/30 p-4 shadow-xs animate-pulse flex flex-col gap-4" key={index}>
-              <div className="w-full aspect-[3/4] bg-surface-container-high rounded-xl"></div>
+              <div className="w-full aspect-3/4 bg-surface-container-high rounded-xl"></div>
               <div className="space-y-2">
                 <div className="h-5 bg-surface-container-high rounded w-3/4"></div>
                 <div className="h-4 bg-surface-container-high rounded w-1/2"></div>
@@ -184,7 +184,7 @@ export default function page() {
 
   if (pageError) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4 bg-surface-container-lowest border border-outline-variant/30 rounded-3xl p-8 text-center shadow-xs">
+      <div className="flex flex-col items-center justify-center min-h-100 gap-4 bg-surface-container-lowest border border-outline-variant/30 rounded-3xl p-8 text-center shadow-xs">
         <p className="text-error font-medium text-base">{pageError}</p>
         <Button onClick={fetchingWishlist} variant="outline" className="border-outline hover:bg-surface-container-low rounded-full px-6 cursor-pointer">
           Try Again
@@ -267,7 +267,7 @@ export default function page() {
               className="bg-surface-container-lowest rounded-2xl border border-outline-variant/30 hover:border-outline-variant/70 p-4 shadow-xs hover:shadow-md transition-all duration-300 flex flex-col group relative overflow-hidden"
             >
               {/* Image Preview & Floating Quick Actions */}
-              <div className="w-full aspect-[3/4] mb-4 relative rounded-xl overflow-hidden bg-surface-container-low border border-outline-variant/20 flex items-center justify-center">
+              <div className="w-full aspect-3/4 mb-4 relative rounded-xl overflow-hidden bg-surface-container-low border border-outline-variant/20 flex items-center justify-center">
                 {item.images ? (
                   <img
                     src={item.images}

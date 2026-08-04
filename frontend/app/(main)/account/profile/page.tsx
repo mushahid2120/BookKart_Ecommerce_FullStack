@@ -90,8 +90,8 @@ export default function Page() {
       {/* ── Stitch Hero Profile Banner Card ── */}
       <Card className="overflow-hidden border border-outline-variant/40 rounded-3xl bg-surface-container-lowest shadow-xs p-0">
         {/* Banner Cover Gradient */}
-        <div className="h-32 sm:h-40 bg-gradient-to-r from-primary-container via-primary-fixed to-primary-fixed-dim relative">
-          <div className="absolute inset-0 bg-[radial-gradient(#231b00_1px,transparent_1px)] [background-size:16px_16px] opacity-15" />
+        <div className="h-32 sm:h-40 bg-linear-to-r from-primary-container via-primary-fixed to-primary-fixed-dim relative">
+          <div className="absolute inset-0 bg-[radial-gradient(#231b00_1px,transparent_1px)] bg-size-[16px_16px] opacity-15" />
         </div>
 
         {/* Profile Info Overlay */}

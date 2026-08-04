@@ -35,7 +35,7 @@ export default function DrawerMenu({
       </SheetTrigger>
       <SheetContent
         side="left"
-        className="overflow-y-auto z-[2000] bg-surface-container-lowest text-on-surface border-r-outline-variant/40"
+        className="overflow-y-auto z-2000 bg-surface-container-lowest text-on-surface border-r-outline-variant/40"
       >
         <SheetHeader>
           <SheetTitle>
