@@ -1,91 +1,148 @@
-import { Clock4, Facebook, Headphones, Shield } from "lucide-react";
+"use client";
 import Link from "next/link";
 import FooterCard from "./FooterCard";
+import { Earth, Laugh, Mail, ShieldCheck, ShieldUser, Waypoints } from "lucide-react";
 
 export default function Footer() {
   const footList = [
     {
-      heading: "ABOUT US",
+      heading: "Fun Links",
+      hoverClass: "hover:text-accent-teal",
       items: [
+        { name: "Shop the Stacks", path: "/books" },
+        { name: "Start Selling", path: "/book-sell" },
         { name: "About Us", path: "/about-us" },
-        { name: "Contact Us", path: "/contactus" },
+        { name: "How it works?", path: "/" },
       ],
     },
     {
-      heading: "USEFULL LINKS",
+      heading: "About Us",
+      hoverClass: "hover:text-accent-coral",
       items: [
-        { name: "How it works?", path: "/howitwork" },
-        { name: "Blogs", path: "/blog" },
+        { name: "Our Story", path: "/about-us" },
+        { name: "The Blog", path: "/" },
+        { name: "Help & Support", path: "/help" },
+        { name: "Contact Us", path: "/" },
       ],
     },
     {
-      heading: "POLICIES",
+      heading: "The Rules",
+      hoverClass: "hover:text-primary",
       items: [
-        { name: "Terms Of Use", path: "/term-of-use" },
-        { name: "Privacy Policy", path: "/privacy-policy" },
-      ],
-    },
-    {
-      heading: "STAY CONNECTED",
-      items: [
-        { name: "Terms Of Use", path: "/term-of-use" },
-        { name: "Privacy Policy", path: "/privacy-policy" },
+        { name: "Privacy First", path: "/privacy-policy" },
+        { name: "Terms of Use", path: "/term-of-use" },
+        { name: "Shipping Details", path: "/" },
+        { name: "Safe Trading Guide", path: "/" },
       ],
     },
   ];
 
-  const footFeatures=[
+  const footFeatures = [
     {
-      icon:<Shield  className="size-16"/>,
-      heading: "Secure Payment",
-      description: "100% Secure Online Transaction"
+      icon: <ShieldCheck />,
+      heading: "Super Safe Pay",
+      description: "100% Secure & Protected",
+      iconBgClass: "bg-accent-teal-container text-accent-teal",
     },
     {
-      icon:<Clock4 className="size-16"/>,
-      heading: "BookKart Trust",  
-      description: "Money transferred safely after confirmation"
+      icon: <ShieldUser />,
+      heading: "BookKart Trust",
+      description: "Hand-picked Sellers Only",
+      iconBgClass: "bg-accent-coral-container text-accent-coral",
     },
     {
-      icon:<Headphones className="size-16"/>,
-      heading: "Customer Support",
-      description: "Friendly customer support"
+      icon: <Laugh />,
+      heading: "Happy Readers",
+      description: "24/7 Friendly Support",
+      iconBgClass: "bg-primary-container text-on-primary-container",
     },
-  ]
+  ];
 
   return (
-    <footer className="bg-(--color-footer-bg) pt-12 text-white md:px-8 sm:px-4 px-2 pb-16">
-      <div className="flex justify-between flex-wrap  flex-col md:flex-row md:gap-3 gap-8">
-        {footList.map(({ heading, items }, index) => (
-          <div key={index}>
-            <h2 className="text-xl font-semibold mb-3">{heading}</h2>
-            <div className="flex flex-col gap-2 text-(--color-footer-text) focus:text-(--color-accent-yellow)">
-              {items.map(({ path, name }, index) => (
-                <Link href={path} key={index}>
-                  {name}
-                </Link>
-              ))}
+    <footer className="w-full mt-12 border-t border-outline-variant bg-surface-container-lowest rounded-t-[3rem] pt-12">
+      <div className="max-w-7xl mx-auto px-8">
+        {/* ── Top grid: brand + nav columns ── */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+          {/* Brand column */}
+          <div className="col-span-1">
+            <span className="text-3xl font-black text-primary">BookKart</span>
+            <p className="mt-4 text-sm leading-relaxed font-medium text-secondary">
+              The friendliest place in India to swap stories and save books from
+              the dust. Let&apos;s build a library together!
+            </p>
+
+            {/* Social icons */}
+            <div className="flex gap-3 mt-6">
+              <button
+                className="w-10 h-10 rounded-2xl flex items-center justify-center transition-all bg-surface-container text-on-surface hover:bg-primary-container hover:text-on-primary-container cursor-pointer"
+                aria-label="Website"
+              >
+                <Earth />
+              </button>
+              <button
+                className="w-10 h-10 rounded-2xl flex items-center justify-center transition-all bg-surface-container text-on-surface hover:bg-accent-teal hover:text-white cursor-pointer"
+                aria-label="Share"
+              >
+                <Waypoints />
+              </button>
+              <button
+                className="w-10 h-10 rounded-2xl flex items-center justify-center transition-all bg-surface-container text-on-surface hover:bg-accent-coral hover:text-white cursor-pointer"
+                aria-label="Email"
+              >
+                <Mail />
+              </button>
             </div>
           </div>
-        ))}
 
-        <div className="md:max-w-60 max-w-100">
-          <h2 className="text-xl font-semibold mb-3">STAY CONNECTED</h2>
-          <div className="flex flex-col gap-2 text-(--color-footer-text) focus:text-(--color-footer-text)">
-            <div>
-              BookKart is a free platform where you can buy second hand books at
-              very cheap prices. Buy used books online like college books,
-              school books, much more near you.
+          {/* Nav link columns */}
+          {footList.map(({ heading, items, hoverClass }, index) => (
+            <div key={index}>
+              <h4 className="font-black text-on-surface mb-6 text-lg">
+                {heading}
+              </h4>
+              <ul className="space-y-3">
+                {items.map(({ path, name }, i) => (
+                  <li key={i}>
+                    <Link
+                      href={path}
+                      className={`text-sm font-medium text-secondary transition-all ${hoverClass}`}
+                    >
+                      {name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
+          ))}
+        </div>
+
+        {/* ── Trust badges ── */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 border-y-2 border-dashed border-outline-variant py-12 mb-12">
+          {footFeatures.map(
+            ({ heading, icon, description, iconBgClass }, index) => (
+              <FooterCard
+                key={index}
+                heading={heading}
+                icon={icon}
+                description={description}
+                iconBgClass={iconBgClass}
+              />
+            )
+          )}
+        </div>
+
+        {/* ── Bottom bar ── */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 py-8">
+          <p className="text-sm font-medium italic text-secondary">
+            © {new Date().getFullYear()} BookKart. Helping stories find new
+            homes, one shelf at a time.
+          </p>
+          <div className="flex items-center gap-6 opacity-50 hover:opacity-100 transition-opacity">
+            <span className="text-xs font-bold tracking-widest uppercase text-on-surface-variant">
+              UPI · Cards · Net Banking
+            </span>
           </div>
         </div>
-      </div>
-
-      <div className="flex justify-center items-center flex-wrap md:gap-16 gap-4 flex-col md:flex-row md:mr-32 mt-8 w-full">
-          {
-            footFeatures.map(({heading,icon,description},index)=>(
-              <FooterCard heading={heading} icon={icon} description={description} key={index}/>
-            ))
-          }
       </div>
     </footer>
   );

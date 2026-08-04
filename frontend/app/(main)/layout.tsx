@@ -7,12 +7,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-        <div className="flex justify-center">
-          <div className="w-full max-w-325 bg-(--color-page-shell)">
-              <Header />
-              {children}
-              <Footer />
-          </div>
-        </div>
+    <div className="flex justify-center">
+      <div className="w-full max-w-325 bg-background">
+        <Header />
+        {children}
+        <Footer />
+      </div>
+    </div>
   );
 }

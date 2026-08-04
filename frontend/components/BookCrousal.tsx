@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent } from "./ui/card";
-import { Button } from "./ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Heart } from "lucide-react";
 import { useLazyGetLatestProductQuery } from "@/store/api";
 import Link from "next/link";
 
@@ -15,6 +13,25 @@ interface ILatestBooks {
   finalPrice: number;
   images: string[];
 }
+
+// Accent styles cycled per card
+const accentColors = [
+  {
+    labelText: "text-accent-teal",
+    hoverTitle: "group-hover:text-accent-teal",
+    btnHover: "hover:bg-accent-teal hover:text-white",
+  },
+  {
+    labelText: "text-accent-coral",
+    hoverTitle: "group-hover:text-accent-coral",
+    btnHover: "hover:bg-accent-coral hover:text-white",
+  },
+  {
+    labelText: "text-primary",
+    hoverTitle: "group-hover:text-primary",
+    btnHover: "hover:bg-primary hover:text-white",
+  },
+];
 
 export default function BookCarousel() {
   const [books, setBooks] = useState<ILatestBooks[]>([]);
@@ -43,6 +60,8 @@ export default function BookCarousel() {
     const handleResize = () => {
       if (window.innerWidth < 768) {
         setVisibleCards(1);
+      } else if (window.innerWidth < 1024) {
+        setVisibleCards(2);
       } else {
         setVisibleCards(3);
       }
@@ -53,14 +72,13 @@ export default function BookCarousel() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const maxIndex = books.length - visibleCards;
+  const maxIndex = Math.max(0, books.length - visibleCards);
 
   // Autoplay
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev >= maxIndex ? 0 : prev + 1));
     }, 3000);
-
     return () => clearInterval(timer);
   }, [maxIndex]);
 
@@ -79,109 +97,148 @@ export default function BookCarousel() {
     return 0;
   };
 
-  
-
-  return (
-    <div className="relative overflow-hidden w-full max-w-5xl mx-auto px-2">
-      {isLoading ? (
-        <div className="flex">
-          {Array.from({ length: visibleCards }).map((_, index) => (
-            <div
-              key={index}
-              className="px-2"
-              style={{ minWidth: `${100 / visibleCards}%` }}
-            >
-              <Card className="bg-(--color-card) shadow-md border border-(--color-header-border)">
-                <div className="aspect-video w-full bg-(--color-surface-soft) animate-pulse rounded"></div>
-                <CardContent>
-                  <div className="h-4 bg-(--color-surface-soft) animate-pulse rounded mb-2"></div>
-                  <div className="flex justify-between mt-2 mb-2">
-                    <div className="h-6 bg-(--color-surface-soft) animate-pulse rounded w-1/2"></div>
-                    <div className="h-4 bg-(--color-surface-soft) animate-pulse rounded w-1/4"></div>
-                  </div>
-                  <div className="h-4 bg-(--color-surface-soft) animate-pulse rounded w-1/3 mb-3"></div>
-                  <div className="h-10 bg-(--color-surface-soft) animate-pulse rounded"></div>
-                </CardContent>
-              </Card>
-            </div>
-          ))}
-        </div>
-      ) : books.length === 0 ? (
-        <div className="flex items-center justify-center h-40 text-(--color-text-muted) text-lg font-medium">
-          Product is yet to be added, book list is empty
-        </div>
-      ) : (
-        <>
+  // ── Skeleton ──
+  if (isLoading) {
+    return (
+      <div className="flex gap-6">
+        {Array.from({ length: visibleCards }).map((_, index) => (
           <div
-            className="flex transition-transform duration-500 ease-in-out"
+            key={index}
+            className=" rounded-[2rem] overflow-hidden border border-outline-variant bg-surface-container-lowest animate-pulse"
             style={{
-              transform: `translateX(-${currentSlide * (100 / visibleCards)}%)`,
+              width: `calc(${100 / visibleCards}% - 1rem)`,
             }}
           >
-            {books.map((book) => (
-              <div
-                key={book._id}
-                className="px-2"
-                style={{ minWidth: `${100 / visibleCards}%` }}
-              >
-                <Card className="bg-(--color-card) shadow-md border border-(--color-header-border)">
-                  <div className="h-40">
-                    <img
+            <div className="m-3 rounded-[1.5rem] aspect-4/5 bg-surface-container" />
+            <div className="p-5 space-y-3">
+              <div className="h-3 rounded-full w-1/3 bg-surface-container" />
+              <div className="h-5 rounded-full w-3/4 bg-surface-container" />
+              <div className="flex justify-between">
+                <div className="h-7 rounded-full w-1/2 bg-surface-container" />
+                <div className="h-6 rounded-full w-1/5 bg-surface-container" />
+              </div>
+              <div className="h-12 rounded-2xl w-full bg-surface-container" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // ── Empty state ──
+  if (books.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-40 text-lg font-medium text-on-surface-variant">
+        No books listed yet — check back soon!
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative overflow-hidden w-full">
+      {/* Carousel track */}
+      <div
+        className="flex transition-transform duration-500 ease-in-out"
+        style={{
+          transform: `translateX(-${currentSlide * (100 / visibleCards)}%)`,
+        }}
+      >
+        {books.map((book, index) => {
+          const accent = accentColors[index % accentColors.length];
+          const discount = calculateDiscount(book.price, book.finalPrice);
+
+          return (
+            <div
+              key={book._id}
+              className="px-3 "
+              style={{ minWidth: `${100 / visibleCards}%` }}
+            >
+              {/* Card */}
+              <div className="group rounded-[2rem] border border-outline-variant bg-surface-container-lowest overflow-hidden transition-all duration-500 cursor-pointer hover:shadow-2xl">
+                {/* Image area */}
+                <div className="relative aspect-4/5 overflow-hidden m-3 rounded-[1.5rem]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     src={book.images[0]}
                     alt={book.title}
-                    className="aspect-video w-full object-cover"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
+
+                  {/* Condition badge */}
+                  <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full text-[11px] font-extrabold uppercase shadow-sm bg-white/95 text-accent-teal">
+                    {book.condition}
                   </div>
 
-                  <CardContent>
-                    <div className="font-medium truncate text-base">
-                      {book.title}
-                    </div>
+                  {/* Wishlist heart (appears on hover) */}
+                  <button className="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center bg-white/95 text-on-surface hover:bg-accent-coral hover:text-white opacity-0 group-hover:opacity-100 transition-all transform group-hover:translate-y-0 translate-y-2 cursor-pointer">
+                    <Heart className="h-4 w-4" />
+                  </button>
+                </div>
 
-                    <div className="flex justify-between mt-2">
-                      <h3 className="text-lg font-semibold text-(--color-button-yellow)">
+                {/* Content */}
+                <div className="px-5 pb-5 pt-1">
+                  {/* Category */}
+                  <div
+                    className={`text-xs font-extrabold uppercase mb-2 tracking-widest ${accent.labelText}`}
+                  >
+                    Used Book
+                  </div>
+
+                  {/* Title */}
+                  <h3
+                    className={`font-bold text-lg mb-4 leading-snug text-on-surface transition-colors ${accent.hoverTitle}`}
+                  >
+                    {book.title}
+                  </h3>
+
+                  {/* Price row */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-2xl font-black text-on-surface">
                         ₹{book.finalPrice}
-                        <span className="line-through text-sm font-normal ml-2 text-(--color-text-muted)">
+                      </span>
+                      {book.price > book.finalPrice && (
+                        <span className="line-through text-sm text-on-surface-variant">
                           ₹{book.price}
                         </span>
-                      </h3>
-
-                      <span className="text-sm text-(--color-text-muted)">
-                        {book.condition}
+                      )}
+                    </div>
+                    {discount > 0 && (
+                      <span className="px-3 py-1 rounded-full font-bold text-xs bg-accent-coral-container text-accent-coral">
+                        {discount}% OFF
                       </span>
-                    </div>
+                    )}
+                  </div>
 
-                    <div className="mt-2 text-(--color-accent-yellow) font-medium text-sm">
-                      {calculateDiscount(book.price, book.finalPrice)}% Off
-                    </div>
-
-                    <Link href={`/books/${book._id}`}>
-                      <Button className="mt-3 w-full bg-(--color-button-yellow) hover:bg-(--color-button-yellow-hover)">
-                        Buy Now
-                      </Button>
-                    </Link>
-                  </CardContent>
-                </Card>
+                  {/* Buy button */}
+                  <Link href={`/books/${book._id}`}>
+                    <button
+                      className={`w-full py-3.5 rounded-2xl font-black text-sm transition-all active:scale-95 shadow-sm bg-surface-container-high text-on-surface-variant ${accent.btnHover} cursor-pointer`}
+                    >
+                      Bag this book
+                    </button>
+                  </Link>
+                </div>
               </div>
-            ))}
-          </div>
+            </div>
+          );
+        })}
+      </div>
 
-          {/* Navigation */}
-          <button
-            onClick={prevSlide}
-            className="absolute left-2 top-1/2 -translate-y-1/2 bg-(--color-card) rounded-full shadow p-2 border border-(--color-header-border)"
-          >
-            <ChevronLeft size={24} />
-          </button>
+      {/* ── Nav arrows ── */}
+      <button
+        onClick={prevSlide}
+        className="absolute left-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full border-2 border-outline-variant bg-white text-on-surface flex items-center justify-center transition-all shadow-sm hover:border-accent-teal hover:text-accent-teal z-10 cursor-pointer"
+      >
+        <ChevronLeft size={20} />
+      </button>
 
-          <button
-            onClick={nextSlide}
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-(--color-card) rounded-full shadow p-2 border border-(--color-header-border)"
-          >
-            <ChevronRight size={24} />
-          </button>
-        </>
-      )}
+      <button
+        onClick={nextSlide}
+        className="absolute right-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full border-2 border-outline-variant bg-white text-on-surface flex items-center justify-center transition-all shadow-sm hover:border-accent-teal hover:text-accent-teal z-10 cursor-pointer"
+      >
+        <ChevronRight size={20} />
+      </button>
     </div>
   );
 }

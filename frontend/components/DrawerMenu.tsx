@@ -17,9 +17,8 @@ export default function DrawerMenu({
   menuItem,
   user,
   setIsMenuOpen,
-  setIsDropDownMenuOpen
+  setIsDropDownMenuOpen,
 }: {
-
   isMenuOpen: boolean;
   menuItem: EachMenuItemType[];
   user: IUserState | null;
@@ -27,11 +26,17 @@ export default function DrawerMenu({
   setIsDropDownMenuOpen: (arg0: boolean) => void;
 }) {
   return (
-    <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen} >
+    <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
       <SheetTrigger>
-        <MenuIcon strokeWidth={3} className="size-6 cursor-pointer" />
+        <MenuIcon
+          strokeWidth={3}
+          className="size-6 cursor-pointer text-primary-fixed"
+        />
       </SheetTrigger>
-      <SheetContent side="left" className="overflow-y-auto z-2000">
+      <SheetContent
+        side="left"
+        className="overflow-y-auto z-[2000] bg-surface-container-lowest text-on-surface border-r-outline-variant/40"
+      >
         <SheetHeader>
           <SheetTitle>
             <Image
@@ -42,14 +47,21 @@ export default function DrawerMenu({
               className="w-auto"
             />
           </SheetTitle>
-          <hr />
-          <SheetDescription  onClick={()=>{setIsMenuOpen(false)}}>
-            <MenuItem
-              menuItem={menuItem}
-              user={user}
-              setIsMenuOpen={setIsMenuOpen}
-              setIsDropDownMenuOpen={setIsDropDownMenuOpen}
-            />
+          <hr className="border-outline-variant/30 my-2" />
+          <SheetDescription
+            asChild
+            onClick={() => {
+              setIsMenuOpen(false);
+            }}
+          >
+            <div className="text-on-surface">
+              <MenuItem
+                menuItem={menuItem}
+                user={user}
+                setIsMenuOpen={setIsMenuOpen}
+                setIsDropDownMenuOpen={setIsDropDownMenuOpen}
+              />
+            </div>
           </SheetDescription>
         </SheetHeader>
       </SheetContent>

@@ -1,33 +1,34 @@
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-
+// Trust badge card used in the Footer
 export default function FooterCard({
   heading,
   icon,
   description,
+  iconBgClass = "bg-surface-container text-on-surface",
 }: {
   heading: string;
   icon: React.ReactNode;
   description: string;
+  iconBgClass?: string;
+  // Kept for backward compatibility if passed:
+  iconBg?: string;
+  iconColor?: string;
 }) {
   return (
-    <Card className="shadow-md border border-(--color-header-border) w-full md:max-w-80 min-h-36 bg-(--color-footer-card-bg)">
-      <CardHeader className="flex items-center gap-4 text-white">
+    <div className="flex items-center gap-4">
+      {/* Icon container */}
+      <div
+        className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${iconBgClass}`}
+      >
         {icon}
-        <div>
-            <CardTitle className="text-lg">{heading}</CardTitle>
-        <CardDescription className="text-md font-normal text-(--color-footer-text)">
+      </div>
+
+      {/* Text */}
+      <div>
+        <h5 className="font-black text-base text-on-surface">{heading}</h5>
+        <p className="text-xs font-bold uppercase tracking-tight text-on-surface-variant">
           {description}
-        </CardDescription>
-        </div>
-      </CardHeader>
-    </Card>
+        </p>
+      </div>
+    </div>
   );
 }

@@ -1,66 +1,121 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import { Book, BookOpen, ShoppingBagIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
+import { BadgeCheck, BookOpenCheck, Rocket, Tag } from "lucide-react";
 
 export default function Hero() {
   const heroImages = ["Hero1.jpg", "Hero2.jpg", "Hero3.jpg"];
-
   const [currentImage, setCurrentImage] = useState<number>(0);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentImage((prev) => {
-        if(prev===2)
-            return 0;
-        return prev+1
+        if (prev === 2) return 0;
+        return prev + 1;
       });
-        return () => clearInterval(timer);
+      return () => clearInterval(timer);
     }, 4000);
   }, []);
 
-  // console.log(currentImage);
-
   return (
-    <section className="flex relative items-center justify-center flex-col  min-h-120">
-      <h1 className="md:text-[56px] sm:text-[40px] text-[28px] z-20 text-white font-semibold sm:leading-15 md:leading-12 leading-10 text-center mb-4">
-        Buy and Sell Old Books
-        <br /> Online in India
-      </h1>
-      <div className="flex sm:flex-row gap-6 flex-col sm:gap-8  z-20 text-[4px] md:text-normal">
-        <Button className="w-auto px-28   max-w-44 rounded-2xl h-auto flex items-center gap-x-4 bg-(--color-button-yellow) hover:bg-(--color-button-yellow-hover)">
-          <div className="md:p-2 p-1 bg-(--color-surface-muted) rounded-lg">
-            <ShoppingBagIcon />
-          </div>
-          <Link href="/books" className="flex flex-col">
-            <span  className="font-normal">Start Shopping</span>
-            <span className="font-semibold">Buy Used Books</span>
-          </Link >
-        </Button>
-        <Button className="w-auto px-28  max-w-44 rounded-2xl h-auto flex items-center gap-x-4 bg-(--color-accent-yellow) hover:bg-(--color-button-yellow-hover)">
-          <div className="md:p-2 p-1 bg-(--color-surface-muted) rounded-lg">
-            <BookOpen />
-          </div>
-          <Link href="/book-sell" className="flex flex-col">
-            <span className="font-normal">Start Selling</span>
-            <span className="font-semibold">Sell Old Books</span>
+    <section className="max-w-7xl mx-auto px-8 py-12 grid lg:grid-cols-2 gap-12 items-center min-h-110">
+      {/* ── Left: text content ── */}
+      <div className="space-y-6">
+        {/* Badge */}
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-accent-teal-container text-accent-teal">
+          <BookOpenCheck />
+          Keep stories moving
+        </div>
+
+        {/* Headline */}
+        <h1 className="text-5xl md:text-6xl lg:text-5xl font-black leading-[1.1] text-on-surface">
+          Find a New{" "}
+          <br />
+          <span className="inline-block border-b-8 text-primary-container border-primary-container/30">
+            Home
+          </span>{" "}
+          for your Books.
+        </h1>
+
+        {/* Subheading */}
+        <p className="text-lg max-w-lg leading-relaxed text-on-surface-variant">
+          Join India&apos;s friendliest community of book lovers! Whether
+          you&apos;re hunting for a hidden gem or clearing your shelves, we make
+          it fun and easy.
+        </p>
+
+        {/* CTA Buttons */}
+        <div className="flex flex-wrap gap-4 pt-2">
+          <Link href="/books">
+            <button className="px-10 py-4 rounded-full font-bold flex items-center gap-2 shadow-xl shadow-primary-container/30 bg-primary-container text-on-primary-container transition-all hover:scale-[1.05] active:scale-95 cursor-pointer">
+              <Rocket />
+              Let&apos;s Browse
+            </button>
           </Link>
-        </Button>
+          <Link href="/book-sell">
+            <button className="px-10 py-4 rounded-full font-bold flex items-center gap-2 bg-surface-container-highest text-on-surface hover:bg-surface-variant transition-all hover:shadow-md cursor-pointer">
+              <Tag />
+              I&apos;m Selling!
+            </button>
+          </Link>
+        </div>
+
+        {/* Stats */}
+        <div className="flex items-center gap-10 pt-6 border-t border-outline-variant">
+          <div className="text-center">
+            <div className="text-3xl font-black text-on-surface">50k+</div>
+            <div className="text-sm font-medium text-on-surface-variant">
+              Readers
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl font-black text-on-surface">12k+</div>
+            <div className="text-sm font-medium text-on-surface-variant">
+              Stories Sold
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl font-black text-accent-coral">4.8/5</div>
+            <div className="text-sm font-medium text-on-surface-variant">
+              Happy Faces
+            </div>
+          </div>
+        </div>
       </div>
-      <div className="absolute inset-0 w-full h-auto bg-black/50">
-        {heroImages.map((image,index)=>(
-          <Image
-          src={`/Image/${image}`}
-          fill
-          alt="Hero Image"
-          key={index} 
-          priority={index===0}
-          className={`w=full object-cover ${index===currentImage ?"opacity-100":"opacity-0"} transition-opacity duration-1000 ease-in-out`}
-          />
-        ))}
-        <div className="absolute inset-0 bg-black/60 z-10"></div>
+
+      {/* ── Right: hero image with blobs ── */}
+      <div className="relative hidden lg:block">
+        {/* Blob decorations */}
+        <div className="absolute -inset-6 blob-shape -rotate-6 opacity-60 bg-accent-teal/10" />
+        <div className="absolute -inset-4 blob-shape rotate-3 opacity-60 bg-primary-container/10" />
+
+        {/* Rotating hero images */}
+        <div className="relative z-10 w-full h-120 rounded-[3rem] overflow-hidden shadow-2xl">
+          {heroImages.map((image, index) => (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              key={index}
+              src={`/Image/${image}`}
+              alt="Hero Image"
+              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${
+                index === currentImage ? "opacity-100" : "opacity-0"
+              }`}
+            />
+          ))}
+        </div>
+
+        {/* Floating badge */}
+        <div className="absolute bottom-12 -left-12 z-20 p-4 rounded-2xl shadow-2xl flex items-center gap-4 border-l-4 border-l-accent-teal bg-white animate-bounce">
+          <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 bg-accent-teal-container text-accent-teal">
+            <BadgeCheck />
+          </div>
+          <div>
+            <p className="font-bold text-on-surface">Trusted Quality</p>
+            <p className="text-xs text-on-surface-variant">
+              Verified by Readers
+            </p>
+          </div>
+        </div>
       </div>
     </section>
   );

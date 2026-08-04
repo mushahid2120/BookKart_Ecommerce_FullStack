@@ -1,9 +1,10 @@
+"use client";
 import BlogCard from "@/components/BlogCard";
 import BookCrousal from "@/components/BookCrousal";
 import Hero from "@/components/Hero";
 import StepCard from "@/components/StepCard";
-import { Button } from "@/components/ui/button";
 import {
+  ArrowRight,
   BookOpen,
   Camera,
   CreditCard,
@@ -20,47 +21,48 @@ export default function Home() {
   const sellSteps = [
     {
       step: "Step 1",
-      title: "Post an ad for selling used books",
+      title: "Snap some cool pics",
       description:
-        "Post an ad on BookKart describing your book details to sell your old books online.",
-      icon: <Camera className="h-8 w-8 text-primary" />,
+        "Grab your phone, take a few shots, and tell us why this book is great.",
+      icon: <Camera className="h-6 w-6 text-accent-teal" />,
     },
     {
       step: "Step 2",
-      title: "Set the selling price for your books",
+      title: "Pick your price",
       description:
-        "Set the price for your books at which you want to sell them.",
-      icon: <Tag className="h-8 w-8 text-primary" />,
+        "You're the boss! Set a price that makes both you and the next reader happy.",
+      icon: <Tag className="h-6 w-6 text-accent-teal" />,
     },
     {
       step: "Step 3",
-      title: "Get paid into your UPI/Bank account",
+      title: "Get paid fast!",
       description:
-        "You will get money into your account once you receive an order for your book.",
-      icon: <Wallet className="h-8 w-8 text-primary" />,
+        "No waiting games. Once the book reaches its new home, the cash is yours.",
+      icon: <Wallet className="h-6 w-6 text-accent-teal" />,
     },
   ];
 
   const buySteps = [
     {
       step: "Step 1",
-      title: "Select the used books you want",
+      title: "Discover hidden gems",
       description:
-        "Search from over thousands of used books listed on BookKart.",
-      icon: <Search className="h-8 w-8 text-primary" />,
+        "Thousands of stories waiting for you at up to 70% off the original price.",
+      icon: <Search className="h-6 w-6 text-on-primary-container" />,
     },
     {
       step: "Step 2",
-      title: "Place the order by making payment",
+      title: "Safe & sound payments",
       description:
-        "Then simply place the order by clicking on the 'Buy Now' button.",
-      icon: <CreditCard className="h-8 w-8 text-primary" />,
+        "Pay with UPI, Cards, or whatever you like. We keep your money safe until the book arrives.",
+      icon: <CreditCard className="h-6 w-6 text-on-primary-container" />,
     },
     {
       step: "Step 3",
-      title: "Get the books delivered at your doorstep",
-      description: "The books will be delivered to you at your doorstep!",
-      icon: <Truck className="h-8 w-8 text-primary" />,
+      title: "Doorstep high-fives",
+      description:
+        "Sit tight! We handle the delivery so you can start clearing space on your nightstand.",
+      icon: <Truck className="h-6 w-6 text-on-primary-container" />,
     },
   ];
 
@@ -68,111 +70,194 @@ export default function Home() {
     {
       imageSrc:
         "https://images.unsplash.com/photo-1604866830893-c13cafa515d5?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8b25saW5lJTIwc2VsbCUyMGJvb2tzfGVufDB8fDB8fHww",
-      title: "Where and how to sell old books online?",
+      title: "How to get the most for your old books?",
       description:
-        "Get started with selling your used books online and earn money from your old books.",
-      icon: <BookOpen className="w-12 h-6 text-primary" />,
+        "Tips and tricks from our top sellers on making your listings stand out and sell faster!",
+      icon: <BookOpen className="w-5 h-5" />,
     },
     {
       imageSrc:
         "https://img.freepik.com/premium-photo/little-girl-is-laying-floor-reading-book_1041545-4497.jpg?w=1060",
-      title: "What to do with old books?",
+      title: "The magic of pre-loved books 🌍",
       description:
-        "Learn about different ways to make use of your old books and get value from them.",
-      icon: <Library className="w-12 text-primary" />,
+        "Discover how your choice to buy second-hand is helping the planet, one page at a time.",
+      icon: <Library className="w-5 h-5" />,
     },
     {
       imageSrc:
         "https://images.unsplash.com/photo-1492539438225-2666b2a98f93?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fG9sZCUyMCUyMGJvb2tzfGVufDB8fDB8fHww",
-      title: "What is BookKart?",
+      title: "Meet the readers of BookKart",
       description:
-        "Discover how BookKart helps you buy and sell used books online easily.",
-      icon: <Store className="w-12 text-primary" />,
+        "Fun stories from our community members about their rarest finds and best book memories.",
+      icon: <Store className="w-5 h-5" />,
     },
   ];
 
   return (
-    <main>
+    <main className="bg-background">
+      {/* ── Hero ── */}
       <Hero />
-      <section className="md:px-12 sm:px-10 px-6 bg-(--color-page-bg) py-16">
-        <h1 className="pt-10 mb-8 text-xl md:text-3xl sm:text-2xl text-center font-semibold">
-          Newly Added Books
-        </h1>
 
-        <BookCrousal />
+      {/* ── Fresh Arrivals ── */}
+      <section className="py-12 overflow-hidden bg-surface-container-low">
+        <div className="max-w-7xl mx-auto px-8">
+          {/* Section header */}
+          <div className="flex items-end justify-between mb-10">
+            <div>
+              <h2 className="text-4xl font-bold mb-2 text-on-surface">
+                Fresh Arrivals ✨
+              </h2>
+              <p className="text-lg text-on-surface-variant">
+                Check out what the community just listed!
+              </p>
+            </div>
+          </div>
 
-        <Link href="/books" className="flex items-center justify-center my-8">
-          <Button
-            className="bg-(--color-button-yellow) hover:bg-(--color-button-yellow-hover) text-white text-lg font-normal h-12 shadow-lg transition-all duration-200"
-            size="lg"
-          >
-            Explore All Books
-          </Button>
-        </Link>
+          <BookCrousal />
 
-        <div className=" font-semibold text-center lg:mt-24 md:mt-16 mt-12 lg:mb-16 mb-12">
-          <h1 className="text-3xl">
-            How to SELL your old books online on BookKart?
-          </h1>
-          <p className="font-normal text-(--color-text-muted) mt-4">
-            Earning money by selling your old books is just 3 steps away from
-            you
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-3 grid-row-3 lg:gap-8 sm:px-10 md:px-0 gap-4">
-          {sellSteps.map(({ step, title, description, icon }, index) => (
-            <StepCard
-              key={index}
-              step={step}
-              title={title}
-              description={description}
-              icon={icon}
-              cardbg="bg-(--color-card)"
-              stepbg="bg-(--color-accent-yellow)"
-            />
-          ))}
-        </div>
-
-        <div className=" font-semibold text-center lg:mt-24 md:mt-16 mt-12 lg:mb-16 mb-12">
-          <h1 className="text-3xl">
-            How to BUY second hand books online on BookKart?
-          </h1>
-          <p className="font-normal text-(--color-text-muted) mt-4">
-            Saving some good amount of money by buying used books is just 3
-            steps away from you you
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-3 grid-row-3 lg:gap-8 gap-4">
-          {buySteps.map(({ step, title, description, icon }, index) => (
-            <StepCard
-              key={index}
-              step={step}
-              title={title}
-              description={description}
-              icon={icon}
-              cardbg="bg-(--color-accent-yellow)"
-              stepbg="bg-(--color-card)"
-            />
-          ))}
+          <div className="mt-10 text-center">
+            <Link href="/books">
+              <button className="border-2 border-primary-container px-10 py-4 rounded-full font-black flex items-center gap-3 mx-auto transition-all group shadow-sm bg-white text-primary hover:bg-primary-container hover:text-on-primary-container cursor-pointer">
+                Explore all books
+                <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+              </button>
+            </Link>
+          </div>
         </div>
       </section>
 
-      <section className="md:px-12 sm:px-10 px-6 pb-20 pt-8 mt-12 bg-(--color-surface-soft)">
-        <h1 className="pb-12 text-3xl font-semibold text-center">
-          Read from our Blog
-        </h1>
-        <div className="grid md:grid-cols-3 grid-cols-1 gap-8 max-w-6xl mx-auto">
-          {blogPosts.map(({ imageSrc, icon, title, description }, index) => (
-            <BlogCard
-              key={index}
-              imageSrc={imageSrc}
-              icon={icon}
-              title={title}
-              description={description}
-            />
-          ))}
+      {/* ── How It Works ── */}
+      <section className="py-12 relative overflow-hidden">
+        {/* Blob decorations */}
+        <div className="absolute top-0 right-0 w-64 h-64 blob-shape -translate-y-1/2 translate-x-1/2 pointer-events-none bg-accent-coral/5" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 blob-shape translate-y-1/2 -translate-x-1/2 pointer-events-none bg-accent-teal/5" />
+
+        <div className="max-w-7xl mx-auto px-8 relative z-10">
+          {/* Section heading */}
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold mb-4 text-on-surface">
+              How it works? It&apos;s easy-peasy! 🥳
+            </h2>
+            <p className="text-lg max-w-2xl mx-auto font-medium text-on-surface-variant">
+              We&apos;ve built a friendly neighborhood for books where everyone
+              wins. No complicated stuff, just love for reading.
+            </p>
+          </div>
+
+          {/* Two panel cards */}
+          <div className="grid lg:grid-cols-2 gap-12">
+            {/* ── Give & Earn (sell) ── */}
+            <div className="rounded-[3rem] p-10 relative overflow-hidden border border-white bg-surface-container">
+              {/* Card header */}
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-16 h-16 rounded-3xl flex items-center justify-center shadow-xl -rotate-6 bg-white text-accent-teal">
+                  <Library className="h-8 w-8" />
+                </div>
+                <div>
+                  <h3 className="text-3xl font-black text-on-surface">
+                    Give &amp; Earn
+                  </h3>
+                  <p className="font-bold text-sm text-accent-teal">
+                    Empty your shelves
+                  </p>
+                </div>
+              </div>
+
+              {/* Steps */}
+              <div className="space-y-2">
+                {sellSteps.map(({ step, title, description, icon }, i) => (
+                  <StepCard
+                    key={i}
+                    step={step}
+                    title={title}
+                    description={description}
+                    icon={icon}
+                    cardbg="bg-surface-container"
+                    stepbg="bg-teal"
+                  />
+                ))}
+              </div>
+
+              {/* CTA */}
+              <Link href="/book-sell">
+                <button className="w-full mt-8 py-5 rounded-3xl font-black transition-all shadow-lg hover:-translate-y-1 bg-white text-on-surface hover:bg-accent-teal hover:text-white cursor-pointer">
+                  I want to Sell Books!
+                </button>
+              </Link>
+            </div>
+
+            {/* ── Hunt & Read (buy) ── */}
+            <div className="rounded-[3rem] p-10 relative overflow-hidden bg-primary-container">
+              {/* Glow blob */}
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/20 rounded-full blur-2xl pointer-events-none" />
+
+              {/* Card header */}
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-16 h-16 rounded-3xl flex items-center justify-center shadow-xl rotate-6 bg-on-primary-container text-primary-container">
+                  <BookOpen className="h-8 w-8" />
+                </div>
+                <div>
+                  <h3 className="text-3xl font-black text-on-primary-container">
+                    Hunt &amp; Read
+                  </h3>
+                  <p className="font-bold text-sm text-on-primary-container/70">
+                    Find your next obsession
+                  </p>
+                </div>
+              </div>
+
+              {/* Steps */}
+              <div className="space-y-2">
+                {buySteps.map(({ step, title, description, icon }, i) => (
+                  <StepCard
+                    key={i}
+                    step={step}
+                    title={title}
+                    description={description}
+                    icon={icon}
+                    cardbg="bg-accent-yellow"
+                    stepbg="bg-card"
+                  />
+                ))}
+              </div>
+
+              {/* CTA */}
+              <Link href="/books">
+                <button className="w-full mt-8 py-5 rounded-3xl font-black transition-all shadow-lg hover:-translate-y-1 bg-on-primary-container text-white hover:bg-white hover:text-on-primary-container cursor-pointer">
+                  Take me to the Shop!
+                </button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Community Stories ── */}
+      <section className="py-12 bg-surface-container-low">
+        <div className="max-w-7xl mx-auto px-8">
+          <div className="flex items-center justify-between mb-10">
+            <h2 className="text-3xl font-bold text-on-surface">
+              Community Stories ✍️
+            </h2>
+            <Link
+              href="/"
+              className="px-6 py-2 rounded-full border-2 border-outline-variant font-bold text-sm transition-all bg-white text-on-surface hover:border-accent-coral hover:text-accent-coral"
+            >
+              See everything
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {blogPosts.map(({ imageSrc, icon, title, description }, index) => (
+              <BlogCard
+                key={index}
+                imageSrc={imageSrc}
+                icon={icon}
+                title={title}
+                description={description}
+              />
+            ))}
+          </div>
         </div>
       </section>
     </main>

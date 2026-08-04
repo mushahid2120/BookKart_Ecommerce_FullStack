@@ -1,14 +1,33 @@
-import {
-  Card,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import Image from "next/image";
-import { Button } from "./ui/button";
+"use client";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+
+// Accent themes cycled per card (teal / coral / primary)
+const cardAccents = [
+  {
+    hoverBorder: "hover:border-accent-teal",
+    badgeBg: "bg-accent-teal",
+    label: "Seller Guide",
+    textColor: "text-accent-teal",
+    groupHoverText: "group-hover:text-accent-teal",
+  },
+  {
+    hoverBorder: "hover:border-accent-coral",
+    badgeBg: "bg-accent-coral",
+    label: "Sustainability",
+    textColor: "text-accent-coral",
+    groupHoverText: "group-hover:text-accent-coral",
+  },
+  {
+    hoverBorder: "hover:border-primary",
+    badgeBg: "bg-primary",
+    label: "Community",
+    textColor: "text-primary",
+    groupHoverText: "group-hover:text-primary",
+  },
+];
+
+let cardIndex = 0;
 
 export default function BlogCard({
   imageSrc,
@@ -21,28 +40,46 @@ export default function BlogCard({
   description: string;
   icon: React.ReactNode;
 }) {
+  const accent = cardAccents[cardIndex % cardAccents.length];
+  cardIndex++;
+
   return (
-    <Card className="relative mx-auto w-full max-w-sm md:max-h-100 lg:max-h-200 pt-0 overflow-hidden bg-(--color-card) shadow-md border border-(--color-header-border)">
-      <div className="absolute inset-0 z-30 aspect-video" />
-      <img
-        src={imageSrc}
-        alt="blog"
-        className="relative z-20 aspect-video w-full object-cover"
-      />
-      <CardHeader className="md:h-40">
-        <CardTitle className="lg:text-lg text-base flex lg:gap-4 gap-4 md:gap-2 justify-center items-center font-medium text-(--color-header-text)">
-          {icon}
-          <div>{title}</div>
-        </CardTitle>
-        <CardDescription className="lg:text-base text-sm font-normal text-(--color-text-muted)">
+    <div
+      className={`group rounded-[2.5rem] overflow-hidden border border-outline-variant bg-surface-container-lowest transition-all duration-500 cursor-pointer hover:shadow-2xl ${accent.hoverBorder}`}
+    >
+      {/* Image */}
+      <div className="relative h-56 overflow-hidden m-3 rounded-[2rem]">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={imageSrc}
+          alt={title}
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+        />
+        {/* Category badge */}
+        <div
+          className={`absolute bottom-4 left-4 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest text-white shadow-lg ${accent.badgeBg}`}
+        >
+          {accent.label}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="p-6 pt-2">
+        <h3
+          className={`font-black text-xl leading-tight mb-3 text-on-surface transition-colors ${accent.groupHoverText}`}
+        >
+          {title}
+        </h3>
+        <p className="text-sm mb-5 line-clamp-2 leading-relaxed text-on-surface-variant">
           {description}
-        </CardDescription>
-      </CardHeader>
-      <CardFooter className="flex items-center justify-center">
-        <Link href="/">
-          <Button variant="link">Read More <ArrowRight /></Button>
+        </p>
+        <Link
+          href="/"
+          className={`inline-flex items-center gap-2 font-black text-sm transition-all group-hover:gap-4 ${accent.textColor}`}
+        >
+          Keep Reading <ArrowRight className="h-4 w-4" />
         </Link>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 }

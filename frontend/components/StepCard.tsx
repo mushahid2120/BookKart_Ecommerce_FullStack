@@ -1,31 +1,57 @@
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-
 export default function StepCard({
-  step,title,description,icon,stepbg,cardbg
+  step,
+  title,
+  description,
+  icon,
+  stepbg,
+  cardbg,
 }: {
   step: string;
   title: string;
   description: string;
   icon: React.ReactNode;
-  stepbg:string;
-  cardbg:string
+  stepbg: string;
+  cardbg: string;
 }) {
+  const isBuyCard =
+    cardbg.includes("accent-yellow") ||
+    cardbg.includes("primary-container") ||
+    cardbg.includes("color-accent");
+
   return (
-    <Card className={`shadow-md border border-(--color-header-border) text-center relative ${cardbg}`}>
-        <div className={`md:text-base text-base absolute top-4 left-4 md:px-3 px-4 p1-2 py-1 rounded-2xl font-normal ${stepbg}`}>{step}</div>
-      <div className="min-h-24 md:min-h-16 flex items-center justify-center">{icon}</div>
-      <CardHeader>
-        <CardTitle className="md:text-lg md:leading-6 lg:leading-normal text-base text-(--color-header-text)">{title}</CardTitle>
-        <CardDescription className="md:text-base md:leading-4 lg:leading-normal text-sm font-normal text-(--color-text-muted)">{description}</CardDescription>
-      </CardHeader>
-    </Card>
+    <div className="flex gap-5 items-start p-2 rounded-2xl">
+      {/* Step number circle */}
+      <div
+        className={`w-10 h-10 rounded-2xl flex items-center justify-center font-black text-base shrink-0 ${
+          isBuyCard
+            ? "bg-on-primary-container text-primary-container"
+            : "bg-accent-teal/10 text-accent-teal"
+        }`}
+      >
+        {step.replace("Step ", "")}
+      </div>
+
+      {/* Content */}
+      <div className="flex-1">
+        {/* Icon + title row */}
+        <div className="flex items-center gap-3 mb-1">
+          <span className="opacity-80">{icon}</span>
+          <h4
+            className={`font-black text-base leading-snug ${
+              isBuyCard ? "text-on-primary-container" : "text-on-surface"
+            }`}
+          >
+            {title}
+          </h4>
+        </div>
+        <p
+          className={`text-sm leading-relaxed ${
+            isBuyCard ? "text-on-primary-container/80" : "text-on-surface-variant"
+          }`}
+        >
+          {description}
+        </p>
+      </div>
+    </div>
   );
 }

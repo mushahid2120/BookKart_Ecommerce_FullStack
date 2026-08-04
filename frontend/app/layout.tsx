@@ -1,13 +1,12 @@
-import { Roboto_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import LayoutWrapper from "@/components/LayoutWrapper";
 
-
-const roboto = Roboto_Mono({
+const inter = Inter({
   subsets: ["latin"],
-  display: "swap"
+  display: "swap",
+  weight: ["400", "500", "600", "700", "900"],
 });
-
 
 export default function RootLayout({
   children,
@@ -16,14 +15,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={roboto.className}
-      >
+      <body className={`${inter.className} bg-background text-on-surface`}>
         <div className="flex justify-center">
-          <div className="w-full max-w-325 bg-(--color-page-shell)">
-            <LayoutWrapper>
-              {children}
-            </LayoutWrapper>
+          <div className="w-full max-w-325 bg-background">
+            <LayoutWrapper>{children}</LayoutWrapper>
           </div>
         </div>
       </body>

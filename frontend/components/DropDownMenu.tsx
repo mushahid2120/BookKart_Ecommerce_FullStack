@@ -5,9 +5,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import MenuItem from "./MenuItem";
-import { EachMenuItemType} from "./Header";
+import { EachMenuItemType } from "./Header";
 import { IUserState } from "@/store/slice/userSlice";
-import { useDispatch } from "react-redux";
 
 export default function DropDownMenu({
   open,
@@ -16,21 +15,20 @@ export default function DropDownMenu({
   menuItem,
   user,
   setIsMenuOpen,
-  setIsDropDownMenuOpen
+  setIsDropDownMenuOpen,
 }: {
   open: boolean;
-  onOpenChange: (arg0:boolean) => void;
+  onOpenChange: (arg0: boolean) => void;
   children: React.ReactNode;
   menuItem: EachMenuItemType[];
   user: IUserState | null;
   setIsMenuOpen: (arg0: boolean) => void;
-  setIsDropDownMenuOpen:(arg0: boolean) => void;
+  setIsDropDownMenuOpen: (arg0: boolean) => void;
 }) {
-  const dispatch=useDispatch();
   return (
-    <DropdownMenu open={open} onOpenChange={onOpenChange} >
+    <DropdownMenu open={open} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
-      <DropdownMenuContent className="z-2000">
+      <DropdownMenuContent className="z-[2000] border-outline-variant/40 bg-surface-container-lowest text-on-surface p-2 rounded-2xl shadow-xl min-w-64">
         <DropdownMenuGroup>
           <MenuItem
             menuItem={menuItem}
