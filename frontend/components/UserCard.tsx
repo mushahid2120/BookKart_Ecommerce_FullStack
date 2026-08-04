@@ -5,23 +5,31 @@ import { User } from "lucide-react";
 import { IUserState } from "@/store/slice/userSlice";
 
 export default function UserCard({ user }: { user: IUserState | null }) {
+  const getInitials = (name: string) => {
+    if (!name) return "U";
+    return name
+      .split(" ")
+      .filter(Boolean)
+      .map((part) => part[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   return (
     <Button
       variant="ghost"
-      className="w-full h-auto hover:bg-surface-container-high text-on-surface px-3 py-4 font-normal rounded-xl transition-colors cursor-pointer"
+      className="w-full h-auto hover:bg-surface-container-high/60 text-on-surface px-3 py-3.5 font-normal rounded-2xl transition-all cursor-pointer border border-transparent hover:border-outline-variant/30"
     >
-      <div className="flex items-center gap-4 text-base w-full">
-        <div className="overflow-hidden">
-          <Avatar className="h-10 w-10 border border-outline-variant/30">
+      <div className="flex items-center gap-3.5 text-base w-full">
+        <div className="relative shrink-0">
+          <Avatar className="h-11 w-11 border-2 border-primary-fixed ring-2 ring-primary/10 shadow-xs">
             {user ? (
               user?.profilePic ? (
                 <AvatarImage src={user.profilePic} alt={user.name} />
               ) : (
-                <AvatarFallback className="bg-primary-container text-on-primary-container font-bold">
-                  {user.name
-                    .split(" ")
-                    .map((name: string) => name[0])
-                    .join("")}
+                <AvatarFallback className="bg-primary-container text-on-primary-container font-bold text-sm">
+                  {getInitials(user.name)}
                 </AvatarFallback>
               )
             ) : (
@@ -30,13 +38,16 @@ export default function UserCard({ user }: { user: IUserState | null }) {
               </AvatarFallback>
             )}
           </Avatar>
+          {user && (
+            <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-tertiary ring-2 ring-white" />
+          )}
         </div>
         {user && (
-          <div className="flex flex-col items-start text-left">
-            <h3 className="text-base font-bold text-on-surface leading-snug">
+          <div className="flex flex-col items-start text-left min-w-0 flex-1">
+            <h3 className="text-sm font-bold text-on-surface leading-tight truncate w-full">
               {user.name}
             </h3>
-            <p className="text-xs font-medium text-on-surface-variant truncate max-w-[170px]">
+            <p className="text-xs text-on-surface-variant truncate w-full mt-0.5">
               {user.email}
             </p>
           </div>
@@ -45,3 +56,4 @@ export default function UserCard({ user }: { user: IUserState | null }) {
     </Button>
   );
 }
+

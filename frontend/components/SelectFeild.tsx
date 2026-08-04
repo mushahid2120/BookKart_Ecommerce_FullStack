@@ -31,14 +31,14 @@ export default function SelectFeild({
           onValueChange={field.onChange || ""} // Updates React Hook Form state
           value={field.value ?? ""}
         >
-          <SelectTrigger className="w-full md:max-w-140 sm:max-w-110 max-w-100 font-normal text-sm truncate">
+          <SelectTrigger className="w-full h-12 px-4 rounded-xl border border-outline-variant bg-surface text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary font-normal text-sm truncate">
             <SelectValue placeholder={placeholder} />
           </SelectTrigger>
-          <SelectContent className="overflow-hidden max-w-140">
+          <SelectContent className="overflow-hidden border border-outline-variant bg-surface-container-lowest rounded-xl shadow-md">
             <SelectGroup>
-              <SelectLabel>{placeholder}</SelectLabel>
+              <SelectLabel className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 py-2">{placeholder}</SelectLabel>
               {selectItems.map((item, i) => (
-                <SelectItem value={item} key={i}>
+                <SelectItem value={item} key={i} className="cursor-pointer hover:bg-surface-container-low text-on-surface text-sm focus:bg-surface-container-low">
                   {item}
                 </SelectItem>
               ))}

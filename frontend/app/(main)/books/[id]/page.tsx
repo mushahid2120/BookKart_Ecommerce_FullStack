@@ -1,11 +1,5 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
 import { monthDiff } from "@/lib/bookUploadTime";
 import { IProduct } from "@/lib/types/product";
 import {
@@ -26,9 +20,9 @@ import {
   Heart,
   Loader,
   MapPin,
-  MessageCircle,
-  Share,
+  Megaphone,
   ShoppingCart,
+  Truck,
   User,
 } from "lucide-react";
 import Image from "next/image";
@@ -37,48 +31,29 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 
-const book = {
-  _id: "1",
-  images: [
-    "https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=400&q=80",
-    "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?auto=format&fit=crop&w=400&q=80",
-  ],
-  title: "The Alchemist",
-  category: "Reading Books (Novels)",
-  condition: "Excellent",
-  classType: "B.Com",
-  subject: "Fiction",
-  price: 300,
-  author: "Paulo Coelho",
-  edition: "25th Anniversary Edition",
-  description: "A philosophical novel about destiny and dreams.",
-  finalPrice: 250,
-  shippingCharge: 40,
-  paymentMode: "UPI",
-  paymentDetails: { upiId: "book1@upi" },
-  createdAt: new Date("2024-01-01"),
-  seller: { name: "Seller 1", contact: "9000000001" },
-};
-
 const howWork = [
   {
     step: "Step 1",
     title: "Seller posts an Ad",
     description: "Seller posts an ad on book kart to sell their used books.",
-    image: "/Image/step1.png",
+    icon: <Megaphone className="w-10 h-10 text-[#725c00]/80" />,
   },
   {
     step: "Step 2",
     title: "Buyer Pays Online",
-    description:
-      "Buyer makes an online payment to book kart to buy those books.",
-    image: "/Image/step2.png",
+    description: "Buyer makes an online payment to book kart to buy those books.",
+    icon: (
+      <svg className="w-10 h-10 text-[#725c00]/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <rect x="2" y="5" width="20" height="14" rx="2" />
+        <path d="M2 10h20" />
+      </svg>
+    ),
   },
   {
     step: "Step 3",
     title: "Seller ships the books",
     description: "Seller then ships the books to the buyer",
-    image: "/Image/step3.png",
+    icon: <Truck className="w-10 h-10 text-[#725c00]/80" />,
   },
 ];
 
@@ -230,47 +205,41 @@ export default function page() {
     }
   };
 
-  // Loading State - Show Shimmer
+  // ── Loading State ──────────────────────────────────────────────────────────
   if (isPageLoading) {
     return (
-      <main className="md:px-20 sm:px-10 px-6 py-8 bg-(--color-surface-soft)">
-        <section className="flex lg:flex-row flex-col items-start gap-12">
-          <div className="w-full">
-            <Card className="lg:max-w-125 lg:min-h-100 flex justify-center rounded-md">
-              <div className="aspect-video w-full bg-(--color-surface-soft) animate-pulse"></div>
-            </Card>
-            <div className="flex gap-2 mt-2">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="w-15 h-15 bg-(--color-surface-soft) animate-pulse rounded-md"
-                ></div>
+      <main className="flex-grow pt-6 pb-12 px-4 md:px-8 max-w-[1280px] mx-auto w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* Image skeleton */}
+          <div className="lg:col-span-5 flex flex-col gap-2">
+            <div className="aspect-[4/3] rounded-xl bg-[#edeeef] animate-pulse" />
+            <div className="grid grid-cols-4 gap-2">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="aspect-square rounded-lg bg-[#edeeef] animate-pulse" />
               ))}
             </div>
           </div>
-          <div className="w-full space-y-4">
-            <div className="h-8 bg-(--color-surface-soft) animate-pulse rounded w-3/4"></div>
-            <div className="h-4 bg-(--color-surface-soft) animate-pulse rounded w-1/4"></div>
-            <div className="h-6 bg-(--color-surface-soft) animate-pulse rounded w-1/3"></div>
-            <div className="h-12 bg-(--color-surface-soft) animate-pulse rounded w-1/2"></div>
-            <div className="space-y-3">
+          {/* Details skeleton */}
+          <div className="lg:col-span-7 flex flex-col gap-4">
+            <div className="h-9 bg-[#edeeef] animate-pulse rounded-lg w-3/4" />
+            <div className="h-4 bg-[#edeeef] animate-pulse rounded w-1/4" />
+            <div className="h-12 bg-[#edeeef] animate-pulse rounded-lg w-1/3" />
+            <div className="h-12 bg-[#edeeef] animate-pulse rounded-lg w-48" />
+            <div className="rounded-xl border border-[#d1c6ab] p-5 space-y-3">
               {Array.from({ length: 6 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="h-4 bg-(--color-surface-soft) animate-pulse rounded"
-                ></div>
+                <div key={i} className="h-4 bg-[#edeeef] animate-pulse rounded" />
               ))}
             </div>
           </div>
-        </section>
+        </div>
       </main>
     );
   }
 
-  // Error State - Show Error with Retry
+  // ── Error State ────────────────────────────────────────────────────────────
   if (pageError) {
     return (
-      <main className="md:px-20 sm:px-10 px-6 py-8 bg-(--color-surface-soft)">
+      <main className="flex-grow pt-6 pb-12 px-4 md:px-8 max-w-[1280px] mx-auto w-full">
         <div className="flex items-center justify-center flex-col h-96">
           <div className="max-w-md flex items-center flex-col justify-center text-center gap-4">
             <div>
@@ -280,12 +249,12 @@ export default function page() {
                 className="w-32 h-32"
               />
             </div>
-            <h1 className="text-2xl font-medium text-(--color-text-primary)">
+            <h1 className="text-2xl font-semibold text-[#191c1d]">
               Oops! Something went wrong
             </h1>
-            <p className="text-(--color-text-muted) font-light">{pageError}</p>
+            <p className="text-[#4d4632] font-light">{pageError}</p>
             <Button
-              className="bg-(--color-button-yellow) hover:bg-(--color-button-yellow-hover) text-white cursor-pointer px-8 py-2"
+              className="bg-[#725c00] hover:bg-[#564500] text-white cursor-pointer px-8 py-2 rounded-lg"
               onClick={getSigleBook}
             >
               Try Again
@@ -296,82 +265,109 @@ export default function page() {
     );
   }
 
-  // Success State - Show Book Details
+  // ── Success State ──────────────────────────────────────────────────────────
   if (book) {
     return (
-      <main className="md:px-20 sm:px-10  px-6 py-8 bg-(--color-surface-soft)">
-        <section className="flex lg:flex-row flex-col items-start gap-12">
-          <div className="w-full ">
-            <Card className="lg:max-w-125 lg:min-h-100 flex justify-center rounded-md">
+      <main className="flex-grow pt-6 pb-12 px-4 md:px-8 max-w-[1280px] mx-auto w-full flex flex-col gap-6">
+
+        {/* ── Book Header Section: Image + Details ──────────────────────────── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+          {/* ── Image Gallery (5 cols) ──────────────────────────────────────── */}
+          <div className="lg:col-span-5 flex flex-col gap-2">
+            {/* Main image */}
+            <div className="aspect-[4/3] bg-[#edeeef] rounded-xl overflow-hidden relative border border-[#d1c6ab] shadow-sm group cursor-pointer">
               {book.images && (
                 <Image
                   src={book.images[currentImage]}
-                  width={200}
-                  height={200}
+                  fill
                   alt="Book Image"
                   loading="eager"
-                  className="relative aspect-video w-full object-cover"
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               )}
-            </Card>
-            <div className="flex gap-2 mt-2 overflow-y-auto custom-scrollbar">
-              {book.images &&
-                book.images.map((image, index) => (
-                  <Image
-                    src={image}
-                    width="60"
-                    height="60"
-                    alt="book image list"
+            </div>
+            {/* Thumbnails */}
+            {book.images && book.images.length > 1 && (
+              <div className="grid grid-cols-4 gap-2">
+                {book.images.map((image, index) => (
+                  <div
                     key={index}
-                    className="rounded-md aspect-square object-cover hover:scale-102 transition-transform ease-in-out duration-200"
-                    onClick={() => {
-                      setCurrentImage(index);
-                    }}
-                  />
+                    onClick={() => setCurrentImage(index)}
+                    className={`aspect-square bg-[#edeeef] rounded-lg overflow-hidden cursor-pointer transition-all ${
+                      currentImage === index
+                        ? "border-2 border-[#725c00] shadow-sm"
+                        : "border border-[#d1c6ab] hover:border-[#725c00]/50 opacity-80 hover:opacity-100"
+                    }`}
+                  >
+                    <Image
+                      src={image}
+                      width={80}
+                      height={80}
+                      alt={`Book image ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                 ))}
-            </div>
-          </div>
-          <div className="w-full">
-            <div className="flex justify-between items-center w-full ">
-              <h2 className="text-2xl font-semibold">{book.title}</h2>
-              <div className="font-normal text-sm space-x-4">
-                <Button
-                  variant={"outline"}
-                  className=" rounded-md cursor-pointer"
-                  onClick={(e) => {
-                    e.preventDefault(); // stops Link navigation
-                    e.stopPropagation();
-                    if (!isLoggedIn) {
-                      dispatch(toggleLoginDialog());
-                      return;
-                    }
-                    if (isWishlist) {
-                      removeFromWishlistByProductId(book._id);
-                    } else {
-                      handleAddToWishlist(book._id);
-                    }
-                  }}
-                >
-                  <Heart
-                    width={22}
-                    fill={book && wishlist && isWishlist ? "red" : "none"}
-                  />{" "}
-                  {isWishlist ? "Remove" : "Add"}
-                </Button>
               </div>
+            )}
+          </div>
+
+          {/* ── Basic Details & Actions (7 cols) ──────────────────────────── */}
+          <div className="lg:col-span-7 flex flex-col gap-4">
+
+            {/* Title + Wishlist */}
+            <div className="flex justify-between items-start gap-4">
+              <div>
+                <h1 className="text-2xl md:text-[32px] font-bold leading-tight text-[#191c1d] mb-1">
+                  {book.title}
+                </h1>
+                <p className="text-sm text-[#4d4632]">
+                  Posted {monthDiff(book.createdAt)} months ago
+                </p>
+              </div>
+              <button
+                aria-label={isWishlist ? "Remove from wishlist" : "Add to wishlist"}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (!isLoggedIn) {
+                    dispatch(toggleLoginDialog());
+                    return;
+                  }
+                  if (isWishlist) {
+                    removeFromWishlistByProductId(book._id);
+                  } else {
+                    handleAddToWishlist(book._id);
+                  }
+                }}
+                className="p-2 border border-[#d1c6ab] rounded-full text-[#4d4632] hover:text-[#725c00] hover:border-[#725c00] hover:bg-[#edeeef]/50 transition-all flex items-center justify-center shrink-0 cursor-pointer"
+              >
+                <Heart
+                  className="w-5 h-5"
+                  fill={isWishlist ? "#ba1a1a" : "none"}
+                  color={isWishlist ? "#ba1a1a" : "currentColor"}
+                />
+              </button>
             </div>
-            <p className="text-sm mt-2 mb-4">
-              Posted {monthDiff(book.createdAt)} months ago
-            </p>
-            <div className="flex items-end gap-6">
-              <h1 className="text-3xl font-medium">₹{book.finalPrice}</h1>
-              <p className="text-(--color-accent-yellow) text-sm font-medium ">
+
+            {/* Price + Shipping badge */}
+            <div className="flex items-end gap-4">
+              <span className="text-[40px] font-bold leading-none text-[#191c1d]">
+                ₹{book.finalPrice}
+              </span>
+              <span className="text-sm font-semibold text-[#725c00] bg-[#ffd200]/20 px-2 py-1 rounded mb-1">
                 Shipping available
-              </p>
+              </span>
             </div>
-            <Button
-              size="lg"
-              className={`${isPresentInCart ? "bg-red-500" : "bg-(--color-button-yellow)"} text-lg w-full max-w-55 min-h-11 my-4 cursor-pointer`}
+
+            {/* Add to Cart Button */}
+            <button
+              className={`w-full md:w-auto mt-1 ${
+                isPresentInCart
+                  ? "bg-[#ba1a1a] hover:bg-[#93000a]"
+                  : "bg-[#725c00] hover:bg-[#564500]"
+              } text-white text-base font-semibold py-3 px-8 rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2 cursor-pointer`}
               onClick={() => {
                 if (!isLoggedIn) {
                   dispatch(toggleLoginDialog());
@@ -385,138 +381,148 @@ export default function page() {
               }}
             >
               {isLoading ? (
-                <Loader className="animate-spin cursor-not-allowed" />
+                <Loader className="animate-spin w-5 h-5" />
               ) : (
                 <>
-                  <ShoppingCart />{" "}
+                  <ShoppingCart className="w-5 h-5" />
                   {isPresentInCart ? "Remove from Cart" : "Add to Cart"}
                 </>
               )}
-            </Button>
-            <Card className="gap-2">
-              <CardHeader className="font-semibold text-lg">
-                Book Details
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  <li className="grid grid-cols-2 text-[14px] pr-8">
-                    <h1 className="font-medium">Subject/Title</h1>
-                    <p className="justify-self-start">{book.subject}</p>
-                  </li>
-                  <li className="grid grid-cols-2 text-[14px] pr-8">
-                    <h1 className="font-medium">Course</h1>
-                    <p>{book.classType}</p>
-                  </li>
-                  <li className="grid grid-cols-2 text-[14px] pr-8">
-                    <h1 className="font-medium">Category</h1>
-                    <p>{book.category}</p>
-                  </li>
-                  <li className="grid grid-cols-2 text-[14px] pr-8">
-                    <h1 className="font-medium">Author</h1>
-                    <p>{book.author}</p>
-                  </li>
-                  <li className="grid grid-cols-2 text-[14px] pr-8">
-                    <h1 className="font-medium">Edition</h1>
-                    <p>{book.edition}</p>
-                  </li>
-                  <li className="grid grid-cols-2 text-[14px] pr-8">
-                    <h1 className="font-medium">Condition</h1>
-                    <p>{book.condition}</p>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
-        <section className="flex md:flex-row flex-col gap-12 items-center justify-between my-8">
-          <Card className="gap-2 w-full md:w-1/2 min-h-100 md:min-h-100 lg:min-h-80 ">
-            <CardHeader className="">
-              <h3 className="font-semibold text-lg">Book Description</h3>
-              <p>{book.description}</p>
-            </CardHeader>
-            <hr className="mx-4 my-2" />
-            <CardContent>
-              <h3 className="font-medium mb-2">Our Community</h3>
-              <p>
-                We're not just another shopping website where you buy from
-                professional sellers - we are a vibrant community of students,
-                book lovers across India who deliver happiness to each other!
-              </p>
-            </CardContent>
-            <CardFooter className="flex flex-col sm:flex-row gap-1 justify-between items-center w-full font-normal text-[14px]">
-              <p>Ad Id: {book._id}</p>
-              <p>Posted: {monthDiff(book.createdAt)} months ago</p>
-            </CardFooter>
-          </Card>
+            </button>
 
-          <Card className="gap-2 w-full md:w-1/2 min-h-20 lg:min-h-80 ">
-            <CardHeader className="font-semibold text-lg">Sold By</CardHeader>
-            <CardContent className="flex gap-4  w-full">
-              <div className="bg-(--color-surface-soft) rounded-full p-4 h-14 w-20 text-(--color-accent-yellow)">
-                <User />
-              </div>
-              <div>
-                <div className="flex gap-4 w-full">
-                  <h2 className="text-base font-medium">{book.seller.name}</h2>{" "}
-                  <span className="flex gap-1 font-medium items-center p-1 text-green-600 text-[10px] bg-(--color-surface-soft) ">
-                    <CircleCheck className="size-4" /> Verified
+            {/* Book Details Card */}
+            <div className="mt-2 bg-white border border-[#d1c6ab] rounded-xl p-5 shadow-sm">
+              <h3 className="text-lg font-semibold text-[#191c1d] mb-4">Book Details</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-6">
+                <div className="flex justify-between sm:block border-b sm:border-none border-[#d1c6ab]/30 pb-2 sm:pb-0">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-[#4d4632] block">
+                    Subject/Title
                   </span>
+                  <span className="text-sm font-medium text-[#191c1d]">{book.subject}</span>
                 </div>
-                <p className="text-[14px] font-normal flex">
-                  {" "}
-                  <MapPin />{" "}
-                  {book?.seller?.address?.length != 0
-                    ? `${book.seller.address[0].addressLine1} ${book.seller.address[0].addressLine1} ${book.seller.address[0].city} ${book.seller.address[0].state} ${book.seller.address[0].pin}`
-                    : "Address Not Specified"}
-                </p>
+                <div className="flex justify-between sm:block border-b sm:border-none border-[#d1c6ab]/30 pb-2 sm:pb-0">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-[#4d4632] block">
+                    Course
+                  </span>
+                  <span className="text-sm font-medium text-[#191c1d]">{book.classType}</span>
+                </div>
+                <div className="flex justify-between sm:block border-b sm:border-none border-[#d1c6ab]/30 pb-2 sm:pb-0">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-[#4d4632] block">
+                    Category
+                  </span>
+                  <span className="text-sm font-medium text-[#191c1d]">{book.category}</span>
+                </div>
+                <div className="flex justify-between sm:block border-b sm:border-none border-[#d1c6ab]/30 pb-2 sm:pb-0">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-[#4d4632] block">
+                    Author
+                  </span>
+                  <span className="text-sm font-medium text-[#191c1d]">{book.author}</span>
+                </div>
+                <div className="flex justify-between sm:block border-b sm:border-none border-[#d1c6ab]/30 pb-2 sm:pb-0">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-[#4d4632] block">
+                    Edition
+                  </span>
+                  <span className="text-sm font-medium text-[#191c1d]">{book.edition}</span>
+                </div>
+                <div className="flex justify-between sm:block">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-[#4d4632] block">
+                    Condition
+                  </span>
+                  <span className="text-sm font-medium text-[#191c1d]">{book.condition}</span>
+                </div>
               </div>
-            </CardContent>
-          </Card>
-        </section>
-        <section>
-          <h1 className="text-2xl font-semibold mt-6 mb-3">
+            </div>
+
+          </div>
+        </div>
+
+        {/* ── Description & Seller Info ─────────────────────────────────────── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-2">
+
+          {/* Description (8 cols) */}
+          <div className="lg:col-span-8">
+            <div className="bg-white border border-[#d1c6ab] rounded-xl p-6 shadow-sm h-full">
+              <h3 className="text-lg font-semibold text-[#191c1d] mb-3">Book Description</h3>
+              <p className="text-sm text-[#191c1d] mb-4 pb-4 border-b border-[#d1c6ab]/50 leading-relaxed">
+                {book.description}
+              </p>
+              <h4 className="text-base font-semibold text-[#191c1d] mb-2">Our Community</h4>
+              <p className="text-sm text-[#4d4632] leading-relaxed mb-4">
+                We&apos;re not just another shopping website where you buy from professional sellers
+                — we are a vibrant community of students, book lovers across India who deliver
+                happiness to each other!
+              </p>
+              <div className="flex flex-col sm:flex-row justify-between text-xs text-[#4d4632] mt-4 pt-3 border-t border-[#d1c6ab]/20">
+                <span>Ad Id: {book._id}</span>
+                <span>Posted: {monthDiff(book.createdAt)} months ago</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Seller Info (4 cols) */}
+          <div className="lg:col-span-4">
+            <div className="bg-white border border-[#d1c6ab] rounded-xl p-6 shadow-sm sticky top-20">
+              <h3 className="text-lg font-semibold text-[#191c1d] mb-4">Sold By</h3>
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-full bg-[#ffd200]/20 text-[#725c00] flex items-center justify-center shrink-0">
+                  <User className="w-6 h-6" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h4 className="text-sm font-semibold text-[#191c1d]">{book.seller.name}</h4>
+                    <span className="flex items-center gap-1 text-[10px] uppercase font-bold text-[#006e28] bg-[#64f17d]/30 px-2 py-0.5 rounded-full">
+                      <CircleCheck className="w-3 h-3" /> Verified
+                    </span>
+                  </div>
+                  <p className="text-xs text-[#4d4632] leading-relaxed mt-1 flex items-start gap-1">
+                    <MapPin className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                    <span>
+                      {book?.seller?.address?.length !== 0
+                        ? `${book.seller.address[0].addressLine1} ${book.seller.address[0].city} ${book.seller.address[0].state} ${book.seller.address[0].pin}`
+                        : "Address Not Specified"}
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        {/* ── How It Works Section ──────────────────────────────────────────── */}
+        <div className="mt-8 mb-4">
+          <h2 className="text-2xl md:text-[32px] font-bold text-[#191c1d] mb-6 text-center">
             How does it work?
-          </h1>
-          <div className="flex md:flex-row flex-col items-center justify-center gap-4">
-            {howWork.map(({ step, title, description, image }, index) => (
-              <Card
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {howWork.map(({ step, title, description, icon }, index) => (
+              <div
                 key={index}
-                className="w-full gap-0 max-w-100 max-h-125 min-h-50 bg-linear-to-tl from-(--color-surface-soft) to-(--color-page-bg)"
+                className="bg-[#edeeef] border border-[#d1c6ab] rounded-xl p-6 flex flex-col items-center text-center relative overflow-hidden group hover:border-[#725c00] transition-colors"
               >
-                <CardHeader className="mb-1">
-                  <span className="text-sm mb-2 bg-black rounded-md text-white max-w-17.5 text-center">
-                    {step}
-                  </span>
-                  <span className="text-lg font-medium">{title}</span>
-                </CardHeader>
-                <CardContent className="text-[14px] text-(--color-text-muted)">
-                  {description}
-                </CardContent>
-                <div className="flex item-center justify-center my-4">
-                  <Image
-                    src={image}
-                    width={100}
-                    height={100}
-                    alt={step}
-                    className="object-cover w-auto max-w-40 aspect-square"
-                  />
+                <span className="absolute top-4 left-4 bg-[#191c1d] text-white text-xs font-semibold px-3 py-1 rounded-full">
+                  {step}
+                </span>
+                <div className="h-28 mt-8 mb-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  {icon}
                 </div>
-              </Card>
+                <h3 className="text-base font-semibold text-[#191c1d] mb-2">{title}</h3>
+                <p className="text-sm text-[#4d4632]">{description}</p>
+              </div>
             ))}
           </div>
-        </section>
+        </div>
+
       </main>
     );
   }
 
-  // Fallback State
+  // ── Fallback State ─────────────────────────────────────────────────────────
   return (
-    <main className="md:px-20 sm:px-10 px-6 py-8 bg-(--color-surface-soft)">
+    <main className="flex-grow pt-6 pb-12 px-4 md:px-8 max-w-[1280px] mx-auto w-full">
       <div className="flex items-center justify-center flex-col h-96">
         <div className="text-center">
-          <h1 className="text-2xl font-medium text-(--color-text-primary)">
-            Loading...
-          </h1>
+          <h1 className="text-2xl font-semibold text-[#191c1d]">Loading...</h1>
         </div>
       </div>
     </main>
