@@ -44,14 +44,14 @@ export async function register(
         message: { email: "email should be less than 50 charater" },
       });
     }
-    if (name.length > 20) {
+    if (password.length > 20) {
       return res.status(400).json({
         isSuccess: false,
         message: { password: "password should be less than 20 charater" },
       });
     }
     const verificationToken = crypto.randomBytes(20).toString("hex");
-    await User.insertOne({
+    await User.create({
       name,
       email,
       password,
@@ -86,7 +86,7 @@ export async function verfiyEmail(
     }
     user.isVerified = true;
     user.verificationToken = null;
-    user.save();
+    await user.save();
     const accessToken = generateToken(user._id.toString());
     res.cookie("token", accessToken, {
       httpOnly: true,
@@ -144,7 +144,7 @@ export async function forgotPassword(
     const user = await User.findOne({ email });
     const resetPasswordToken = crypto.randomBytes(20).toString("hex");
     if (!user) {
-      response(res, 400, "User Does not exists");
+      return response(res, 400, "User Does not exists");
     }
     if (user) {
       user.resetPasswordToken = resetPasswordToken;
@@ -155,7 +155,7 @@ export async function forgotPassword(
         resetPasswordToken,
       );
     }
-    response(res, 200, "Password Resent link has been sent to your email");
+    return response(res, 200, "Password Reset link has been sent to your email");
   } catch (error) {
     console.log(error);
     next(error);
@@ -184,7 +184,7 @@ export async function resetPassword(
     user.password = newPassword;
     user.resetPasswordToken = null;
     user.resetPaswordExpires = null;
-    user.save();
+    await user.save();
     response(res, 200, "Your Password has been updated");
   } catch (error) {
     console.log(error);
