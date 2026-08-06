@@ -273,7 +273,7 @@ export default function page() {
       if (response.isSuccess) {
         toast.success("Your Book has been posted");
         setIsLoading(false);
-        setTimeout(()=>{router.push(`/books/${response.data.id}`)},3000)
+        setTimeout(()=>{router.push(`/books/${response.data.productid}`)},3000)
       }
     } catch (error: any) {
       console.log(error);

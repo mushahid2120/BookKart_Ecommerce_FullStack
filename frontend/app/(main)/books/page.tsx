@@ -93,6 +93,7 @@ export default function Books() {
     (state: RootState) => state.productQuery.query,
   );
 
+
   const [categoriesCheck, setCategoriesCheck] = useState<CategoriesCheckType>({
     "College Books (Higher Education Textbooks)": false,
     "Exam/Test Preparation Books": false,

@@ -109,11 +109,14 @@ export default function Header() {
     }
   };
 
+
   const handleProductQuery = (event: React.SubmitEvent) => {
     event.preventDefault();
     if (!queryRef.current) return;
-    const query = queryRef.current.value.toLowerCase();
-    dispatch(setQuery(query));
+    const form = event.target as HTMLFormElement;
+    const formData = new FormData(form);
+    const query = formData.get('queryField') as string;
+    dispatch(setQuery(query.toLowerCase()));
     if (pathname !== "/books") {
       router.push("/books");
     }
@@ -152,6 +155,7 @@ export default function Header() {
             <Input
               placeholder="Find your next favorite story..."
               ref={queryRef}
+              name="queryField"
               className="w-full h-11 pl-4 pr-10 rounded-full text-sm border bg-white/10 border-outline-variant/30 text-inverse-on-surface placeholder:text-white/50 focus-visible:ring-2 focus-visible:ring-primary-fixed"
             />
             <Button

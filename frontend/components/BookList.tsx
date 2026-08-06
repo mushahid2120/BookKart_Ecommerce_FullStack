@@ -39,8 +39,6 @@ export default function BookList({
     (state: RootState) => state.productQuery.query,
   );
 
-    console.log(productQuery)
-
   const calculateDiscount = (price: number, finalPrice: number) => {
     if (price > finalPrice && price > 0) {
       return Math.round(((price - finalPrice) / price) * 100);

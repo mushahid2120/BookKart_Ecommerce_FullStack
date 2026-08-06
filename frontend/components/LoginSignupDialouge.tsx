@@ -79,6 +79,7 @@ export default function LoginSignupDialouge({
   //Login Submission
   const handleLogin = async (data: ILogin) => {
     try {
+      console.log("login")
       setIsLoading(true);
       const { email, password } = data;
       const response = await loginApi({ email, password }).unwrap();
@@ -203,7 +204,8 @@ export default function LoginSignupDialouge({
                   placeholder="Email"
                   {...loginRegister("email", { required: true })}
                   className="pl-10 text-black"
-                  onChange={() => {
+                  onChange={(e) => {
+                    loginRegister("email").onChange(e);
                     if (loginError) setLoginError(null);
                   }}
                 />
@@ -216,7 +218,8 @@ export default function LoginSignupDialouge({
                   placeholder="Password"
                   type={isShowPassword ? "text" : "password"}
                   className="pl-10 text-black"
-                  onChange={() => {
+                  onChange={(e) => {
+                    loginRegister("password").onChange(e);
                     if (loginError) setLoginError(null);
                   }}
                 />
@@ -288,7 +291,8 @@ export default function LoginSignupDialouge({
                   {...signupRegister("name", { required: true })}
                   placeholder="Name"
                   className=" pl-10 text-black"
-                  onChange={() => {
+                  onChange={(e) => {
+                    signupRegister("name").onChange(e)
                     if (signupError.name)
                       setSignUpError((prevState: ISignUp) => ({
                         ...prevState,
@@ -311,7 +315,8 @@ export default function LoginSignupDialouge({
                   {...signupRegister("email", { required: true })}
                   placeholder="Email"
                   className="pl-10 text-black"
-                  onChange={() => {
+                  onChange={(e) => {
+                    signupRegister("email").onChange(e)
                     if (signupError.email)
                       setSignUpError((prevState: ISignUp) => ({
                         ...prevState,
@@ -333,7 +338,8 @@ export default function LoginSignupDialouge({
                   placeholder="Password"
                   type={isShowPassword ? "text" : "password"}
                   className="pl-10 text-black"
-                  onChange={() => {
+                  onChange={(e) => {
+                    signupRegister("password").onChange(e)
                     if (signupError.password)
                       setSignUpError((prevState: ISignUp) => ({
                         ...prevState,

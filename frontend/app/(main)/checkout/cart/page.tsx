@@ -386,28 +386,42 @@ export default function page() {
     rzp1.open();
   };
 
+  // ─── Derived helpers ───────────────────────────────────────────────────────
+  const steps = [
+    { key: "cart", label: "Cart", icon: <ShoppingCart className="w-4 h-4" />, num: 1 },
+    { key: "address", label: "Address", icon: <MapPin className="w-4 h-4" />, num: 2 },
+    { key: "payment", label: "Payment", icon: <CreditCard className="w-4 h-4" />, num: 3 },
+  ] as const;
+
+  const currentStepIndex = steps.findIndex((s) => s.key === cart.checkoutStatus);
+
+  // ─── Page Error State ───────────────────────────────────────────────────────
   if (pageError) {
     return (
-      <div className="flex items-center justify-center flex-col h-96 bg-(--color-surface-soft)">
-        <div className="max-w-md flex items-center flex-col justify-center text-center gap-4">
-          <div>
+      <div className="min-h-[60vh] flex items-center justify-center bg-surface-bright px-4">
+        <div className="flex flex-col items-center text-center gap-5 max-w-sm">
+          <div className="w-24 h-24 rounded-full bg-surface-container flex items-center justify-center">
             <img
-              src={`/Image/EmptyWishlist.png`}
+              src="/Image/EmptyWishlist.png"
               alt="Error"
-              className="w-32 h-32"
+              className="w-16 h-16 object-contain"
             />
           </div>
-          <h1 className="text-2xl font-medium">Something went wrong</h1>
-          <p className="text-(--color-text-muted) font-light">{pageError}</p>
-          <Button
-            className="bg-(--color-button-yellow) hover:bg-(--color-button-yellow-hover) text-white cursor-pointer px-8 py-2"
+          <div className="space-y-2">
+            <h1 className="text-[22px] font-bold text-[#191c1d]">
+              Something went wrong
+            </h1>
+            <p className="text-[14px] text-on-surface-variant">{pageError}</p>
+          </div>
+          <button
+            className="px-8 py-3 bg-primary-container hover:bg-[#ecc200] text-on-primary-container font-semibold rounded-full text-[14px] transition-colors cursor-pointer active:scale-95"
             onClick={() => {
               setIsPageLoading(true);
               fetchingCart();
             }}
           >
             Try Again
-          </Button>
+          </button>
         </div>
       </div>
     );
@@ -415,112 +429,139 @@ export default function page() {
 
   return (
     <>
-      {/* Not Logged In State */}
+      {/* ── Not Logged In State ────────────────────────────────────────────── */}
       {!user.isLoggedIn && (
-        <div className="flex items-center justify-center flex-col h-screen bg-(--color-surface-soft)">
-          <div className="max-w-md flex items-center flex-col justify-center text-center gap-4">
-            <div>
+        <div className="min-h-[70vh] flex items-center justify-center bg-surface-bright px-4">
+          <div className="flex flex-col items-center text-center gap-5 max-w-sm">
+            <div className="w-28 h-28 rounded-full bg-surface-container flex items-center justify-center">
               <img
-                src={`/Image/EmptyWishlist.png`}
+                src="/Image/EmptyWishlist.png"
                 alt="Not logged in"
-                className="w-32 h-32"
+                className="w-20 h-20 object-contain"
               />
             </div>
-            <h1 className="text-2xl font-medium">You are not logged in</h1>
-            <p className="text-(--color-text-muted) font-light">
-              Please log in to your account to proceed with checkout.
-            </p>
-            <Button
-              className="bg-(--color-button-yellow) hover:bg-(--color-button-yellow-hover) text-white cursor-pointer px-8 py-2"
+            <div className="space-y-2">
+              <h1 className="text-[24px] font-bold text-[#191c1d]">
+                You are not logged in
+              </h1>
+              <p className="text-[14px] text-on-surface-variant leading-relaxed">
+                Please log in to your account to proceed with checkout.
+              </p>
+            </div>
+            <button
+              className="px-8 py-3 bg-primary-container hover:bg-[#ecc200] text-on-primary-container font-semibold rounded-full text-[14px] transition-colors cursor-pointer active:scale-95"
               onClick={() => dispatch(toggleLoginDialog())}
             >
-              Login
-            </Button>
+              Login to Continue
+            </button>
           </div>
         </div>
       )}
 
-      {/* Loading State - Shimmer Effect */}
+      {/* ── Loading Skeleton ───────────────────────────────────────────────── */}
       {user.isLoggedIn && isPageLoading && (
-        <>
-          <div className="flex items-center gap-4 font-medium text-lg bg-(--color-surface-soft) p-4">
-            <div className="h-6 w-6 bg-(--color-surface-soft) animate-pulse rounded"></div>
-            <div className="h-4 w-32 bg-(--color-surface-soft) animate-pulse rounded"></div>
-          </div>
-          <main className="md:px-10 sm:px-10 px-4 pb-16 bg-(--color-surface-soft)">
-            <section className="flex items-center justify-center gap-4 p-6">
-              <div className="flex gap-2 w-full justify-center">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="h-12 w-24 bg-(--color-surface-soft) animate-pulse rounded-full"
-                  ></div>
-                ))}
-              </div>
-            </section>
-            <section className="flex lg:flex-row flex-col gap-8">
-              <div className="gap-4 grow max-h-160 overflow-y-scroll space-y-4">
-                {Array.from({ length: 2 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="bg-(--color-card) p-4 rounded-lg space-y-3"
-                  >
-                    <div className="h-40 bg-(--color-surface-soft) animate-pulse rounded"></div>
-                    <div className="h-4 bg-(--color-surface-soft) animate-pulse rounded w-3/4"></div>
-                    <div className="h-4 bg-(--color-surface-soft) animate-pulse rounded w-1/2"></div>
+        <div className="bg-surface-bright min-h-screen">
+          {/* Stepper skeleton */}
+          <div className="border-b border-outline-variant bg-white px-4 md:px-8 lg:px-8 py-4">
+            <div className="max-w-7xl mx-auto flex items-center justify-center gap-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <div className="flex flex-col items-center gap-1">
+                    <div className="w-10 h-10 rounded-full bg-surface-container animate-pulse" />
+                    <div className="w-14 h-3 rounded bg-surface-container animate-pulse" />
                   </div>
-                ))}
-              </div>
-              <div className="space-y-4">
-                <div className="lg:w-80 bg-(--color-card) p-4 rounded-lg space-y-3">
-                  <div className="h-6 bg-(--color-surface-soft) animate-pulse rounded w-1/2"></div>
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="h-4 bg-(--color-surface-soft) animate-pulse rounded"
-                    ></div>
-                  ))}
+                  {i < 3 && (
+                    <div className="w-16 h-0.5 bg-surface-container animate-pulse rounded mb-4" />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Content skeleton */}
+          <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-8 py-8">
+            <div className="flex lg:flex-row flex-col gap-6">
+              {/* Left panel */}
+              <div className="grow space-y-4">
+                <div className="bg-white rounded-xl border border-outline-variant p-6 space-y-4">
+                  <div className="h-6 w-40 bg-surface-container animate-pulse rounded-lg" />
+                  <div className="h-4 w-28 bg-surface-container animate-pulse rounded" />
+                  <div className="border-t border-outline-variant pt-4 space-y-4">
+                    {[1, 2].map((i) => (
+                      <div key={i} className="flex gap-4 py-4">
+                        <div className="w-24 h-32 bg-surface-container animate-pulse rounded-lg shrink-0" />
+                        <div className="flex-1 space-y-3">
+                          <div className="h-4 bg-surface-container animate-pulse rounded w-3/4" />
+                          <div className="h-3 bg-surface-container animate-pulse rounded w-1/2" />
+                          <div className="h-3 bg-surface-container animate-pulse rounded w-1/3" />
+                          <div className="flex gap-2 mt-4">
+                            <div className="h-8 w-24 bg-surface-container animate-pulse rounded-full" />
+                            <div className="h-8 w-28 bg-surface-container animate-pulse rounded-full" />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </section>
-          </main>
-        </>
+              {/* Right panel */}
+              <div className="lg:w-80 w-full">
+                <div className="bg-white rounded-xl border border-outline-variant p-6 space-y-4">
+                  <div className="h-5 w-32 bg-surface-container animate-pulse rounded-lg" />
+                  <div className="border-t border-outline-variant pt-4 space-y-3">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div key={i} className="flex justify-between">
+                        <div className="h-4 w-28 bg-surface-container animate-pulse rounded" />
+                        <div className="h-4 w-16 bg-surface-container animate-pulse rounded" />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="h-11 w-full bg-surface-container animate-pulse rounded-full mt-2" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
-      {/* Empty Cart State */}
+      {/* ── Empty Cart State ───────────────────────────────────────────────── */}
       {user.isLoggedIn &&
         !isPageLoading &&
         !pageError &&
         cart.item.length === 0 && (
-          <div className="flex items-center justify-center flex-col h-96 bg-(--color-surface-soft)">
-            <div className="max-w-md flex items-center flex-col justify-center text-center gap-4">
-              <div>
+          <div className="min-h-[60vh] flex items-center justify-center bg-surface-bright px-4">
+            <div className="flex flex-col items-center text-center gap-5 max-w-sm">
+              <div className="w-36 h-36 rounded-full bg-surface-container flex items-center justify-center">
                 <img
-                  src={`/Image/EmptyWishlist.png`}
+                  src="/Image/EmptyWishlist.png"
                   alt="Empty Cart"
-                  className="w-32 h-32"
+                  className="w-28 h-28 object-contain"
                 />
               </div>
-              <h1 className="text-2xl font-medium">Your cart is empty</h1>
-              <p className="text-(--color-text-muted) font-light">
-                Add some books to your cart to proceed with checkout.
-              </p>
-              <Button
-                className="bg-(--color-button-yellow) hover:bg-(--color-button-yellow-hover) text-white cursor-pointer px-8 py-2"
+              <div className="space-y-2">
+                <h1 className="text-[24px] font-bold text-[#191c1d]">
+                  Your cart is empty
+                </h1>
+                <p className="text-[14px] text-on-surface-variant leading-relaxed">
+                  Add some books to your cart to proceed with checkout.
+                </p>
+              </div>
+              <button
+                className="px-8 py-3 bg-primary-container hover:bg-[#ecc200] text-on-primary-container font-semibold rounded-full text-[14px] transition-colors cursor-pointer active:scale-95"
                 onClick={() => (window.location.href = "/books")}
               >
-                Continue Shopping
-              </Button>
+                Browse Books
+              </button>
             </div>
           </div>
         )}
 
-      {/* Success State - Normal Checkout Flow */}
+      {/* ── Main Checkout Flow ─────────────────────────────────────────────── */}
       {user.isLoggedIn &&
         !isPageLoading &&
         !pageError &&
         cart.item.length > 0 && (
-          <>
+          <div className="bg-surface-bright min-h-screen">
+            {/* Razorpay Script */}
             {cart.checkoutStatus === "payment" && (
               <Script
                 id="razorpay-checkout"
@@ -530,186 +571,291 @@ export default function page() {
               />
             )}
 
-            <div className="flex items-center gap-4 font-medium text-lg bg-(--color-surface-soft)  p-4">
-              <ShoppingCart className="text-(--color-header-text)" />{" "}
-              <span>
-                {cart.item.length !== 0 && cart.item.length} items in your cart
-              </span>
-            </div>
-            <main className="md:px-10 sm:px-10  px-4 pb-16    bg-(--color-surface-soft) ">
-              <section className="flex items-center justify-center gap-1 sm:gap-4 p-6">
-                <div className="flex items-center justify-center gap-2">
-                  <span
-                    className={`p-2.5 rounded-full text-white bg-(--color-surface-soft) shadow-xl ${cart.checkoutStatus === "cart" && "bg-[#d4a574]"}`}
-                  >
-                    <ShoppingCart />
-                  </span>
-                  <p className="font-medium">Cart</p>
-                </div>
-                <ChevronRight
-                  strokeWidth={2}
-                  className="text-(--color-text-muted)"
-                />
-                <div className="flex items-center justify-center gap-2">
-                  <span
-                    className={`p-2.5 rounded-full text-white bg-(--color-surface-soft) shadow-xl  ${cart.checkoutStatus === "address" && "bg-[#d4a574]"}`}
-                  >
-                    <MapPin />
-                  </span>
-                  <p className="font-medium">Address</p>
-                </div>
-                <ChevronRight
-                  strokeWidth={2}
-                  className="text-(--color-text-muted)"
-                />
-                <div className="flex items-center justify-center gap-2">
-                  <span
-                    className={`p-2.5 rounded-full text-white bg-(--color-surface-soft) shadow-xl ${cart.checkoutStatus === "payment" && "bg-[#d4a574]"}`}
-                  >
-                    <CreditCard />
-                  </span>
-                  <p className="font-medium">Payment</p>
-                </div>
-              </section>
-              <section className="flex lg:flex-row flex-col gap-8">
-                <Card className="gap-4 grow max-h-160 overflow-y-scroll">
-                  <CardHeader className="gap-0">
-                    <h1 className="text-2xl font-medium">Order Summary</h1>
-                    <p className="text-(--color-text-muted) text-sm">
-                      Review your items
-                    </p>
-                  </CardHeader>
-                  <CardContent>
-                    {cart.item &&
-                      cart.item.map((item, index) => (
-                        <div key={index}>
+            {/* ── Checkout Progress Stepper ───────────────────────────────── */}
+            <div className="bg-white border-b border-outline-variant shadow-sm">
+              <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-8 py-5">
+                <div className="flex items-center justify-center gap-0">
+                  {steps.map((step, idx) => {
+                    const isActive = cart.checkoutStatus === step.key;
+                    const isCompleted = currentStepIndex > idx;
+                    return (
+                      <div key={step.key} className="flex items-center">
+                        <div className="flex flex-col items-center gap-1.5">
                           <div
-                            className="flex flex-col sm:flex-row gap-8"
-                            key={index}
+                            className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-[14px] transition-all duration-200 ${
+                              isActive
+                                ? "bg-primary-container text-on-primary-container shadow-md shadow-primary-container/40"
+                                : isCompleted
+                                ? "bg-tertiary-container text-on-tertiary-container"
+                                : "bg-surface-container text-on-surface-variant"
+                            }`}
                           >
-                            {item.product.image && (
-                              <Image
-                                src={item.product.image}
-                                width={200}
-                                height={200}
-                                alt="cartImage "
-                                className="w-60 h-60"
-                              />
+                            {isCompleted ? (
+                              <svg
+                                className="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2.5}
+                                  d="M5 13l4 4L19 7"
+                                />
+                              </svg>
+                            ) : (
+                              step.num
                             )}
-                            <div className="space-y-1">
-                              <h1 className="font-medium">
-                                {item.product.title}
-                              </h1>
-                              <p className="text-(--color-text-muted) text-sm font-light">
-                                Quantity: {item.quantity}
-                              </p>
-                              <div>
-                                <span className="text-(--color-text-muted) font-medium line-through text-sm">
-                                  ₹{item.product.price}
-                                </span>{" "}
-                                <span className="font-medium">
-                                  ₹{item.product.finalPrice}
-                                </span>
-                              </div>
-                              <p className="text-(--color-accent-yellow) text-sm font-medium ">
-                                {item.product.shippingCharge === 0
-                                  ? "Free Shipping"
-                                  : `Shipping Charge: ₹${item.product.shippingCharge}`}
-                              </p>
-                              <div className="flex gap-4 mt-6">
-                                <Button
-                                  variant="outline"
-                                  className="text-xs cursor-pointer"
-                                  onClick={() => {
-                                    handleRemoveFromCart(item.product._id);
-                                  }}
-                                >
-                                  {isCartLoading &&
-                                  isCartLoading === item.product._id ? (
-                                    <Loader className="animate-spin cursor-not-allowed" />
+                          </div>
+                          <span
+                            className={`text-[12px] font-semibold tracking-wide ${
+                              isActive
+                                ? "text-on-primary-container"
+                                : isCompleted
+                                ? "text-on-tertiary-container"
+                                : "text-on-surface-variant"
+                            }`}
+                          >
+                            {step.label}
+                          </span>
+                        </div>
+                        {idx < steps.length - 1 && (
+                          <div
+                            className={`w-16 sm:w-24 h-0.5 mx-3 mb-5 rounded-full transition-colors duration-300 ${
+                              currentStepIndex > idx
+                                ? "bg-tertiary-container"
+                                : "bg-outline-variant"
+                            }`}
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* ── Page Header ────────────────────────────────────────────── */}
+            <div className="bg-white border-b border-outline-variant">
+              <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-8 py-4 flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-primary-container/20 flex items-center justify-center">
+                  <ShoppingCart className="w-5 h-5 text-on-primary-container" />
+                </div>
+                <div>
+                  <h1 className="text-[18px] font-bold text-[#191c1d] leading-tight">
+                    {cart.item.length !== 0 && cart.item.length}{" "}
+                    {cart.item.length === 1 ? "item" : "items"} in your cart
+                  </h1>
+                  <p className="text-[12px] text-on-surface-variant">
+                    Review your order before proceeding
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* ── Main Content ────────────────────────────────────────────── */}
+            <main className="max-w-7xl mx-auto px-4 md:px-8 lg:px-8 py-6 pb-16">
+              <div className="flex lg:flex-row flex-col gap-6 items-start">
+
+                {/* ── Left: Cart Items ──────────────────────────────────── */}
+                <div className="grow min-w-0">
+                  <div className="bg-white rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+                    {/* Card Header */}
+                    <div className="px-6 pt-6 pb-4 border-b border-outline-variant">
+                      <h2 className="text-[20px] font-bold text-[#191c1d]">
+                        Order Summary
+                      </h2>
+                      <p className="text-[13px] text-on-surface-variant mt-0.5">
+                        Review your items before checkout
+                      </p>
+                    </div>
+
+                    {/* Scrollable Items List */}
+                    <div className="max-h-150 overflow-y-auto custom-scrollbar">
+                      {cart.item &&
+                        cart.item.map((item, index) => {
+                          const isInWishlist =
+                            wishlist &&
+                            wishlist.find(
+                              (book) => item.product._id === book._id,
+                            );
+                          const isLastItem = index === cart.item.length - 1;
+
+                          return (
+                            <div
+                              key={index}
+                              className={`px-6 py-5 transition-colors hover:bg-surface-bright ${
+                                !isLastItem ? "border-b border-outline-variant" : ""
+                              }`}
+                            >
+                              <div className="flex flex-col sm:flex-row gap-4">
+                                {/* Book Thumbnail */}
+                                <div className="shrink-0">
+                                  {item.product.image ? (
+                                    <div className="w-24 h-32 rounded-lg overflow-hidden border border-outline-variant shadow-sm bg-surface-container-low">
+                                      <Image
+                                        src={item.product.image}
+                                        width={96}
+                                        height={128}
+                                        alt={item.product.title || "Book cover"}
+                                        className="w-full h-full object-cover"
+                                      />
+                                    </div>
                                   ) : (
-                                    <>
-                                      <Trash2 />{" "}
-                                      <span className="hidden sm:block">
-                                        Remove
-                                      </span>
-                                    </>
+                                    <div className="w-24 h-32 rounded-lg border border-outline-variant bg-surface-container flex items-center justify-center">
+                                      <ShoppingCart className="w-8 h-8 text-outline" />
+                                    </div>
                                   )}
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  className="text-xs cursor-pointer"
-                                  onClick={() => {
-                                    if (
-                                      wishlist.find(
-                                        (book) => book._id === item.product._id,
-                                      )
-                                    ) {
-                                      removeFromWishlistByProductId(
-                                        item.product._id,
-                                      );
-                                    } else {
-                                      handleAddToWishlist(item.product._id);
-                                    }
-                                  }}
-                                >
-                                  {isWishlistLoading &&
-                                  isWishlistLoading === item.product._id ? (
-                                    <Loader className="animate-spin cursor-not-allowed" />
-                                  ) : (
-                                    <>
-                                      <Heart
-                                        fill={
-                                          item &&
-                                          wishlist &&
-                                          wishlist.find(
-                                            (book) =>
-                                              item.product._id === book._id,
-                                          )
-                                            ? "red"
-                                            : "none"
+                                </div>
+
+                                {/* Book Details */}
+                                <div className="flex-1 min-w-0 flex flex-col justify-between gap-3">
+                                  <div className="space-y-1.5">
+                                    {/* Title */}
+                                    <h3 className="font-semibold text-[15px] text-[#191c1d] leading-snug line-clamp-2">
+                                      {item.product.title}
+                                    </h3>
+
+                                    {/* Quantity chip */}
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-surface-container text-[#191c1d] rounded-full text-[12px] font-semibold">
+                                        Qty: {item.quantity}
+                                      </span>
+                                      {/* Shipping badge */}
+                                      {item.product.shippingCharge === 0 ? (
+                                        <span className="inline-flex items-center px-2.5 py-1 bg-tertiary-container text-on-tertiary-container rounded-full text-[12px] font-semibold">
+                                          Free Shipping
+                                        </span>
+                                      ) : (
+                                        <span className="inline-flex items-center px-2.5 py-1 bg-surface-container text-on-surface-variant rounded-full text-[12px]">
+                                          Shipping: ₹{item.product.shippingCharge}
+                                        </span>
+                                      )}
+                                    </div>
+
+                                    {/* Pricing */}
+                                    <div className="flex items-baseline gap-2">
+                                      <span className="text-[18px] font-bold text-[#191c1d]">
+                                        ₹{item.product.finalPrice}
+                                      </span>
+                                      {item.product.price !== item.product.finalPrice && (
+                                        <>
+                                          <span className="text-[13px] text-outline line-through">
+                                            ₹{item.product.price}
+                                          </span>
+                                          <span className="text-[12px] font-semibold text-tertiary">
+                                            {Math.round(
+                                              ((item.product.price - item.product.finalPrice) /
+                                                item.product.price) *
+                                                100,
+                                            )}
+                                            % off
+                                          </span>
+                                        </>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  {/* Action Buttons */}
+                                  <div className="flex items-center gap-2">
+                                    {/* Remove from cart */}
+                                    <button
+                                      id={`remove-cart-${item.product._id}`}
+                                      onClick={() => handleRemoveFromCart(item.product._id)}
+                                      disabled={!!isCartLoading}
+                                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[13px] font-medium transition-all cursor-pointer ${
+                                        isCartLoading === item.product._id
+                                          ? "border-outline-variant text-on-surface-variant opacity-70 cursor-not-allowed"
+                                          : "border-outline-variant text-on-surface-variant hover:border-error hover:text-error hover:bg-error-container active:scale-95"
+                                      }`}
+                                    >
+                                      {isCartLoading === item.product._id ? (
+                                        <Loader className="w-3.5 h-3.5 animate-spin" />
+                                      ) : (
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                      )}
+                                      <span className="hidden sm:inline">Remove</span>
+                                    </button>
+
+                                    {/* Wishlist toggle */}
+                                    <button
+                                      id={`wishlist-${item.product._id}`}
+                                      onClick={() => {
+                                        if (isInWishlist) {
+                                          removeFromWishlistByProductId(item.product._id);
+                                        } else {
+                                          handleAddToWishlist(item.product._id);
                                         }
-                                      />{" "}
-                                      <span className="hidden sm:block">
-                                        Add to Wishlist
+                                      }}
+                                      disabled={!!isWishlistLoading}
+                                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[13px] font-medium transition-all cursor-pointer ${
+                                        isWishlistLoading === item.product._id
+                                          ? "border-outline-variant text-on-surface-variant opacity-70 cursor-not-allowed"
+                                          : isInWishlist
+                                          ? "border-accent-coral text-accent-coral bg-accent-coral-container hover:bg-[#fecdd3] active:scale-95"
+                                          : "border-outline-variant text-on-surface-variant hover:border-accent-coral hover:text-accent-coral hover:bg-accent-coral-container active:scale-95"
+                                      }`}
+                                    >
+                                      {isWishlistLoading === item.product._id ? (
+                                        <Loader className="w-3.5 h-3.5 animate-spin" />
+                                      ) : (
+                                        <Heart
+                                          className="w-3.5 h-3.5"
+                                          fill={isInWishlist ? "#fb7185" : "none"}
+                                        />
+                                      )}
+                                      <span className="hidden sm:inline">
+                                        {isInWishlist ? "Wishlisted" : "Add to Wishlist"}
                                       </span>
-                                    </>
-                                  )}
-                                </Button>
+                                    </button>
+                                  </div>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                          <hr className="my-4" />
-                        </div>
-                      ))}
-                  </CardContent>
-                </Card>
+                          );
+                        })}
+                    </div>
+                  </div>
+                </div>
 
-                {cart.checkoutStatus === "address" && (
-                  <Address
-                    handleAddress={handleAddress}
-                    addressDialogueStatus={addressDialogueStatus}
-                    setAddressDialogueStatus={setAddressDialogueStatus}
-                    userAddress={userAddress}
-                    orderAddress={order.shippingAddress}
-                    isAddressLoading={isAddressLoading}
-                    handleAddAddressOnOrder={handleAddAddressOnOrder}
-                    handleRemoveAddressOnOrder={handleRemoveAddressOnOrder}
-                    editingAddressId={editingAddressId}
-                    setEditingAddressId={setEditingAddressId}
-                  />
-                )}
+                {/* ── Right: Address (step 2) + Order Summary Sidebar ────── */}
+                <div className="lg:w-80 w-full shrink-0 space-y-4">
 
-                <div className="space-y-4">
+                  {/* Address Component (step 2 only) */}
+                  {cart.checkoutStatus === "address" && (
+                    <Address
+                      handleAddress={handleAddress}
+                      addressDialogueStatus={addressDialogueStatus}
+                      setAddressDialogueStatus={setAddressDialogueStatus}
+                      userAddress={userAddress}
+                      orderAddress={order.shippingAddress}
+                      isAddressLoading={isAddressLoading}
+                      handleAddAddressOnOrder={handleAddAddressOnOrder}
+                      handleRemoveAddressOnOrder={handleRemoveAddressOnOrder}
+                      editingAddressId={editingAddressId}
+                      setEditingAddressId={setEditingAddressId}
+                    />
+                  )}
+
+                  {/* ── Price Details Card ─────────────────────────────── */}
                   {cart.item && (
-                    <Card className="lg:w-80 gap-2 h-90">
-                      <CardHeader className="text-xl font-medium ">
-                        Price Details
-                      </CardHeader>
-                      <CardContent className="flex flex-col gap-4 text-sm">
-                        <div className="flex items-center justify-between">
-                          <span>Price ({cart.item.length} items)</span>
-                          <span>
+                    <div className="bg-white rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+                      {/* Card Header */}
+                      <div className="px-5 pt-5 pb-3 border-b border-outline-variant">
+                        <h2 className="text-[16px] font-bold text-[#191c1d] uppercase tracking-wide">
+                          Price Details
+                        </h2>
+                      </div>
+
+                      <div className="px-5 py-4 space-y-3">
+                        {/* Items subtotal */}
+                        <div className="flex items-center justify-between text-[14px]">
+                          <span className="text-on-surface-variant">
+                            Price ({cart.item.length}{" "}
+                            {cart.item.length === 1 ? "item" : "items"})
+                          </span>
+                          <span className="font-medium text-[#191c1d]">
                             ₹
                             {cart.item.reduce(
                               (acc: number, item: any) =>
@@ -718,10 +864,12 @@ export default function page() {
                             )}
                           </span>
                         </div>
-                        <div className="text-(--color-accent-yellow) flex items-center justify-between">
-                          <span>Discount</span>
-                          <span>
-                            - ₹
+
+                        {/* Discount */}
+                        <div className="flex items-center justify-between text-[14px]">
+                          <span className="text-on-surface-variant">Discount</span>
+                          <span className="font-semibold text-tertiary">
+                            − ₹
                             {cart.item.reduce(
                               (acc: number, item: any) =>
                                 acc +
@@ -731,21 +879,38 @@ export default function page() {
                             )}
                           </span>
                         </div>
-                        <div className="flex items-center justify-between">
-                          <span>Delivery Charges</span>
-                          <span className="text-[16A34A]">
-                            {cart.item.reduce(
-                              (acc: number, item: any) =>
-                                acc +
-                                item.product.shippingCharge * item.quantity,
-                              0,
-                            )}
-                          </span>
+
+                        {/* Delivery */}
+                        <div className="flex items-center justify-between text-[14px]">
+                          <span className="text-on-surface-variant">Delivery Charges</span>
+                          {cart.item.reduce(
+                            (acc: number, item: any) =>
+                              acc + item.product.shippingCharge * item.quantity,
+                            0,
+                          ) === 0 ? (
+                            <span className="font-semibold text-tertiary">Free</span>
+                          ) : (
+                            <span className="font-medium text-[#191c1d]">
+                              ₹
+                              {cart.item.reduce(
+                                (acc: number, item: any) =>
+                                  acc +
+                                  item.product.shippingCharge * item.quantity,
+                                0,
+                              )}
+                            </span>
+                          )}
                         </div>
-                        <hr />
-                        <div className="flex items-center justify-between font-medium ">
-                          <span>Total Amount</span>
-                          <span>
+
+                        {/* Separator */}
+                        <div className="border-t border-outline-variant my-1" />
+
+                        {/* Total */}
+                        <div className="flex items-center justify-between">
+                          <span className="text-[15px] font-bold text-[#191c1d]">
+                            Total Amount
+                          </span>
+                          <span className="text-[16px] font-bold text-[#191c1d]">
                             ₹
                             {cart.item.reduce(
                               (acc: number, item: any) =>
@@ -756,8 +921,32 @@ export default function page() {
                             )}
                           </span>
                         </div>
-                        <Button
-                          className="bg-blue-600 hover:bg-(--color-button-yellow) cursor-pointer"
+
+                        {/* Savings note */}
+                        {cart.item.reduce(
+                          (acc: number, item: any) =>
+                            acc +
+                            (item.product.price -
+                              item.product.finalPrice * item.quantity),
+                          0,
+                        ) > 0 && (
+                          <div className="bg-tertiary-container/20 border border-tertiary-container rounded-lg px-3 py-2 text-[12px] font-semibold text-on-tertiary-container">
+                            🎉 You save ₹
+                            {cart.item.reduce(
+                              (acc: number, item: any) =>
+                                acc +
+                                (item.product.price -
+                                  item.product.finalPrice * item.quantity),
+                              0,
+                            )}{" "}
+                            on this order!
+                          </div>
+                        )}
+
+                        {/* Proceed / Action Button */}
+                        <button
+                          id="proceed-checkout-btn"
+                          className="w-full flex items-center justify-center gap-2 py-3 bg-primary-container hover:bg-[#ecc200] text-on-primary-container font-bold rounded-full text-[14px] transition-colors cursor-pointer active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed mt-2"
                           onClick={async () => {
                             if (cart.checkoutStatus === "cart") {
                               await handleCreateOrder();
@@ -781,36 +970,39 @@ export default function page() {
                               dispatch(changeCheckoutStatus("cart"));
                             }
                           }}
+                          disabled={isCreateOrderLoading}
                         >
                           {isCreateOrderLoading ? (
-                            <Loader className="animate-spin cursor-not-allowed" />
+                            <Loader className="w-4 h-4 animate-spin" />
                           ) : (
                             <>
                               {cart.checkoutStatus === "cart" && (
                                 <>
-                                  {" "}
-                                  <ChevronRight /> Proceed to Checkout{" "}
+                                  <ChevronRight className="w-4 h-4" />
+                                  Proceed to Checkout
                                 </>
                               )}
                               {cart.checkoutStatus === "address" && (
                                 <>
-                                  {" "}
-                                  <ChevronRight /> Proceed to Payment{" "}
+                                  <ChevronRight className="w-4 h-4" />
+                                  Proceed to Payment
                                 </>
                               )}
                               {cart.checkoutStatus === "payment" && (
                                 <>
-                                  {" "}
-                                  <ChevronRight /> Proceed to Pay{" "}
+                                  <CreditCard className="w-4 h-4" />
+                                  Proceed to Pay
                                 </>
                               )}
                             </>
                           )}
-                        </Button>
+                        </button>
+
+                        {/* Go Back button */}
                         {cart && cart.checkoutStatus !== "cart" && (
-                          <Button
-                            variant="outline"
-                            className="cursor-pointer"
+                          <button
+                            id="go-back-btn"
+                            className="w-full flex items-center justify-center gap-2 py-2.5 border border-outline-variant text-on-surface-variant hover:bg-surface-container-low font-medium rounded-full text-[13px] transition-colors cursor-pointer active:scale-95"
                             onClick={() => {
                               if (cart.checkoutStatus === "address") {
                                 dispatch(changeCheckoutStatus("cart"));
@@ -819,50 +1011,61 @@ export default function page() {
                               }
                             }}
                           >
-                            <ChevronLeft /> Go Back
-                          </Button>
+                            <ChevronLeft className="w-4 h-4" />
+                            Go Back
+                          </button>
                         )}
-                        <p className="text-sm flex items-center gap-2 justify-center text-(--color-header-text)">
-                          <Shield /> Safe and Secure Payments
-                        </p>
-                      </CardContent>
-                    </Card>
+
+                        {/* Security note */}
+                        <div className="flex items-center justify-center gap-1.5 pt-1">
+                          <Shield className="w-3.5 h-3.5 text-tertiary" />
+                          <span className="text-[11px] text-on-surface-variant">
+                            Safe and Secure Payments
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                   )}
 
+                  {/* ── Delivery Address Card (step 2 / 3) ─────────────── */}
                   {order?.shippingAddress &&
                     !(cart?.checkoutStatus === "cart") && (
-                      <Card className="gap-2 lg:w-80">
-                        <CardHeader className="text-xl font-medium">
-                          Delivery Address
-                        </CardHeader>
-                        <CardContent className="text-[sm]">
-                          <div>{order.shippingAddress.addressLine1}</div>
+                      <div className="bg-white rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+                        <div className="px-5 pt-5 pb-3 border-b border-outline-variant flex items-center gap-2">
+                          <MapPin className="w-4 h-4 ext-surface-tint" />
+                          <h2 className="text-[15px] font-bold text-[#191c1d]">
+                            Delivery Address
+                          </h2>
+                        </div>
+                        <div className="px-5 py-4 space-y-1 text-[13px] text-on-surface-variant">
+                          <div className="font-medium text-[#191c1d]">
+                            {order.shippingAddress.addressLine1}
+                          </div>
                           <div>{order.shippingAddress.addressLine2}</div>
                           <div>
                             {order.shippingAddress.city},{" "}
                             {order.shippingAddress.state}{" "}
                             {order.shippingAddress.pin}
                           </div>
-                          <div>Phone: {order.shippingAddress.phoneNumber}</div>
-                        </CardContent>
-                        <CardFooter>
-                          <Button
-                            variant="outline"
-                            className="ml-auto cursor-pointer"
-                            onClick={() => {
-                              setAddressDialogueStatus("selectAddress");
-                            }}
+                          <div className="text-on-surface-variant">
+                            📞 {order.shippingAddress.phoneNumber}
+                          </div>
+                        </div>
+                        <div className="px-5 pb-4">
+                          <button
+                            className="w-full flex items-center justify-center gap-2 py-2 border border-outline-variant text-on-surface-variant hover:bg-surface-container-low font-medium rounded-full text-[13px] transition-colors cursor-pointer active:scale-95"
+                            onClick={() => setAddressDialogueStatus("selectAddress")}
                           >
-                            <MapPin />
-                            <span>Change Address</span>
-                          </Button>
-                        </CardFooter>
-                      </Card>
+                            <MapPin className="w-3.5 h-3.5" />
+                            Change Address
+                          </button>
+                        </div>
+                      </div>
                     )}
                 </div>
-              </section>
+              </div>
             </main>
-          </>
+          </div>
         )}
     </>
   );

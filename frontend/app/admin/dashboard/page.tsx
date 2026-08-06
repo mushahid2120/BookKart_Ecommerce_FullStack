@@ -1,11 +1,12 @@
 "use client";
+
 import { IOrder } from "@/store/slice/adminSlice";
 import { RootState } from "@/store/store";
-import { RechartsDevtools } from "@recharts/devtools";
 import {
   BookOpen,
   IndianRupee,
   ShoppingBagIcon,
+  TrendingUp,
   Users,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -13,68 +14,25 @@ import { useSelector } from "react-redux";
 import {
   Bar,
   BarChart,
-  ResponsiveContainer,
   CartesianGrid,
+  Cell,
   Legend,
   Pie,
   PieChart,
   PieLabelRenderProps,
   PieSectorShapeProps,
+  ResponsiveContainer,
   Sector,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
 
-const margin = {
-  top: 20,
-  right: 0,
-  left: 0,
-  bottom: 0,
-};
+// ─── Types ──────────────────────────────────────────────────────────────────
 
-const stats = [
-  {
-    title: "Total Orders",
-    value: "38",
-    delta: "+12%",
-    description: "from last month",
-    icon: ShoppingBagIcon,
-    color: "bg-(--color-primary)/10 text-(--color-primary)",
-  },
-  {
-    title: "Total Users",
-    value: "53",
-    delta: "+8%",
-    description: "from last month",
-    icon: Users,
-    color: "bg-(--color-accent-yellow)/10 text-(--color-accent-yellow)",
-  },
-  {
-    title: "Total Products",
-    value: "10",
-    delta: "+5%",
-    description: "from last month",
-    icon: BookOpen,
-    color: "bg-(--color-surface-muted)/10 text-(--color-surface-muted)",
-  },
-  {
-    title: "Total Revenue",
-    value: "₹5,604",
-    delta: "+15%",
-    description: "from last month",
-    icon: IndianRupee,
-    color: "bg-(--color-accent-yellow)/10 text-(--color-accent-yellow)",
-  },
-];
-
-
-
-
-
-interface ISalesData{
-  month:string;
-  sales: number
+interface ISalesData {
+  month: string;
+  sales: number;
 }
 
 interface IOrderStatusData {
@@ -83,14 +41,70 @@ interface IOrderStatusData {
   color: string;
 }
 
+// ─── Static stat card definitions (values injected from dashboardCount) ──────
+
+const stats = [
+  {
+    title: "Total Orders",
+    value: "38",
+    delta: "+12%",
+    description: "from last month",
+    icon: ShoppingBagIcon,
+    iconBg: "bg-[#ffd200]/20",
+    iconColor: "text-[#725c00]",
+  },
+  {
+    title: "Total Users",
+    value: "53",
+    delta: "+8%",
+    description: "from last month",
+    icon: Users,
+    iconBg: "bg-[#e2dfe0]",
+    iconColor: "text-[#636263]",
+  },
+  {
+    title: "Total Products",
+    value: "10",
+    delta: "+5%",
+    description: "from last month",
+    icon: BookOpen,
+    iconBg: "bg-[#e1e3e4]",
+    iconColor: "text-on-surface-variant",
+  },
+  {
+    title: "Total Revenue",
+    value: "₹5,604",
+    delta: "+15%",
+    description: "from last month",
+    icon: IndianRupee,
+    iconBg: "bg-[#ffd200]/20",
+    iconColor: "text-[#725c00]",
+  },
+];
+
+// ─── Pie chart colors matching Stitch design ─────────────────────────────────
+
+const PIE_COLORS = ["#725c00", "#53e16f", "#ecc200", "#ba1a1a"];
+
+const RADIAN = Math.PI / 180;
+
+// ─── Component ───────────────────────────────────────────────────────────────
+
 export default function AdminDashboardPage() {
   const dashboardData = useSelector((state: RootState) => state.admin);
   const [dashboardCount, setDashboardCount] = useState<number[]>([]);
-  const [salesData,setSalesData]=useState<ISalesData[]>([])
-  const [orderStatus,setOrderStatus]=useState<IOrderStatusData[]>([])
+  const [salesData, setSalesData] = useState<ISalesData[]>([]);
+  const [orderStatus, setOrderStatus] = useState<IOrderStatusData[]>([]);
 
+  // ── Derived counts ──────────────────────────────────────────────────────
   useEffect(() => {
-    if(!dashboardData || !dashboardData.order || !dashboardData.totalProducts || !dashboardData.totalUser) return 
+    if (
+      !dashboardData ||
+      !dashboardData.order ||
+      !dashboardData.totalProducts ||
+      !dashboardData.totalUser
+    )
+      return;
     const dashboardCount = [
       dashboardData.order?.length,
       dashboardData.totalUser,
@@ -103,9 +117,78 @@ export default function AdminDashboardPage() {
     setDashboardCount(dashboardCount);
   }, [dashboardData]);
 
-  const RADIAN = Math.PI / 180;
-  const PIE_COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+  // ── Sales chart data ────────────────────────────────────────────────────
+  const formatSalesData = (orders: IOrder[]) => {
+    const salesMap: Record<string, number> = {};
+    orders.forEach((order) => {
+      if (order.paymentStatus === "complete") {
+        const date = new Date(order.createdAt);
+        const monthYear = date.toLocaleDateString("en-US", {
+          month: "short",
+          year: "numeric",
+        });
+        salesMap[monthYear] = (salesMap[monthYear] || 0) + order.totalAmount;
+      }
+    });
+    return Object.entries(salesMap).map(([month, sales]) => ({
+      month,
+      sales,
+    }));
+  };
 
+  // ── Order status pie data ───────────────────────────────────────────────
+  const formatOrderStatusData = (orders: IOrder[]): IOrderStatusData[] => {
+    const totalOrders = orders.length;
+    const counts = {
+      processing: 0,
+      shipped: 0,
+      delivered: 0,
+      cancelled: 0,
+    };
+    orders.forEach((order) => {
+      const status = order.status?.toLowerCase();
+      if (status in counts) {
+        counts[status as keyof typeof counts]++;
+      }
+    });
+    const getPercentage = (count: number) => {
+      if (totalOrders === 0) return 0;
+      return Math.round((count / totalOrders) * 100);
+    };
+    return [
+      {
+        label: "Processing",
+        value: getPercentage(counts.processing),
+        color: "bg-(--color-accent-yellow)",
+      },
+      {
+        label: "Shipped",
+        value: getPercentage(counts.shipped),
+        color: "bg-(--color-primary)",
+      },
+      {
+        label: "Delivered",
+        value: getPercentage(counts.delivered),
+        color: "bg-(--color-accent-yellow)/50",
+      },
+      {
+        label: "Cancelled",
+        value: getPercentage(counts.cancelled),
+        color: "bg-(--color-danger)",
+      },
+    ];
+  };
+
+  useEffect(() => {
+    if (dashboardData?.order) {
+      const salesDataResult = formatSalesData(dashboardData.order);
+      const orderStatusResult = formatOrderStatusData(dashboardData.order);
+      setSalesData(salesDataResult);
+      setOrderStatus(orderStatusResult);
+    }
+  }, [dashboardData.order]);
+
+  // ── Custom pie label ────────────────────────────────────────────────────
   const renderCustomizedLabel = ({
     cx,
     cy,
@@ -114,7 +197,7 @@ export default function AdminDashboardPage() {
     outerRadius,
     percent,
     name,
-    index, // 1. Extract index to grab the correct color
+    index,
   }: PieLabelRenderProps & { name?: string; index: number }) => {
     if (
       cx == null ||
@@ -124,8 +207,6 @@ export default function AdminDashboardPage() {
     ) {
       return null;
     }
-
-    // Skip rendering if percentage is 0% to prevent outside clutter
     if (!percent) return null;
 
     const ncx = Number(cx);
@@ -133,30 +214,23 @@ export default function AdminDashboardPage() {
     const nOuterRadius = Number(outerRadius);
     const angle = midAngle ?? 0;
 
-    // 2. Position the label outside (add 30px padding past the outer radius)
     const outerLabelRadius = nOuterRadius + 30;
     const x = ncx + outerLabelRadius * Math.cos(-angle * RADIAN);
     const y = ncy + outerLabelRadius * Math.sin(-angle * RADIAN);
 
-    // 3. Position coordinates for an optional anchor line starting point
     const lineStartRadius = nOuterRadius + 5;
     const lx1 = ncx + lineStartRadius * Math.cos(-angle * RADIAN);
     const ly1 = ncy + lineStartRadius * Math.sin(-angle * RADIAN);
 
-    // Coordinate for line ending near text
     const lineEndRadius = nOuterRadius + 22;
     const lx2 = ncx + lineEndRadius * Math.cos(-angle * RADIAN);
     const ly2 = ncy + lineEndRadius * Math.sin(-angle * RADIAN);
 
-    // 4. Resolve the matching hex color from your existing colors array
     const sliceColor = PIE_COLORS[index % PIE_COLORS.length];
-
-    // Decide alignment: if text is on the right side, align 'start'. If left, align 'end'.
     const isRightSide = x > ncx;
 
     return (
       <g>
-        {/* Visual connector line matching the slice color */}
         <line
           x1={lx1}
           y1={ly1}
@@ -165,11 +239,10 @@ export default function AdminDashboardPage() {
           stroke={sliceColor}
           strokeWidth={1.5}
         />
-        {/* Label text matching the slice color */}
         <text
           x={x}
           y={y}
-          fill={sliceColor} // 5. Applied respective label color here
+          fill={sliceColor}
           textAnchor={isRightSide ? "start" : "end"}
           dominantBaseline="central"
           fontSize="12px"
@@ -187,242 +260,273 @@ export default function AdminDashboardPage() {
     );
   };
 
-const formatSalesData = (orders:IOrder[]) => {
-   const salesMap: Record<string, number> = {};
-  orders.forEach(order => {
-    // Only aggregate if payment is finalized and successful
-    if (order.paymentStatus === "complete") {
-      const date = new Date(order.createdAt);
-      
-      // Format to "MMM YYYY" (e.g., "May 2026")
-      const monthYear = date.toLocaleDateString("en-US", {
-        month: "short",
-        year: "numeric"
-      });
-
-      // Accumulate total amount
-      salesMap[monthYear] = (salesMap[monthYear] || 0) + order.totalAmount;
+  // ── Status badge colour helper ──────────────────────────────────────────
+  const getStatusStyle = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case "processing":
+        return "bg-[#fff8dc] text-[#705b00] border border-[#ffd200]/40";
+      case "shipped":
+        return "bg-[#e8fdf0] text-tertiary border border-[#64f17d]/40";
+      case "delivered":
+        return "bg-[#d4f8e8] text-[#00531c] border border-[#53e16f]/40";
+      case "cancelled":
+        return "bg-[#ffdad6] text-[#93000a] border border-[#ba1a1a]/30";
+      default:
+        return "bg-surface-container text-on-surface-variant border border-outline-variant/40";
     }
-  });
-
-  // Convert the aggregated object back into a structured array
-  return Object.entries(salesMap).map(([month, sales]) => ({
-    month,
-    sales
-  }));
-};
-
-useEffect(()=>{
-  if(dashboardData?.order){
-  const salesData = formatSalesData(dashboardData.order);
-  const OrderStatusData=formatOrderStatusData(dashboardData.order)
-  setSalesData(salesData)
-  setOrderStatus(OrderStatusData)
-  }
-},[dashboardData.order])
-
-
-const formatOrderStatusData = (orders: IOrder[]): IOrderStatusData[] => {
-  const totalOrders = orders.length;
-
-  // 1. Initialize our counters for each specific status
-  const counts = {
-    processing: 0,
-    shipped: 0,
-    delivered: 0,
-    cancelled: 0,
   };
 
-  // 2. Count the occurrences safely
-  orders.forEach(order => {
-    // Normalize string to lowercase to prevent casing mismatch bugs
-    const status = order.status?.toLowerCase(); 
-    if (status in counts) {
-      counts[status as keyof typeof counts]++;
-    }
-  });
-
-  // 3. Helper to safely calculate percentages without dividing by zero
-  const getPercentage = (count: number) => {
-    if (totalOrders === 0) return 0;
-    return Math.round((count / totalOrders) * 100);
-  };
-
-  // 4. Return the structured UI data array with your custom Tailwind classes
-  return [
-    { 
-      label: "Processing", 
-      value: getPercentage(counts.processing), 
-      color: "bg-(--color-accent-yellow)" 
-    },
-    { 
-      label: "Shipped", 
-      value: getPercentage(counts.shipped), 
-      color: "bg-(--color-primary)" 
-    },
-    { 
-      label: "Delivered", 
-      value: getPercentage(counts.delivered), 
-      color: "bg-(--color-accent-yellow)/50" 
-    },
-    { 
-      label: "Cancelled", 
-      value: getPercentage(counts.cancelled), 
-      color: "bg-(--color-danger)" 
-    },
-  ];
-};
-
+  // ── Render ──────────────────────────────────────────────────────────────
   return (
-    <div className="space-y-6 px-2">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between"></div>
+    <div className="flex flex-col gap-6 max-w-7xl mx-auto w-full">
 
-      {/* Dashboard Cards Counter Data */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+      {/* ── Stats Cards ──────────────────────────────────────────────────── */}
+      <section
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+        aria-label="Key metrics"
+      >
         {stats.map((item, index) => {
           const Icon = item.icon;
+          const rawValue = dashboardCount[index];
+          const displayValue =
+            rawValue !== undefined
+              ? index === 3
+                ? `₹${rawValue.toLocaleString("en-IN")}`
+                : rawValue.toLocaleString("en-IN")
+              : item.value;
+
           return (
             <div
               key={item.title}
-              className="rounded-3xl bg-(--color-card) px-3 py-4  w-fit shadow-sm"
+              className="bg-white rounded-xl p-6 border border-outline-variant shadow-sm hover:-translate-y-1 transition-transform duration-200"
             >
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-sm text-(--color-text-muted)">
-                    {item.title}
-                  </p>
+              {/* Icon + Trend Row */}
+              <div className="flex items-start justify-between mb-3">
+                <div
+                  className={`w-10 h-10 rounded-full ${item.iconBg} flex items-center justify-center ${item.iconColor}`}
+                >
+                  <Icon className="h-5 w-5" aria-hidden="true" />
                 </div>
+                <span className="flex items-center gap-1 text-tertiary text-xs font-semibold">
+                  <TrendingUp className="h-3.5 w-3.5" aria-hidden="true" />
+                  {item.delta}
+                </span>
               </div>
-              <div className=" gap-2 flex items-center justify-between text-sm text-(--color-text-muted)">
-                <div className={`${item.color} rounded-2xl p-3`}>
-                  <Icon className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="mt-3 text-3xl font-semibold">{dashboardCount[index]}</p>
-                  <span>{item.delta}</span>
-                  <span className="text-xs">{item.description}</span>
-                </div>
-              </div>
+
+              {/* Label */}
+              <p className="text-sm text-on-surface-variant mb-1">{item.title}</p>
+
+              {/* Value */}
+              <p className="text-4xl font-bold text-[#191c1d] leading-tight">
+                {displayValue}
+              </p>
+
+              {/* Subtitle */}
+              <p className="text-xs text-on-surface-variant mt-2 font-medium tracking-wide uppercase">
+                {item.description}
+              </p>
             </div>
           );
         })}
-      </div>
+      </section>
 
-      <div className="grid gap-4 xl:grid-cols-2 ">
-        <section className="rounded-3xl  w-[94vw] sm:w-full border border-(--color-header-border) bg-(--color-card) px-2 py-4 shadow-sm">
-          <div className="flex items-center justify-between gap-4">
-            <p className="text-md text-(--color-text-muted)">Monthly Sales</p>
-          </div>
-
-          <div className="w-full">
-            <ResponsiveContainer width="100%" height={400}>
-              <BarChart data={salesData} margin={margin}>
-                <XAxis dataKey="month" stroke="#8884d8" />
-                <YAxis />
-                <Tooltip wrapperStyle={{ width: 100, backgroundColor: "#ccc" }} />
-                <Legend
-                  width={100}
-                  wrapperStyle={{
-                    bottom: 20,
-                    right: 0,
-                    lineHeight: "40px",
-                  }}
+      {/* ── Analytics Row ────────────────────────────────────────────────── */}
+      <section
+        className="grid grid-cols-1 lg:grid-cols-3 gap-4"
+        aria-label="Analytics charts"
+      >
+        {/* Monthly Sales Bar Chart */}
+        <div className="lg:col-span-2 bg-white rounded-xl p-6 border border-outline-variant shadow-sm flex flex-col min-h-80">
+          <h2 className="text-xl font-semibold text-[#191c1d] mb-6">
+            Monthly Sales
+          </h2>
+          <div className="flex-1">
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart
+                data={salesData}
+                margin={{ top: 4, right: 8, left: 0, bottom: 0 }}
+              >
+                <CartesianGrid
+                  stroke="#d1c6ab"
+                  strokeDasharray="4 4"
+                  vertical={false}
                 />
-                <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-                <Bar dataKey="sales" fill="#8884d8" barSize={30} />
-                <RechartsDevtools />
+                <XAxis
+                  dataKey="month"
+                  tick={{ fill: "#4d4632", fontSize: 12 }}
+                  axisLine={{ stroke: "#d1c6ab" }}
+                  tickLine={false}
+                />
+                <YAxis
+                  tick={{ fill: "#4d4632", fontSize: 12 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#ffffff",
+                    border: "1px solid #d1c6ab",
+                    borderRadius: "8px",
+                    fontSize: "13px",
+                    color: "#191c1d",
+                  }}
+                  cursor={{ fill: "#ffd200", opacity: 0.15 }}
+                />
+                <Legend
+                  wrapperStyle={{ fontSize: "12px", color: "#4d4632" }}
+                />
+                <Bar
+                  dataKey="sales"
+                  name="Sales"
+                  fill="#ecc200"
+                  radius={[4, 4, 0, 0]}
+                  barSize={32}
+                  isAnimationActive={true}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </section>
+        </div>
 
-        <section className="rounded-3xl flex flex-col justify-center items-center  w-[94vw] sm:w-full border border-(--color-header-border) bg-(--color-card) p-6 shadow-sm">
-          <PieChart
-            // 1. Force the internal Recharts wrappers to allow visible overflowing text
-            className="[&_.recharts-surface]:overflow-visible [&_.recharts-wrapper]:overflow-visible"
-            style={{
-              width: "100%",
-              maxWidth: "400px",
-              maxHeight: "50vh",
-              aspectRatio: 1,
-            }}
-            // 2. Add an explicit margin to pad the interior boundaries for long labels
-            margin={{ top: 20, right: 50, bottom: 20, left: 50 }}
-            responsive
+        {/* Order Status Pie Chart */}
+        <div className="bg-white rounded-xl p-6 border border-outline-variant shadow-sm flex flex-col items-center justify-center min-h-80">
+          <h2 className="text-xl font-semibold text-[#191c1d] mb-4 self-start">
+            Order Status
+          </h2>
+          <div
+            className="w-full flex-1"
+            style={{ minHeight: 200 }}
           >
-            <Pie
-              data={orderStatus}
-              labelLine={false}
-              outerRadius="60%"
-              nameKey="label"
-              label={renderCustomizedLabel}
-              fill="#8884d8"
-              dataKey="value"
-              isAnimationActive={true}
-              shape={MyCustomPie}
-            />
-            <RechartsDevtools />
-          </PieChart>
-          <div className="flex sm:gap-4 gap-2 items-center justify-center sm:text-xs text-[10px]">
-            <span className="flex justify-center items-center gap-1 text-[#0088FE]">
-              <div className="w-3 h-3 bg-[#0088FE] rounded-full "></div>
-              <p>Processing</p>
-            </span>
-            <span className="flex  justify-center items-center gap-1 text-[#00C49F]">
-              <div className="w-3 h-3 bg-[#00C49F] rounded-full "></div>
-              <p>Shipped</p>
-            </span>
-            <span className="flex  justify-center items-center gap-1 text-[#FFBB28]">
-              <div className="w-3 h-3 bg-[#FFBB28] rounded-full "></div>
-              <p>Delivered</p>
-            </span>
-            <span className="flex  justify-center items-center gap-1 text-[#FF8042]">
-              <div className="w-3 h-3 bg-[#FF8042] rounded-full "></div>
-              <p>Cancelled</p>
-            </span>
+            <PieChart
+              className="[&_.recharts-surface]:overflow-visible [&_.recharts-wrapper]:overflow-visible"
+              style={{
+                width: "100%",
+                maxWidth: 360,
+                margin: "0 auto",
+                aspectRatio: 1,
+              }}
+              margin={{ top: 16, right: 48, bottom: 16, left: 48 }}
+            >
+              <Pie
+                data={orderStatus}
+                labelLine={false}
+                outerRadius="60%"
+                nameKey="label"
+                label={renderCustomizedLabel}
+                fill="#8884d8"
+                dataKey="value"
+                isAnimationActive={true}
+                shape={MyCustomPie}
+              >
+                {orderStatus.map((_, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={PIE_COLORS[index % PIE_COLORS.length]}
+                  />
+                ))}
+              </Pie>
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#ffffff",
+                  border: "1px solid #d1c6ab",
+                  borderRadius: "8px",
+                  fontSize: "13px",
+                }}
+                formatter={(value, name) => [
+                  `${value}%`,
+                  name,
+                ]}
+              />
+            </PieChart>
           </div>
-        </section>
-      </div>
 
-      <section className="rounded-3xl border border-(--color-header-border) bg-(--color-card) p-6 shadow-sm">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <h3 className="mt-2 text-xl font-semibold">Recent Orders</h3>
+          {/* Legend */}
+          <div className="flex flex-wrap justify-center gap-3 mt-4">
+            {(
+              [
+                { label: "Processing", color: PIE_COLORS[0] },
+                { label: "Shipped", color: PIE_COLORS[1] },
+                { label: "Delivered", color: PIE_COLORS[2] },
+                { label: "Cancelled", color: PIE_COLORS[3] },
+              ] as const
+            ).map((entry) => (
+              <span
+                key={entry.label}
+                className="flex items-center gap-1.5 text-xs text-on-surface-variant"
+              >
+                <span
+                  className="w-3 h-3 rounded-full inline-block shrink-0"
+                  style={{ backgroundColor: entry.color }}
+                />
+                {entry.label}
+              </span>
+            ))}
           </div>
         </div>
-        <div className="mt-2 max-h-80 overflow-x-auto">
-          <table className="min-w-full divide-y divide-(--color-header-border)">
+      </section>
+
+      {/* ── Recent Orders Table ──────────────────────────────────────────── */}
+      <section
+        className="bg-white rounded-xl border border-outline-variant shadow-sm overflow-hidden mb-8"
+        aria-label="Recent orders"
+      >
+        <div className="px-6 py-5 border-b border-outline-variant">
+          <h2 className="text-xl font-semibold text-[#191c1d]">
+            Recent Orders
+          </h2>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse min-w-150">
             <thead>
-              <tr className="text-left text-sm uppercase text-(--color-text-muted)">
-                <th className="py-3 pr-6">Order ID</th>
-                <th className="py-3 pr-6">Customer</th>
-                <th className="py-3 pr-6">Date</th>
-                <th className="py-3 pr-6">Amount</th>
-                <th className="py-3 pr-6">Status</th>
+              <tr className="bg-surface-container-low border-b border-outline-variant">
+                <th className="px-6 py-3 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+                  Order ID
+                </th>
+                <th className="px-6 py-3 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+                  Customer
+                </th>
+                <th className="px-6 py-3 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+                  Date
+                </th>
+                <th className="px-6 py-3 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+                  Amount
+                </th>
+                <th className="px-6 py-3 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+                  Status
+                </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-(--color-header-border)">
-              {dashboardData?.order && dashboardData?.order.map((order) => (
-                <tr key={order._id} className="hover:bg-(--color-surface-muted)">
-                  <td className="py-4 pr-6 font-medium text-(--color-header-text)">
-                    #{order._id?.slice(0,5)}
-                  </td>
-                  <td className="py-4 pr-6 text-(--color-text-muted) whitespace-nowrap">
-                    {order.user.name}
-                  </td>
-                  <td className="py-4 pr-6 text-(--color-text-muted)">
-                    {new Date(order.createdAt).toLocaleDateString("en-GB")}
-                  </td>
-                  <td className="py-4 pr-6 text-(--color-text-muted)">
-                    {order.totalAmount}
-                  </td>
-                  <td className="py-4 pr-6">
-                    <span className="rounded-full bg-(--color-surface-muted) px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-(--color-header-text)">
-                      {order.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
+            <tbody className="divide-y divide-outline-variant">
+              {dashboardData?.order &&
+                dashboardData.order.map((order) => (
+                  <tr
+                    key={order._id}
+                    className="hover:bg-surface-container transition-colors duration-150"
+                  >
+                    <td className="px-6 py-4 text-sm font-medium text-[#191c1d]">
+                      #{order._id?.slice(0, 5)}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-on-surface-variant whitespace-nowrap">
+                      {order.user.name}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-on-surface-variant">
+                      {new Date(order.createdAt).toLocaleDateString("en-GB")}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-[#191c1d] font-semibold">
+                      ₹{order.totalAmount.toLocaleString("en-IN")}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider ${getStatusStyle(
+                          order.status
+                        )}`}
+                      >
+                        {order.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>

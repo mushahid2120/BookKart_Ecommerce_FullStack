@@ -281,7 +281,7 @@ export default function Address({
                       <Edit size={20} />
                     </Button>
                   </CardHeader>
-                  <CardContent className="text-(--color-header-text) text-sm">
+                  <CardContent className="text-black text-sm">
                     <div>{add.addressLine1}</div>
                     <div>{add.addressLine2}</div>
                     <div>
