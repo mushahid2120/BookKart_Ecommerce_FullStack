@@ -233,7 +233,6 @@ export default function AdminOrdersPage() {
     const colors: Record<string, string> = {
       pending: "bg-[#e2dfe0] text-[#636263]",
       complete: "bg-[#e7e8e9] text-[#191c1d]",
-      completed: "bg-[#e7e8e9] text-[#191c1d]",
       failed: "bg-[#ffdad6] text-[#93000a]",
     };
     return colors[status?.toLowerCase()] || "bg-[#e1e3e4] text-[#191c1d]";
@@ -348,7 +347,7 @@ export default function AdminOrdersPage() {
                     </SelectTrigger>
                     <SelectContent className="bg-white border border-outline-variant">
                       <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="completed">Completed</SelectItem>
+                      <SelectItem value="complete">Completed</SelectItem>
                       <SelectItem value="failed">Failed</SelectItem>
                     </SelectContent>
                   </Select>
@@ -782,7 +781,7 @@ export default function AdminOrdersPage() {
                         </SelectTrigger>
                         <SelectContent className="bg-white border border-outline-variant">
                           <SelectItem value="pending">Pending</SelectItem>
-                          <SelectItem value="completed">Completed</SelectItem>
+                          <SelectItem value="complete">Completed</SelectItem>
                           <SelectItem value="failed">Failed</SelectItem>
                         </SelectContent>
                       </Select>
